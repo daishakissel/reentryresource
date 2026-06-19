@@ -1,0 +1,12 @@
+{
+  "name": "reentryresource",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Resources site for homeless people",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  }
+}
