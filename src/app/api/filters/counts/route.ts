@@ -69,14 +69,14 @@ export async function GET(req: NextRequest) {
 
   await Promise.all(
     junctions.map(async (j) => {
-      let query = client.from(j.table).select(`resource_id, ${j.fk}`);
+      let query = client.from(j.table).select("*");
       if (scopedResourceIds) {
         query = query.in("resource_id", Array.from(scopedResourceIds));
       }
       const { data } = await query;
       if (data) {
         for (const row of data) {
-          const id = (row as Record<string, string>)[j.fk];
+          const id = (row as unknown as Record<string, string>)[j.fk];
           counts[j.key][id] = (counts[j.key][id] || 0) + 1;
         }
       }
