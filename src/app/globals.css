@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  .dark h1,
+  .dark h2,
+  .dark h3 {
+    color: #E5E7EB;
+  }
+
+  .dark p {
+    color: #D1D5DB;
+  }
+
+  .dark input,
+  .dark select,
+  .dark textarea {
+    background-color: #1A3C4D;
+    border-color: #234E63;
+    color: #E5E7EB;
+  }
+
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    color: #6B7280;
+  }
+
+  .dark table thead {
+    background-color: #122E3B;
+  }
+
+  .dark table th,
+  .dark table td {
+    color: #D1D5DB;
+  }
+
+  .dark table tr {
+    border-color: #234E63;
+  }
+}
