@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
@@ -85,6 +85,14 @@ function TagList({ label, items }: { label: string; items: string[] }) {
 }
 
 export default function ResourceDetailPage({ params }: { params: { id: string } }) {
+  return (
+    <Suspense fallback={<p className="text-gray-500">Loading...</p>}>
+      <ResourceDetailInner params={params} />
+    </Suspense>
+  );
+}
+
+function ResourceDetailInner({ params }: { params: { id: string } }) {
   const searchParams = useSearchParams();
   const backUrl = searchParams.get("from") || "/";
   const [resource, setResource] = useState<ResourceDetail | null>(null);

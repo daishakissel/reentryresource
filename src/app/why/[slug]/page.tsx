@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { Suspense, useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { notFound } from "next/navigation";
 import ViewToggle from "@/components/ViewToggle";
@@ -22,6 +22,14 @@ interface WhyPageProps {
 }
 
 export default function WhyPage({ params }: WhyPageProps) {
+  return (
+    <Suspense fallback={<p className="text-gray-500">Loading...</p>}>
+      <WhyPageInner params={params} />
+    </Suspense>
+  );
+}
+
+function WhyPageInner({ params }: WhyPageProps) {
   const category = WHY_CATEGORIES.find((c) => c.slug === params.slug);
   const searchParams = useSearchParams();
   const [resources, setResources] = useState<Resource[]>([]);

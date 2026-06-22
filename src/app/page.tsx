@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { Suspense, useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import ViewToggle from "@/components/ViewToggle";
 import ResourceFilter from "@/components/ResourceFilter";
@@ -16,6 +16,14 @@ const JUNCTION_MAP: Record<string, { table: string; fk: string }> = {
 };
 
 export default function HomePage() {
+  return (
+    <Suspense fallback={<p className="text-gray-500">Loading...</p>}>
+      <HomePageInner />
+    </Suspense>
+  );
+}
+
+function HomePageInner() {
   const searchParams = useSearchParams();
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
