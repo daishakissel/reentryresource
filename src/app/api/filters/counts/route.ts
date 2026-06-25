@@ -20,30 +20,28 @@ export async function GET(req: NextRequest) {
     who_centerings: {},
   };
 
-  // If scoped to a WHY category, first get the valid topic IDs and then the resource IDs
+  // If scoped to a WHY category, get resource IDs directly from junction table
   let scopedResourceIds: Set<string> | null = null;
-  let scopedTopicIds: Set<string> | null = null;
 
   if (whyCategoryId) {
-    const { data: topicLinks } = await client
-      .from("what_topics_why_categories")
-      .select("what_topic_id")
+    const { data: whyLinks } = await client
+      .from("resources_why_categories")
+      .select("resource_id")
       .eq("why_category_id", whyCategoryId);
 
-    scopedTopicIds = new Set((topicLinks ?? []).map((l: any) => l.what_topic_id));
-
-    const { data: resources } = await client
-      .from("resources")
-      .select("id, what_topic_id")
-      .in("what_topic_id", Array.from(scopedTopicIds));
-
-    scopedResourceIds = new Set((resources ?? []).map((r: any) => r.id));
+    scopedResourceIds = new Set((whyLinks ?? []).map((l: any) => l.resource_id));
 
     // Count WHAT topics within scope
-    if (resources) {
-      for (const r of resources) {
-        if (r.what_topic_id) {
-          counts.what_topics[r.what_topic_id] = (counts.what_topics[r.what_topic_id] || 0) + 1;
+    if (scopedResourceIds.size > 0) {
+      const { data: resources } = await client
+        .from("resources")
+        .select("what_topic_id")
+        .in("id", Array.from(scopedResourceIds));
+      if (resources) {
+        for (const r of resources) {
+          if (r.what_topic_id) {
+            counts.what_topics[r.what_topic_id] = (counts.what_topics[r.what_topic_id] || 0) + 1;
+          }
         }
       }
     }

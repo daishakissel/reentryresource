@@ -34,9 +34,15 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  // Fetch roles for all users
+  const { data: roles } = await admin.from("user_roles").select("user_id, role");
+  const roleMap: Record<string, string> = {};
+  (roles ?? []).forEach((r: any) => { roleMap[r.user_id] = r.role; });
+
   const users = data.users.map((u) => ({
     id: u.id,
     email: u.email,
+    role: roleMap[u.id] ?? "none",
     created_at: u.created_at,
   }));
 
@@ -49,7 +55,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { email, password } = await req.json();
+  const { email, password, role } = await req.json();
 
   if (!email || !password) {
     return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
@@ -59,8 +65,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 });
   }
 
+  const validRoles = ["admin", "editor", "author"];
+  const userRole = validRoles.includes(role) ? role : "author";
+
   const admin = getAdminClient();
-  const { error } = await admin.auth.admin.createUser({
+  const { data: newUser, error } = await admin.auth.admin.createUser({
     email,
     password,
     email_confirm: true,
@@ -68,6 +77,14 @@ export async function POST(req: NextRequest) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
+  }
+
+  // Create role entry
+  if (newUser?.user) {
+    await admin.from("user_roles").insert({
+      user_id: newUser.user.id,
+      role: userRole,
+    });
   }
 
   return NextResponse.json({ success: true });

@@ -29,6 +29,7 @@ export default function AddResourcePage() {
   const [geocoding, setGeocoding] = useState(false);
 
   const [title, setTitle] = useState("");
+  const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
   const [content, setContent] = useState("");
   const [featuredImage, setFeaturedImage] = useState("");
@@ -94,7 +95,7 @@ export default function AddResourcePage() {
     const token = data.session?.access_token;
 
     const body: Record<string, unknown> = {
-      title, description, content, featured_image: featuredImage,
+      title, slug, description, content, featured_image: featuredImage,
       street_address: streetAddress, city, state, zip, region, country,
       latitude, longitude, phone, email, website,
       what_topic_id: whatTopicId || null,
@@ -127,7 +128,7 @@ export default function AddResourcePage() {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Resource Created</h1>
         <p className="text-gray-600 dark:text-gray-300 mb-6">The resource has been added successfully.</p>
         <div className="flex justify-center gap-4">
-          <button onClick={() => { setSuccess(false); setTitle(""); setDescription(""); setContent(""); setFeaturedImage(""); setStreetAddress(""); setCity(""); setState(""); setZip(""); setRegion(""); setCountry(""); setLatitude(""); setLongitude(""); setPhone(""); setEmail(""); setWebsite(""); setWhatTopicId(""); setSelected({ where_location_type_ids: new Set(), when_time_ids: new Set(), how_format_ids: new Set(), who_centering_ids: new Set() }); }} className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-brand-gold hover:bg-brand-gold/90 transition-colors">Add Another</button>
+          <button onClick={() => { setSuccess(false); setTitle(""); setSlug(""); setDescription(""); setContent(""); setFeaturedImage(""); setStreetAddress(""); setCity(""); setState(""); setZip(""); setRegion(""); setCountry(""); setLatitude(""); setLongitude(""); setPhone(""); setEmail(""); setWebsite(""); setWhatTopicId(""); setSelected({ where_location_type_ids: new Set(), when_time_ids: new Set(), how_format_ids: new Set(), who_centering_ids: new Set() }); }} className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-brand-gold hover:bg-brand-gold/90 transition-colors">Add Another</button>
           <button onClick={() => router.push("/")} className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors">Go to Resources</button>
         </div>
       </div>
@@ -151,7 +152,11 @@ export default function AddResourcePage() {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title <span className="text-red-500">*</span></label>
-              <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent" />
+              <input type="text" value={title} onChange={(e) => { setTitle(e.target.value); if (!slug || slug === title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")) setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")); }} required className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Slug</label>
+              <input type="text" value={slug} onChange={(e) => setSlug(e.target.value)} required className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent" placeholder="auto-generated-from-title" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Short Description</label>

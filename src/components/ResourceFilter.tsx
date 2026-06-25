@@ -133,7 +133,7 @@ export default function ResourceFilter({ selected, onSelectionChange, whyCategor
                   {isExpanded && (
                     <div className="px-4 pb-3 flex flex-wrap gap-x-6 gap-y-2">
                       {options.map((opt) => {
-                        const count = counts[section.filterKey]?.[opt.id] ?? 0;
+                        const count = section.filterKey === "what_topics" ? (counts[section.filterKey]?.[opt.id] ?? 0) : null;
                         return (
                           <label key={opt.id} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                             <input
@@ -143,7 +143,7 @@ export default function ResourceFilter({ selected, onSelectionChange, whyCategor
                               className="h-4 w-4 rounded border-gray-300 text-brand-gold focus:ring-brand-gold"
                             />
                             {opt.name}
-                            <span className="text-xs text-gray-400">({count})</span>
+                            {count !== null && <span className="text-xs text-gray-400">({count})</span>}
                           </label>
                         );
                       })}

@@ -28,6 +28,9 @@ yarn-error.log*
 # data imports
 /data/
 
+# migration progress
+scripts/migrate-images-progress.json
+
 # vercel
 .vercel
 

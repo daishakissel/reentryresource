@@ -34,17 +34,19 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
       .single();
     if (topic) result["What"] = [topic.name];
 
-    const { data: whyLinks } = await client
-      .from("what_topics_why_categories")
-      .select("why_category_id")
-      .eq("what_topic_id", resource.what_topic_id);
-    if (whyLinks && whyLinks.length > 0) {
-      const { data: whys } = await client
-        .from("why_categories")
-        .select("name")
-        .in("id", whyLinks.map((l: any) => l.why_category_id));
-      if (whys) result["Why"] = whys.map((w: any) => w.name);
-    }
+  }
+
+  // Get WHY from direct junction table
+  const { data: whyLinks } = await client
+    .from("resources_why_categories")
+    .select("why_category_id")
+    .eq("resource_id", params.id);
+  if (whyLinks && whyLinks.length > 0) {
+    const { data: whys } = await client
+      .from("why_categories")
+      .select("name")
+      .in("id", whyLinks.map((l: any) => l.why_category_id));
+    if (whys) result["Why"] = whys.map((w: any) => w.name);
   }
 
   // Get junction table tags

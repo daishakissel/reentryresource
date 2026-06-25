@@ -34,12 +34,22 @@ interface ResourceDetail {
   who_centerings: string[];
 }
 
-async function fetchResource(id: string): Promise<ResourceDetail | null> {
-  const { data: resource } = await supabase
+async function fetchResource(slug: string): Promise<ResourceDetail | null> {
+  // Try slug first, fall back to ID for old links
+  let { data: resource } = await supabase
     .from("resources")
     .select("*")
-    .eq("id", id)
+    .eq("slug", slug)
     .single();
+
+  if (!resource) {
+    const { data: byId } = await supabase
+      .from("resources")
+      .select("*")
+      .eq("id", slug)
+      .single();
+    resource = byId;
+  }
 
   if (!resource) return null;
 
@@ -54,7 +64,7 @@ async function fetchResource(id: string): Promise<ResourceDetail | null> {
   };
 
   // Fetch tags via API
-  const res = await fetch(`/api/resources/${id}/tags`, { cache: "no-store" });
+  const res = await fetch(`/api/resources/${resource.id}/tags`, { cache: "no-store" });
   if (res.ok) {
     const tags = await res.json();
     detail.what_topic = tags["What"]?.[0] ?? null;
@@ -84,7 +94,7 @@ function TagList({ label, items }: { label: string; items: string[] }) {
   );
 }
 
-export default function ResourceDetailPage({ params }: { params: { id: string } }) {
+export default function ResourceDetailPage({ params }: { params: { slug: string } }) {
   return (
     <Suspense fallback={<p className="text-gray-500">Loading...</p>}>
       <ResourceDetailInner params={params} />
@@ -92,7 +102,7 @@ export default function ResourceDetailPage({ params }: { params: { id: string } 
   );
 }
 
-function ResourceDetailInner({ params }: { params: { id: string } }) {
+function ResourceDetailInner({ params }: { params: { slug: string } }) {
   const searchParams = useSearchParams();
   const backUrl = searchParams.get("from") || "/";
   const [resource, setResource] = useState<ResourceDetail | null>(null);
@@ -104,11 +114,11 @@ function ResourceDetailInner({ params }: { params: { id: string } }) {
     : "Back to resources";
 
   useEffect(() => {
-    fetchResource(params.id).then((r) => {
+    fetchResource(params.slug).then((r) => {
       setResource(r);
       setLoading(false);
     });
-  }, [params.id]);
+  }, [params.slug]);
 
   if (loading) return <p className="text-gray-500">Loading...</p>;
   if (!resource) return <p className="text-gray-500">Resource not found.</p>;

@@ -8,11 +8,12 @@ import { supabase } from "@/lib/supabase";
 interface ManagedUser {
   id: string;
   email: string;
+  role: string;
   created_at: string;
 }
 
 export default function UserManagementPage() {
-  const { user, loading } = useAuth();
+  const { user, loading, canAccessAdminPages } = useAuth();
   const router = useRouter();
 
   const [users, setUsers] = useState<ManagedUser[]>([]);
@@ -21,6 +22,7 @@ export default function UserManagementPage() {
   // New user form
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [newRole, setNewRole] = useState("author");
   const [createError, setCreateError] = useState<string | null>(null);
   const [createSuccess, setCreateSuccess] = useState<string | null>(null);
 
@@ -37,6 +39,7 @@ export default function UserManagementPage() {
 
   useEffect(() => {
     if (!loading && !user) router.replace("/login");
+    if (!loading && user && !canAccessAdminPages) router.replace("/");
   }, [user, loading, router]);
 
   async function getAuthHeaders(): Promise<Record<string, string>> {
@@ -69,7 +72,7 @@ export default function UserManagementPage() {
     const res = await fetch("/api/admin/users", {
       method: "POST",
       headers: { "Content-Type": "application/json", ...authHeaders },
-      body: JSON.stringify({ email: newEmail, password: newPassword }),
+      body: JSON.stringify({ email: newEmail, password: newPassword, role: newRole }),
     });
 
     const data = await res.json();
@@ -79,6 +82,7 @@ export default function UserManagementPage() {
       setCreateSuccess(`User ${newEmail} created successfully.`);
       setNewEmail("");
       setNewPassword("");
+      setNewRole("author");
       fetchUsers();
     }
   }
@@ -176,6 +180,19 @@ export default function UserManagementPage() {
               placeholder="Minimum 8 characters"
             />
           </div>
+          <div>
+            <label htmlFor="new-role" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Role</label>
+            <select
+              id="new-role"
+              value={newRole}
+              onChange={(e) => setNewRole(e.target.value)}
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent"
+            >
+              <option value="author">Author</option>
+              <option value="editor">Editor</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
           {createError && <p className="text-sm text-red-600">{createError}</p>}
           {createSuccess && <p className="text-sm text-green-600">{createSuccess}</p>}
           <button
@@ -226,6 +243,7 @@ export default function UserManagementPage() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="text-left px-4 py-2 font-medium text-gray-700">Email</th>
+                  <th className="text-left px-4 py-2 font-medium text-gray-700">Role</th>
                   <th className="text-left px-4 py-2 font-medium text-gray-700">Created</th>
                   <th className="px-4 py-2 w-10"></th>
                 </tr>
@@ -234,6 +252,7 @@ export default function UserManagementPage() {
                 {users.map((u) => (
                   <tr key={u.id} className="border-t border-gray-100">
                     <td className="px-4 py-2 text-gray-900">{u.email}</td>
+                    <td className="px-4 py-2 text-gray-600 capitalize">{u.role}</td>
                     <td className="px-4 py-2 text-gray-500">
                       {new Date(u.created_at).toLocaleDateString()}
                     </td>

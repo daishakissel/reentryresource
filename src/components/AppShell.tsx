@@ -25,7 +25,21 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
+    <div className="relative flex flex-col h-screen overflow-hidden">
+      {/* Dark overlay — covers entire screen including header */}
+      <div
+        className={`fixed inset-0 z-[1000] bg-black transition-opacity duration-500 ${
+          sidebarExpanded ? "opacity-40 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+        onClick={() => setSidebarExpanded(false)}
+      />
+
+      {/* Sidebar — covers entire screen height */}
+      <Sidebar
+        expanded={sidebarExpanded}
+        onClose={() => setSidebarExpanded(false)}
+      />
+
       {/* Fixed header */}
       <header className="flex-shrink-0 z-50 bg-white dark:bg-ocean-deeper">
         <div className="flex items-center justify-between px-4 pt-6 pb-4 h-28">
@@ -47,47 +61,30 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      {/* Content area with overlay sidebar */}
-      <div className="flex-1 relative overflow-hidden">
-        {/* Dark overlay when sidebar is open */}
-        <div
-          className={`absolute inset-0 z-[1000] bg-black transition-opacity duration-500 ${
-            sidebarExpanded ? "opacity-40 pointer-events-auto" : "opacity-0 pointer-events-none"
-          }`}
-          onClick={() => setSidebarExpanded(false)}
-        />
+      {/* Scrollable main content */}
+      <main
+        ref={mainRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto dark:bg-ocean-deeper"
+      >
+        <div className="px-4 py-6">
+          {children}
+        </div>
+        <Footer />
+      </main>
 
-        {/* Sidebar overlay */}
-        <Sidebar
-          expanded={sidebarExpanded}
-          onClose={() => setSidebarExpanded(false)}
-        />
-
-        {/* Scrollable main content */}
-        <main
-          ref={mainRef}
-          onScroll={handleScroll}
-          className="h-full overflow-y-auto dark:bg-ocean-deeper"
-        >
-          <div className="px-4 py-6">
-            {children}
-          </div>
-          <Footer />
-        </main>
-
-        {/* Scroll to top button */}
-        <button
-          onClick={scrollToTop}
-          className={`absolute bottom-6 right-6 z-40 p-3 rounded-full bg-brand-gold text-white shadow-lg hover:bg-brand-gold/90 transition-all duration-300 ${
-            showScrollTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
-          }`}
-          aria-label="Scroll to top"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-          </svg>
-        </button>
-      </div>
+      {/* Scroll to top button */}
+      <button
+        onClick={scrollToTop}
+        className={`fixed bottom-6 right-6 z-40 p-3 rounded-full bg-brand-gold text-white shadow-lg hover:bg-brand-gold/90 transition-all duration-300 ${
+          showScrollTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
+        }`}
+        aria-label="Scroll to top"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+        </svg>
+      </button>
     </div>
   );
 }

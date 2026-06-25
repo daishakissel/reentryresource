@@ -28,7 +28,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
   const body = await req.json();
   const {
-    title, description, content, featured_image,
+    title, slug, description, content, featured_image,
     street_address, city, state, zip, region, country,
     latitude, longitude, phone, email, website,
     what_topic_id,
@@ -41,6 +41,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     .from("resources")
     .update({
       title,
+      slug: slug || title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
       description: description || null,
       content: content || null,
       featured_image: featured_image || null,
@@ -68,6 +69,22 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     if (ids.length > 0) {
       const rows = ids.map((id) => ({ resource_id: params.id, [config.fk]: id }));
       await client.from(config.table).insert(rows);
+    }
+  }
+
+  // Re-populate WHY categories from WHAT topic
+  await client.from("resources_why_categories").delete().eq("resource_id", params.id);
+  if (what_topic_id) {
+    const { data: whyLinks } = await client
+      .from("what_topics_why_categories")
+      .select("why_category_id")
+      .eq("what_topic_id", what_topic_id);
+    if (whyLinks && whyLinks.length > 0) {
+      const whyRows = whyLinks.map((l: any) => ({
+        resource_id: params.id,
+        why_category_id: l.why_category_id,
+      }));
+      await client.from("resources_why_categories").insert(whyRows);
     }
   }
 

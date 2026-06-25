@@ -18,7 +18,7 @@ const JUNCTION_LOAD: { key: string; table: string; fk: string }[] = [
 ];
 
 export default function EditResourcePage({ params }: { params: { id: string } }) {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, isAuthor } = useAuth();
   const router = useRouter();
   const [filters, setFilters] = useState<Filters | null>(null);
   const [loadingData, setLoadingData] = useState(true);
@@ -28,6 +28,7 @@ export default function EditResourcePage({ params }: { params: { id: string } })
   const [geocoding, setGeocoding] = useState(false);
 
   const [title, setTitle] = useState("");
+  const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
   const [content, setContent] = useState("");
   const [featuredImage, setFeaturedImage] = useState("");
@@ -60,8 +61,12 @@ export default function EditResourcePage({ params }: { params: { id: string } })
     if (filtersRes.ok) setFilters(await filtersRes.json());
 
     const r = resourceRes.data;
+    if (r && isAuthor && r.created_by !== user?.id) {
+      router.replace("/admin/resources");
+      return;
+    }
     if (r) {
-      setTitle(r.title); setDescription(r.description ?? ""); setContent(r.content ?? "");
+      setTitle(r.title); setSlug(r.slug ?? ""); setDescription(r.description ?? ""); setContent(r.content ?? "");
       setFeaturedImage(r.featured_image ?? ""); setStreetAddress(r.street_address ?? "");
       setCity(r.city ?? ""); setState(r.state ?? ""); setZip(r.zip ?? "");
       setRegion(r.region ?? ""); setCountry(r.country ?? "");
@@ -99,7 +104,7 @@ export default function EditResourcePage({ params }: { params: { id: string } })
     const { data } = await supabase.auth.getSession();
     const token = data.session?.access_token;
     const body: Record<string, unknown> = {
-      title, description, content, featured_image: featuredImage,
+      title, slug, description, content, featured_image: featuredImage,
       street_address: streetAddress, city, state, zip, region, country,
       latitude, longitude, phone, email, website, what_topic_id: whatTopicId || null,
     };
@@ -134,6 +139,10 @@ export default function EditResourcePage({ params }: { params: { id: string } })
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title <span className="text-red-500">*</span></label>
               <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Slug</label>
+              <input type="text" value={slug} onChange={(e) => setSlug(e.target.value)} required className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Short Description</label>

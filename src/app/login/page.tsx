@@ -30,7 +30,7 @@ export default function LoginPage() {
   return (
     <div className="flex justify-center pt-12">
       <div className="w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">Admin Login</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">User Login</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

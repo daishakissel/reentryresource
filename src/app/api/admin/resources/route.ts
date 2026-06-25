@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json();
   const {
-    title, description, content, featured_image,
+    title, slug, description, content, featured_image,
     street_address, city, state, zip, region, country,
     latitude, longitude, phone, email, website,
     what_topic_id,
@@ -36,6 +36,7 @@ export async function POST(req: NextRequest) {
   } = body;
 
   if (!title) return NextResponse.json({ error: "Title is required" }, { status: 400 });
+  const resourceSlug = slug || title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
   const client = getAdmin();
 
@@ -43,6 +44,7 @@ export async function POST(req: NextRequest) {
     .from("resources")
     .insert({
       title,
+      slug: resourceSlug,
       description: description || null,
       content: content || null,
       featured_image: featured_image || null,
@@ -58,7 +60,7 @@ export async function POST(req: NextRequest) {
       email: email || null,
       website: website || null,
       what_topic_id: what_topic_id || null,
-      created_by: caller.email || "",
+      created_by: caller.id,
     })
     .select("id")
     .single();
@@ -72,6 +74,21 @@ export async function POST(req: NextRequest) {
     if (ids.length > 0) {
       const rows = ids.map((id) => ({ resource_id: resource.id, [config.fk]: id }));
       await client.from(config.table).insert(rows);
+    }
+  }
+
+  // Auto-populate WHY categories from WHAT topic
+  if (what_topic_id) {
+    const { data: whyLinks } = await client
+      .from("what_topics_why_categories")
+      .select("why_category_id")
+      .eq("what_topic_id", what_topic_id);
+    if (whyLinks && whyLinks.length > 0) {
+      const whyRows = whyLinks.map((l: any) => ({
+        resource_id: resource.id,
+        why_category_id: l.why_category_id,
+      }));
+      await client.from("resources_why_categories").insert(whyRows);
     }
   }
 

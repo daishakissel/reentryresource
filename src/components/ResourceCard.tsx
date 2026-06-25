@@ -8,8 +8,8 @@ interface ResourceCardProps {
 
 export default function ResourceCard({ resource, backPath }: ResourceCardProps) {
   const href = backPath
-    ? `/resource/${resource.id}?from=${encodeURIComponent(backPath)}`
-    : `/resource/${resource.id}`;
+    ? `/resource/${resource.slug || resource.id}?from=${encodeURIComponent(backPath)}`
+    : `/resource/${resource.slug || resource.id}`;
 
   return (
     <Link href={href}>

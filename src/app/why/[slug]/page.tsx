@@ -60,7 +60,7 @@ function WhyPageInner({ params }: WhyPageProps) {
   }, [resolveTopics]);
 
   const { resources, loading, loadingMore, hasMore, loadInitial, loadMore } =
-    useInfiniteResources({ topicIds, filters: selected });
+    useInfiniteResources({ topicIds, whyCategoryId, filters: selected });
 
   useEffect(() => {
     if (!resolving && topicIds !== undefined) {

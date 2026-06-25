@@ -83,9 +83,10 @@ export default function ResourceMapInner({ resources, backPath, height }: Resour
         <ShiftScrollZoom />
         {mappable.length > 1 && <FitBounds resources={mappable} />}
         {mappable.map((resource) => {
+          const resourceSlug = (resource as any).slug || resource.id;
           const href = backPath
-            ? `/resource/${resource.id}?from=${encodeURIComponent(backPath)}`
-            : `/resource/${resource.id}`;
+            ? `/resource/${resourceSlug}?from=${encodeURIComponent(backPath)}`
+            : `/resource/${resourceSlug}`;
 
           return (
             <Marker

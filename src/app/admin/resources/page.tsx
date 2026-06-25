@@ -14,7 +14,7 @@ interface ResourceRow {
 }
 
 export default function AdminResourcesPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, isAuthor, canManageAllResources } = useAuth();
   const router = useRouter();
   const [resources, setResources] = useState<ResourceRow[]>([]);
   const [loadingResources, setLoadingResources] = useState(true);
@@ -27,10 +27,16 @@ export default function AdminResourcesPage() {
   }, [user, authLoading, router]);
 
   const fetchResources = useCallback(async () => {
-    const { data } = await supabase
+    let query = supabase
       .from("resources")
-      .select("id, title, created_at, what_topics(name)")
+      .select("id, title, created_at, created_by, what_topics(name)")
       .order("created_at", { ascending: false });
+
+    if (isAuthor && user) {
+      query = query.eq("created_by", user.id);
+    }
+
+    const { data } = await query;
 
     setResources(
       (data ?? []).map((r: any) => ({
@@ -176,16 +182,20 @@ export default function AdminResourcesPage() {
           >
             Add New
           </Link>
-          <label className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-ocean-light hover:bg-gray-200 dark:hover:bg-ocean transition-colors cursor-pointer">
-            {importing ? "Importing..." : "Import CSV"}
-            <input type="file" accept=".csv" onChange={handleImport} className="hidden" disabled={importing} />
-          </label>
-          <button
-            onClick={handleExport}
-            className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-ocean-light hover:bg-gray-200 dark:hover:bg-ocean transition-colors"
-          >
-            Export CSV
-          </button>
+          {canManageAllResources && (
+            <>
+              <label className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-ocean-light hover:bg-gray-200 dark:hover:bg-ocean transition-colors cursor-pointer">
+                {importing ? "Importing..." : "Import CSV"}
+                <input type="file" accept=".csv" onChange={handleImport} className="hidden" disabled={importing} />
+              </label>
+              <button
+                onClick={handleExport}
+                className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-ocean-light hover:bg-gray-200 dark:hover:bg-ocean transition-colors"
+              >
+                Export CSV
+              </button>
+            </>
+          )}
         </div>
       </div>
 

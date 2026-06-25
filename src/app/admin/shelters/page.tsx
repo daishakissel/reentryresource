@@ -14,7 +14,7 @@ interface Shelter {
 }
 
 export default function ManageSheltersPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, canAccessAdminPages } = useAuth();
   const router = useRouter();
   const [shelters, setShelters] = useState<Shelter[]>([]);
   const [loadingShelters, setLoadingShelters] = useState(true);
@@ -27,6 +27,7 @@ export default function ManageSheltersPage() {
 
   useEffect(() => {
     if (!authLoading && !user) router.replace("/login");
+    if (!authLoading && user && !canAccessAdminPages) router.replace("/");
   }, [user, authLoading, router]);
 
   async function getAuthHeaders(): Promise<Record<string, string>> {
