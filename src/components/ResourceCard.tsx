@@ -23,10 +23,17 @@ export default function ResourceCard({ resource, backPath }: ResourceCardProps) 
             <span className="text-gray-400 text-sm">No image</span>
           </div>
         )}
-        <div className="p-4 flex-1">
+        <div className="p-4 flex-1 flex flex-col">
           <h3 className="font-semibold text-gray-900 dark:text-white mb-1 line-clamp-2">{resource.title}</h3>
           {resource.description && (
             <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">{resource.description}</p>
+          )}
+          {resource.what_topics?.name && (
+            <div className="mt-auto pt-2 flex flex-col items-end">
+              <span className="text-xs px-2 py-0.5 rounded bg-brand-gold-light text-brand-gold">
+                {resource.what_topics.name}
+              </span>
+            </div>
           )}
         </div>
       </div>

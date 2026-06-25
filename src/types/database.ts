@@ -20,6 +20,7 @@ export type Resource = {
   created_by: string;
   created_at: string;
   updated_at: string;
+  what_topics?: { name: string } | null;
 };
 
 export type WhyCategory = {

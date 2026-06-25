@@ -96,7 +96,7 @@ export function useInfiniteResources({ topicIds, whyCategoryId, filters }: UseIn
     // Build query
     let query = supabase
       .from("resources")
-      .select("*")
+      .select("*, what_topics(name)")
       .order("created_at", { ascending: false })
       .range(offset, offset + PAGE_SIZE - 1);
 
