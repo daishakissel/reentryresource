@@ -3,13 +3,10 @@ import type { Resource } from "@/types/database";
 
 interface ResourceCardProps {
   resource: Resource;
-  backPath?: string;
 }
 
-export default function ResourceCard({ resource, backPath }: ResourceCardProps) {
-  const href = backPath
-    ? `/resource/${resource.slug || resource.id}?from=${encodeURIComponent(backPath)}`
-    : `/resource/${resource.slug || resource.id}`;
+export default function ResourceCard({ resource }: ResourceCardProps) {
+  const href = `/resource/${resource.slug || resource.id}`;
 
   return (
     <Link href={href}>

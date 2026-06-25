@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Logo from "./Logo";
+import SearchBar from "./SearchBar";
 import Sidebar from "./Sidebar";
 import Footer from "./Footer";
 
@@ -42,7 +43,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Fixed header */}
       <header className="flex-shrink-0 z-50 bg-white dark:bg-ocean-deeper">
-        <div className="flex items-center justify-between px-4 pt-6 pb-4 h-28">
+        <div className="flex items-center justify-between px-4 pt-6 pb-2">
           <button
             onClick={() => setSidebarExpanded((v) => !v)}
             className="p-2 text-brand-gray hover:text-brand-gold dark:text-gray-400 dark:hover:text-brand-gold"
@@ -58,6 +59,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="w-10" />
+        </div>
+        <div className="flex justify-center px-4 pb-4">
+          <SearchBar />
         </div>
       </header>
 

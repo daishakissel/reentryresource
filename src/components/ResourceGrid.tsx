@@ -4,13 +4,12 @@ import ResourceCard from "./ResourceCard";
 
 interface ResourceGridProps {
   resources: Resource[];
-  backPath?: string;
   hasMore?: boolean;
   loadingMore?: boolean;
   onLoadMore?: () => void;
 }
 
-export default function ResourceGrid({ resources, backPath, hasMore, loadingMore, onLoadMore }: ResourceGridProps) {
+export default function ResourceGrid({ resources, hasMore, loadingMore, onLoadMore }: ResourceGridProps) {
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -41,7 +40,7 @@ export default function ResourceGrid({ resources, backPath, hasMore, loadingMore
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {resources.map((resource) => (
-          <ResourceCard key={resource.id} resource={resource} backPath={backPath} />
+          <ResourceCard key={resource.id} resource={resource} />
         ))}
       </div>
       {hasMore && (

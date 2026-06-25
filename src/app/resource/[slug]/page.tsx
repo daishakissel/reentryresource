@@ -1,7 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import ResourceMap from "@/components/ResourceMap";
@@ -95,23 +94,9 @@ function TagList({ label, items }: { label: string; items: string[] }) {
 }
 
 export default function ResourceDetailPage({ params }: { params: { slug: string } }) {
-  return (
-    <Suspense fallback={<p className="text-gray-500">Loading...</p>}>
-      <ResourceDetailInner params={params} />
-    </Suspense>
-  );
-}
-
-function ResourceDetailInner({ params }: { params: { slug: string } }) {
-  const searchParams = useSearchParams();
-  const backUrl = searchParams.get("from") || "/";
   const [resource, setResource] = useState<ResourceDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [detailsOpen, setDetailsOpen] = useState(false);
-
-  const backLabel = backUrl.startsWith("/why/")
-    ? `Back to ${backUrl.split("/why/")[1].split("?")[0].split("-").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}`
-    : "Back to resources";
 
   useEffect(() => {
     fetchResource(params.slug).then((r) => {
@@ -128,7 +113,7 @@ function ResourceDetailInner({ params }: { params: { slug: string } }) {
 
   return (
     <div>
-      <Link href={backUrl} className="text-sm text-brand-gold hover:underline mb-4 inline-block">&larr; {backLabel}</Link>
+      <button onClick={() => window.history.back()} className="text-sm text-brand-gold hover:underline mb-4 inline-block">&larr; Back to resources</button>
 
       {hasLocation && (
         <div className="mb-6">

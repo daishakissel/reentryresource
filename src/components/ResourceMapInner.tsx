@@ -54,11 +54,10 @@ function ShiftScrollZoom() {
 
 interface ResourceMapInnerProps {
   resources: Resource[];
-  backPath?: string;
   height: string;
 }
 
-export default function ResourceMapInner({ resources, backPath, height }: ResourceMapInnerProps) {
+export default function ResourceMapInner({ resources, height }: ResourceMapInnerProps) {
   const mappable = resources.filter((r) => r.latitude && r.longitude);
 
   const center: [number, number] = mappable.length > 0
@@ -84,9 +83,7 @@ export default function ResourceMapInner({ resources, backPath, height }: Resour
         {mappable.length > 1 && <FitBounds resources={mappable} />}
         {mappable.map((resource) => {
           const resourceSlug = (resource as any).slug || resource.id;
-          const href = backPath
-            ? `/resource/${resourceSlug}?from=${encodeURIComponent(backPath)}`
-            : `/resource/${resourceSlug}`;
+          const href = `/resource/${resourceSlug}`;
 
           return (
             <Marker

@@ -7,10 +7,9 @@ const MapInner = dynamic(() => import("./ResourceMapInner"), { ssr: false });
 
 interface ResourceMapProps {
   resources: Resource[];
-  backPath?: string;
   height?: string;
 }
 
-export default function ResourceMap({ resources, backPath, height = "400px" }: ResourceMapProps) {
-  return <MapInner resources={resources} backPath={backPath} height={height} />;
+export default function ResourceMap({ resources, height = "400px" }: ResourceMapProps) {
+  return <MapInner resources={resources} height={height} />;
 }

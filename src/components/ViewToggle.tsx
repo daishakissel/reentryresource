@@ -7,13 +7,12 @@ import ResourceMap from "./ResourceMap";
 
 interface ViewToggleProps {
   resources: Resource[];
-  backPath?: string;
   hasMore?: boolean;
   loadingMore?: boolean;
   onLoadMore?: () => void;
 }
 
-export default function ViewToggle({ resources, backPath, hasMore, loadingMore, onLoadMore }: ViewToggleProps) {
+export default function ViewToggle({ resources, hasMore, loadingMore, onLoadMore }: ViewToggleProps) {
   const [view, setView] = useState<"map" | "online">("map");
 
   const inPersonResources = resources.filter((r) => r.latitude && r.longitude);
@@ -46,10 +45,10 @@ export default function ViewToggle({ resources, backPath, hasMore, loadingMore, 
 
       {view === "map" ? (
         <div>
-          <ResourceMap resources={inPersonResources} backPath={backPath} />
+          <ResourceMap resources={inPersonResources} />
           <div className="mt-6">
             {inPersonResources.length > 0 ? (
-              <ResourceGrid resources={inPersonResources} backPath={backPath} hasMore={hasMore} loadingMore={loadingMore} onLoadMore={onLoadMore} />
+              <ResourceGrid resources={inPersonResources} hasMore={hasMore} loadingMore={loadingMore} onLoadMore={onLoadMore} />
             ) : (
               <p className="text-gray-500 dark:text-gray-400">No in-person resources found.</p>
             )}
@@ -58,7 +57,7 @@ export default function ViewToggle({ resources, backPath, hasMore, loadingMore, 
       ) : (
         <div>
           {onlineResources.length > 0 ? (
-            <ResourceGrid resources={onlineResources} backPath={backPath} hasMore={hasMore} loadingMore={loadingMore} onLoadMore={onLoadMore} />
+            <ResourceGrid resources={onlineResources} hasMore={hasMore} loadingMore={loadingMore} onLoadMore={onLoadMore} />
           ) : (
             <p className="text-gray-500 dark:text-gray-400">No online resources found.</p>
           )}
