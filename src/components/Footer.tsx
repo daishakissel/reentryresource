@@ -8,7 +8,7 @@ export default function Footer() {
           Privacy
         </Link>
         <span>|</span>
-        <span>&copy; {new Date().getFullYear()} Reentry Resource - All rights reserved</span>
+        <span>&copy; {new Date().getFullYear()} Reentry Resource<span className="hidden sm:inline"> - All rights reserved</span></span>
         <span>|</span>
         <Link href="/terms" className="hover:text-brand-gold transition-colors">
           Terms

@@ -1,21 +1,33 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Logo from "./Logo";
 import Sidebar from "./Sidebar";
 import Footer from "./Footer";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     setSidebarExpanded(window.innerWidth >= 768);
   }, []);
 
+  const handleScroll = useCallback(() => {
+    if (mainRef.current) {
+      setShowScrollTop(mainRef.current.scrollTop > 300);
+    }
+  }, []);
+
+  function scrollToTop() {
+    mainRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Fixed header - full width, always on top */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-ocean-deeper">
+    <div className="flex flex-col h-screen overflow-hidden">
+      {/* Fixed header */}
+      <header className="flex-shrink-0 z-50 bg-white dark:bg-ocean-deeper">
         <div className="flex items-center justify-between px-4 pt-6 pb-4 h-28">
           <button
             onClick={() => setSidebarExpanded((v) => !v)}
@@ -31,28 +43,51 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             <Logo />
           </div>
 
-          {/* Spacer to keep logo centered */}
           <div className="w-10" />
         </div>
       </header>
 
-      {/* Spacer for fixed header */}
-      <div className="h-32" />
-
-      {/* Middle section: sidebar + content */}
-      <div className="flex flex-1">
-        <Sidebar
-          expanded={sidebarExpanded}
-          onToggle={() => setSidebarExpanded((v) => !v)}
+      {/* Content area with overlay sidebar */}
+      <div className="flex-1 relative overflow-hidden">
+        {/* Dark overlay when sidebar is open */}
+        <div
+          className={`absolute inset-0 z-[1000] bg-black transition-opacity duration-500 ${
+            sidebarExpanded ? "opacity-40 pointer-events-auto" : "opacity-0 pointer-events-none"
+          }`}
+          onClick={() => setSidebarExpanded(false)}
         />
 
-        <main className="flex-1 min-w-0 px-4 py-6 dark:bg-ocean-deeper">
-          {children}
-        </main>
-      </div>
+        {/* Sidebar overlay */}
+        <Sidebar
+          expanded={sidebarExpanded}
+          onClose={() => setSidebarExpanded(false)}
+        />
 
-      {/* Fixed footer - full width, always on bottom */}
-      <Footer />
+        {/* Scrollable main content */}
+        <main
+          ref={mainRef}
+          onScroll={handleScroll}
+          className="h-full overflow-y-auto dark:bg-ocean-deeper"
+        >
+          <div className="px-4 py-6">
+            {children}
+          </div>
+          <Footer />
+        </main>
+
+        {/* Scroll to top button */}
+        <button
+          onClick={scrollToTop}
+          className={`absolute bottom-6 right-6 z-40 p-3 rounded-full bg-brand-gold text-white shadow-lg hover:bg-brand-gold/90 transition-all duration-300 ${
+            showScrollTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
+          }`}
+          aria-label="Scroll to top"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+          </svg>
+        </button>
+      </div>
     </div>
   );
 }
