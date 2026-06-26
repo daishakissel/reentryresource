@@ -7,7 +7,7 @@ import ResourceFilter from "@/components/ResourceFilter";
 import { supabase } from "@/lib/supabase";
 import { WHY_CATEGORIES } from "@/lib/constants";
 import { useInfiniteResources } from "@/lib/useInfiniteResources";
-import { loadFilters, saveFilters } from "@/lib/filterStorage";
+import { loadFilters, saveFilters, saveLastWhy } from "@/lib/filterStorage";
 
 interface WhyPageProps {
   params: { slug: string };
@@ -29,8 +29,9 @@ export default function WhyPage({ params }: WhyPageProps) {
       saveFilters(stored);
     }
     setSelected(stored);
+    if (category) saveLastWhy(category.label, category.href);
     setLoaded(true);
-  }, [params.slug]);
+  }, [params.slug, category]);
 
   function handleSelectionChange(newSelected: Record<string, Set<string>>) {
     setSelected(newSelected);

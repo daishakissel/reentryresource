@@ -120,7 +120,7 @@ export default function ResourceFilter({ selected, onSelectionChange, whyCategor
                     <div className="flex items-center gap-2">
                       <span>{section.label}</span>
                       {sectionSelected > 0 && (
-                        <span className="px-1.5 py-0.5 text-xs rounded-full bg-brand-gold-light text-brand-gold">
+                        <span className="px-1.5 py-0.5 text-xs rounded-full bg-brand-gold-light text-brand-brown">
                           {sectionSelected}
                         </span>
                       )}

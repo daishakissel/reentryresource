@@ -30,3 +30,17 @@ export function loadFilters(): Record<string, Set<string>> {
 export function clearFilters() {
   localStorage.removeItem(STORAGE_KEY);
 }
+
+const LAST_WHY_KEY = "lastWhyCategory";
+
+export function saveLastWhy(label: string, href: string) {
+  localStorage.setItem(LAST_WHY_KEY, JSON.stringify({ label, href }));
+}
+
+export function loadLastWhy(): { label: string; href: string } {
+  try {
+    const stored = localStorage.getItem(LAST_WHY_KEY);
+    if (stored) return JSON.parse(stored);
+  } catch {}
+  return { label: "All", href: "/" };
+}

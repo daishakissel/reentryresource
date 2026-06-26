@@ -14,6 +14,7 @@ const config: Config = {
           gray: "#808080",
           gold: "#F4C430",
           "gold-light": "#FDF6E0",
+          brown: "#8B6914",
         },
         ocean: {
           DEFAULT: "#1A3C4D",

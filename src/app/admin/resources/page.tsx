@@ -68,29 +68,13 @@ export default function AdminResourcesPage() {
   }
 
   async function handleExport() {
-    const { data } = await supabase
-      .from("resources")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (!data || data.length === 0) {
-      alert("No resources to export.");
+    const headers = await getAuthHeaders();
+    const res = await fetch("/api/admin/resources/export", { headers });
+    if (!res.ok) {
+      alert("Export failed");
       return;
     }
-
-    const headers = Object.keys(data[0]);
-    const csv = [
-      headers.join(","),
-      ...data.map((row: any) =>
-        headers.map((h) => {
-          const val = row[h] ?? "";
-          const str = String(val).replace(/"/g, '""');
-          return `"${str}"`;
-        }).join(",")
-      ),
-    ].join("\n");
-
-    const blob = new Blob([csv], { type: "text/csv" });
+    const blob = await res.blob();
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -108,61 +92,87 @@ export default function AdminResourcesPage() {
     setImportSuccess(null);
 
     const text = await file.text();
-    const lines = text.split("\n").filter((l) => l.trim());
+    const lines = text.split("\n");
     if (lines.length < 2) {
       setImportError("CSV file must have a header row and at least one data row.");
       setImporting(false);
       return;
     }
 
-    const headers = lines[0].split(",").map((h) => h.trim().replace(/^"|"$/g, ""));
-    const titleIdx = headers.indexOf("title");
-    if (titleIdx === -1) {
+    // Parse CSV properly handling quoted fields with commas and newlines
+    function parseCSVLine(line: string): string[] {
+      const result: string[] = [];
+      let current = "";
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (inQuotes) {
+          if (ch === '"' && line[i + 1] === '"') { current += '"'; i++; }
+          else if (ch === '"') { inQuotes = false; }
+          else { current += ch; }
+        } else {
+          if (ch === '"') { inQuotes = true; }
+          else if (ch === ',') { result.push(current); current = ""; }
+          else { current += ch; }
+        }
+      }
+      result.push(current);
+      return result;
+    }
+
+    const headers = parseCSVLine(lines[0]).map((h) => h.trim());
+    if (!headers.includes("title")) {
       setImportError("CSV must have a 'title' column.");
       setImporting(false);
       return;
     }
 
-    let imported = 0;
-    const authHeaders = await getAuthHeaders();
-
+    // Parse all data rows
+    const rows: Record<string, string>[] = [];
+    let currentLine = "";
+    let inQuotes = false;
     for (let i = 1; i < lines.length; i++) {
-      const values = lines[i].match(/("(?:[^"]|"")*"|[^,]*)/g)?.map((v) =>
-        v.trim().replace(/^"|"$/g, "").replace(/""/g, '"')
-      );
-      if (!values) continue;
-
-      const row: Record<string, string> = {};
-      headers.forEach((h, idx) => { row[h] = values[idx] ?? ""; });
-
-      if (!row.title) continue;
-
-      const res = await fetch("/api/admin/resources", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...authHeaders },
-        body: JSON.stringify({
-          title: row.title,
-          description: row.description || null,
-          content: row.content || null,
-          street_address: row.street_address || null,
-          city: row.city || null,
-          state: row.state || null,
-          zip: row.zip || null,
-          region: row.region || null,
-          country: row.country || null,
-          phone: row.phone || null,
-          email: row.email || null,
-          website: row.website || null,
-          featured_image: row.featured_image || null,
-          latitude: row.latitude || null,
-          longitude: row.longitude || null,
-        }),
-      });
-
-      if (res.ok) imported++;
+      currentLine += (currentLine ? "\n" : "") + lines[i];
+      for (const ch of lines[i]) {
+        if (ch === '"') inQuotes = !inQuotes;
+      }
+      if (!inQuotes) {
+        if (currentLine.trim()) {
+          const values = parseCSVLine(currentLine);
+          const row: Record<string, string> = {};
+          headers.forEach((h, idx) => { row[h] = values[idx] ?? ""; });
+          if (row.title) rows.push(row);
+        }
+        currentLine = "";
+      }
     }
 
-    setImportSuccess(`Imported ${imported} resource${imported !== 1 ? "s" : ""}.`);
+    if (rows.length === 0) {
+      setImportError("No valid data rows found.");
+      setImporting(false);
+      return;
+    }
+
+    const authHeaders = await getAuthHeaders();
+    const res = await fetch("/api/admin/resources/import", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...authHeaders },
+      body: JSON.stringify({ rows }),
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      let msg = `Imported ${data.imported} resource${data.imported !== 1 ? "s" : ""}.`;
+      if (data.skipped > 0) msg += ` Skipped ${data.skipped} (no title).`;
+      if (data.errors?.length > 0) msg += ` ${data.errors.length} error(s).`;
+      setImportSuccess(msg);
+      if (data.errors?.length > 0) {
+        console.log("Import errors:", data.errors);
+      }
+    } else {
+      setImportError(data.error || "Import failed");
+    }
+
     setImporting(false);
     fetchResources();
     e.target.value = "";

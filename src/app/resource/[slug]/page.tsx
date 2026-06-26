@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { loadLastWhy } from "@/lib/filterStorage";
 import Link from "next/link";
 import ResourceMap from "@/components/ResourceMap";
 import ContentRenderer from "@/components/ContentRenderer";
@@ -84,7 +85,7 @@ function TagList({ label, items }: { label: string; items: string[] }) {
       <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">{label}</h3>
       <div className="flex flex-wrap gap-2">
         {items.map((item) => (
-          <span key={item} className="px-2 py-1 bg-brand-gold-light text-brand-gold rounded-md text-sm">
+          <span key={item} className="px-2 py-1 bg-brand-gold-light text-brand-brown rounded-md text-sm">
             {item}
           </span>
         ))}
@@ -97,8 +98,10 @@ export default function ResourceDetailPage({ params }: { params: { slug: string 
   const [resource, setResource] = useState<ResourceDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [lastWhy, setLastWhy] = useState({ label: "All", href: "/" });
 
   useEffect(() => {
+    setLastWhy(loadLastWhy());
     fetchResource(params.slug).then((r) => {
       setResource(r);
       setLoading(false);
@@ -113,7 +116,7 @@ export default function ResourceDetailPage({ params }: { params: { slug: string 
 
   return (
     <div>
-      <button onClick={() => window.history.back()} className="text-sm text-brand-gold hover:underline mb-4 inline-block">&larr; Back to resources</button>
+      <button onClick={() => window.history.back()} className="text-sm text-brand-gold hover:underline mb-4 inline-block">&larr; Back to {lastWhy.label} resources</button>
 
       {hasLocation && (
         <div className="mb-6">

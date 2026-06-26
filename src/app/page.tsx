@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import ViewToggle from "@/components/ViewToggle";
 import ResourceFilter from "@/components/ResourceFilter";
 import { useInfiniteResources } from "@/lib/useInfiniteResources";
-import { loadFilters, saveFilters } from "@/lib/filterStorage";
+import { loadFilters, saveFilters, saveLastWhy } from "@/lib/filterStorage";
 
 export default function HomePage() {
   const [selected, setSelected] = useState<Record<string, Set<string>>>({});
@@ -12,6 +12,7 @@ export default function HomePage() {
 
   useEffect(() => {
     setSelected(loadFilters());
+    saveLastWhy("All", "/");
     setLoaded(true);
   }, []);
 

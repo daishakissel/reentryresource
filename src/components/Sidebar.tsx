@@ -1,12 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { WHY_CATEGORIES } from "@/lib/constants";
-import { useAuth } from "@/context/AuthContext";
-import { useTheme } from "@/context/ThemeContext";
-import { useShelter } from "@/context/ShelterContext";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useEffect, useRef } from "react";
 
 interface SidebarProps {
   expanded: boolean;
@@ -51,201 +48,18 @@ const WHY_ICONS: Record<string, React.ReactNode> = {
   ),
 };
 
-const ADMIN_ITEMS = [
-  {
-    label: "Resources",
-    href: "/admin/resources",
-    adminOnly: false,
-    icon: (
-      <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-      </svg>
-    ),
-  },
-  {
-    label: "Shelters",
-    href: "/admin/shelters",
-    adminOnly: true,
-    icon: (
-      <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-      </svg>
-    ),
-  },
-  {
-    label: "Database",
-    href: "/admin/database",
-    adminOnly: true,
-    icon: (
-      <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
-      </svg>
-    ),
-  },
-  {
-    label: "Users",
-    href: "/admin/users",
-    adminOnly: true,
-    icon: (
-      <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197" />
-      </svg>
-    ),
-  },
-];
-
-interface ShelterPageItem {
-  id: string;
-  title: string;
-  slug: string;
-  parent_id: string | null;
-}
-
-function ShelterPageTree({
-  pages,
-  parentId,
-  depth,
-  shelterSlug,
-  pathname,
-  onClose,
-}: {
-  pages: ShelterPageItem[];
-  parentId: string | null;
-  depth: number;
-  shelterSlug: string;
-  pathname: string;
-  onClose: () => void;
-}) {
-  const children = pages.filter((p) => p.parent_id === parentId);
-  if (children.length === 0) return null;
-
-  return (
-    <>
-      {children.map((page) => {
-        const pageHref = `/shelter/${shelterSlug}/${page.slug}`;
-        const isActive = pathname === pageHref;
-        const hasChildren = pages.some((p) => p.parent_id === page.id);
-
-        return (
-          <div key={page.id}>
-            <Link
-              href={pageHref}
-              onClick={onClose}
-              className={`block py-1.5 rounded-md text-sm font-medium transition-colors ${
-                isActive
-                  ? "bg-brand-gold-light text-brand-gold"
-                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-ocean-light"
-              }`}
-              style={{ paddingLeft: `${12 + depth * 16}px`, paddingRight: "12px" }}
-            >
-              {page.title}
-            </Link>
-            {hasChildren && (
-              <ShelterPageTree
-                pages={pages}
-                parentId={page.id}
-                onClose={onClose}
-                depth={depth + 1}
-                shelterSlug={shelterSlug}
-                pathname={pathname}
-              />
-            )}
-          </div>
-        );
-      })}
-    </>
-  );
-}
 
 export default function Sidebar({ expanded, onClose }: SidebarProps) {
   const pathname = usePathname();
-  const router = useRouter();
-  const { user, signOut, role, canManageAllResources, canAccessAdminPages } = useAuth();
-  const { theme, toggleTheme } = useTheme();
-  const { currentShelter, selectShelter, isShelterUnlocked, unlockShelter } = useShelter();
-  const isLoggedIn = !!user;
-  const sidebarRef = useRef<HTMLElement>(null);
   const touchStartX = useRef<number>(0);
 
-  // Auto-close sidebar on route change
-  useEffect(() => {
-    onClose();
-  }, [pathname]);
+  useEffect(() => { onClose(); }, [pathname]);
 
-  // Swipe left to close
-  function handleTouchStart(e: React.TouchEvent) {
-    touchStartX.current = e.touches[0].clientX;
-  }
-
-  function handleTouchEnd(e: React.TouchEvent) {
-    const diff = touchStartX.current - e.changedTouches[0].clientX;
-    if (diff > 60) onClose();
-  }
-
-  const [shelters, setShelters] = useState<{ id: string; name: string; slug: string }[]>([]);
-  const [shelterPages, setShelterPages] = useState<{ id: string; title: string; slug: string; parent_id: string | null }[]>([]);
-  const [loadingShelterPages, setLoadingShelterPages] = useState(false);
-  const [shelterPassword, setShelterPassword] = useState("");
-  const [shelterAuthError, setShelterAuthError] = useState<string | null>(null);
-
-  const fetchShelters = useCallback(async () => {
-    const res = await fetch("/api/filters");
-    if (!res.ok) return;
-    // Shelters aren't in filters, fetch separately
-    const client = await import("@/lib/supabase").then((m) => m.supabase);
-    const { data } = await client.from("shelters").select("id, name, slug").order("name");
-    setShelters(data ?? []);
-  }, []);
-
-  useEffect(() => {
-    fetchShelters();
-  }, [fetchShelters]);
-
-  const fetchShelterPages = useCallback(async () => {
-    if (!currentShelter) { setShelterPages([]); return; }
-    setLoadingShelterPages(true);
-    const res = await fetch(`/api/shelters/${currentShelter}/pages`, { cache: "no-store" });
-    if (res.ok) {
-      const data = await res.json();
-      setShelterPages(data.pages ?? []);
-    }
-    setLoadingShelterPages(false);
-  }, [currentShelter]);
-
-  useEffect(() => {
-    if (currentShelter && isShelterUnlocked(currentShelter)) {
-      fetchShelterPages();
-    } else {
-      setShelterPages([]);
-    }
-  }, [currentShelter, isShelterUnlocked, fetchShelterPages]);
-
-  async function handleShelterAuth() {
-    if (!currentShelter) return;
-    setShelterAuthError(null);
-    const res = await fetch(`/api/shelters/${currentShelter}/auth`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password: shelterPassword }),
-    });
-    if (res.ok) {
-      unlockShelter(currentShelter);
-      setShelterPassword("");
-      fetchShelterPages();
-    } else {
-      const data = await res.json();
-      setShelterAuthError(data.error || "Incorrect password");
-    }
-  }
-
-  async function handleLogout() {
-    await signOut();
-    router.push("/");
-  }
+  function handleTouchStart(e: React.TouchEvent) { touchStartX.current = e.touches[0].clientX; }
+  function handleTouchEnd(e: React.TouchEvent) { if (touchStartX.current - e.changedTouches[0].clientX > 60) onClose(); }
 
   return (
       <aside
-        ref={sidebarRef}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         className={`fixed top-0 left-0 bottom-0 z-[1001] bg-white dark:bg-ocean-deeper flex flex-col transition-transform duration-300 ease-in-out overflow-y-auto w-64 ${
@@ -277,7 +91,7 @@ export default function Sidebar({ expanded, onClose }: SidebarProps) {
                     title={cat.label}
                     className={`flex items-center gap-3 px-2 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
                       isActive
-                        ? "bg-brand-gold-light text-brand-gold"
+                        ? "bg-brand-gold-light text-brand-brown"
                         : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-ocean-light"
                     } `}
                   >
@@ -289,147 +103,6 @@ export default function Sidebar({ expanded, onClose }: SidebarProps) {
             </nav>
           </div>
 
-          <div className="mb-6">
-            {(
-              <h3 className="px-4 text-xs font-semibold text-brand-gray dark:text-gray-400 uppercase tracking-wider mb-2 whitespace-nowrap">
-                Shelter
-              </h3>
-            )}
-            {expanded ? (
-              <div className="px-2">
-                <select
-                  value={currentShelter ?? "none"}
-                  onChange={(e) => selectShelter(e.target.value)}
-                  className="w-full px-3 py-2 rounded-md border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold"
-                >
-                  <option value="none">None</option>
-                  {shelters.map((s) => (
-                    <option key={s.slug} value={s.slug}>{s.name}</option>
-                  ))}
-                </select>
-                {currentShelter && !isShelterUnlocked(currentShelter) && (
-                  <div className="mt-2 space-y-2">
-                    <input
-                      type="password"
-                      value={shelterPassword}
-                      onChange={(e) => setShelterPassword(e.target.value)}
-                      placeholder="Shelter password"
-                      className="w-full px-3 py-1.5 rounded-md border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold"
-                      onKeyDown={(e) => e.key === "Enter" && handleShelterAuth()}
-                    />
-                    {shelterAuthError && <p className="text-xs text-red-500">{shelterAuthError}</p>}
-                    <button
-                      onClick={handleShelterAuth}
-                      className="w-full px-3 py-1.5 rounded-md text-xs font-medium text-white bg-brand-gold hover:bg-brand-gold/90 transition-colors"
-                    >
-                      Unlock
-                    </button>
-                  </div>
-                )}
-                {currentShelter && isShelterUnlocked(currentShelter) && (
-                  <nav className="mt-2 space-y-0.5">
-                    {loadingShelterPages ? (
-                      <p className="px-2 text-sm text-gray-400 italic">Loading shelter pages...</p>
-                    ) : shelterPages.length > 0 ? (
-                      <ShelterPageTree
-                        pages={shelterPages}
-                        parentId={null}
-                        depth={0}
-                        shelterSlug={currentShelter}
-                        pathname={pathname}
-                        onClose={onClose}
-                      />
-                    ) : (
-                      <p className="px-2 text-sm text-gray-400 italic">No pages found</p>
-                    )}
-                  </nav>
-                )}
-              </div>
-            ) : null}
-          </div>
-
-          <div>
-            {(
-              <h3 className="px-4 text-xs font-semibold text-brand-gray dark:text-gray-400 uppercase tracking-wider mb-2 whitespace-nowrap">
-                User
-              </h3>
-            )}
-            {isLoggedIn ? (
-              <nav className="space-y-1 px-2">
-                {ADMIN_ITEMS.map((item) => {
-                  if (item.adminOnly && !canAccessAdminPages) return null;
-                  return item.href ? (
-                    <Link
-                      key={item.label}
-                      href={item.href}
-                      onClick={onClose}
-                      title={item.label}
-                      className="flex items-center gap-3 px-2 py-2 rounded-md text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-ocean-light whitespace-nowrap"
-                    >
-                      {item.icon}
-                      {<span>{item.label}</span>}
-                    </Link>
-                  ) : (
-                    <button
-                      key={item.label}
-                      title={item.label}
-                      className="w-full flex items-center gap-3 px-2 py-2 rounded-md text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-ocean-light whitespace-nowrap"
-                    >
-                      {item.icon}
-                      {<span>{item.label}</span>}
-                    </button>
-                  );
-                })}
-                {user && (
-                  <div className="px-2 py-2">
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Logged in as {role ?? "user"}:</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>
-                  </div>
-                )}
-                <button
-                  onClick={handleLogout}
-                  title="Logout"
-                  className="w-full flex items-center gap-3 px-2 py-2 rounded-md text-sm text-red-600 hover:bg-red-50 whitespace-nowrap"
-                >
-                  <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                  {<span>Logout</span>}
-                </button>
-              </nav>
-            ) : (
-              <div className="px-2">
-                <Link
-                  href="/login"
-                  onClick={onClose}
-                  className="block w-full px-3 py-2 rounded-md text-sm font-medium text-white bg-brand-gold hover:bg-brand-gold/90 transition-colors text-center"
-                >
-                  Login
-                </Link>
-              </div>
-            )}
-          </div>
-
-          <div className="mt-6 px-2">
-            <button
-              onClick={toggleTheme}
-              title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
-              className={`w-full flex items-center gap-3 px-2 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-ocean-light whitespace-nowrap transition-colors ${
-                expanded ? "" : "justify-center"
-              }`}
-            >
-              {theme === "light" ? (
-                <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                </svg>
-              ) : (
-                <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              )}
-              {<span>{theme === "light" ? "Dark Mode" : "Light Mode"}</span>}
-            </button>
-          </div>
         </div>
 
       </aside>
