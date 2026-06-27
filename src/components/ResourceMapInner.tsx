@@ -39,6 +39,20 @@ function FitBounds({ resources }: { resources: Resource[] }) {
   return null;
 }
 
+function MapInteractionToggle({ enabled }: { enabled: boolean }) {
+  const map = useMap();
+  useEffect(() => {
+    if (enabled) {
+      map.dragging.enable();
+      map.touchZoom.enable();
+    } else {
+      map.dragging.disable();
+      map.touchZoom.disable();
+    }
+  }, [enabled, map]);
+  return null;
+}
+
 function FitToMyLocation() {
   const map = useMap();
   const { myLocation, hasLocation, radiusMiles } = useMyLocation();
@@ -129,6 +143,7 @@ interface ResourceMapInnerProps {
 export default function ResourceMapInner({ resources, height }: ResourceMapInnerProps) {
   const mappable = resources.filter((r) => r.latitude && r.longitude);
   const { myLocation, hasLocation, radiusMiles } = useMyLocation();
+  const [mapInteractive, setMapInteractive] = useState(false);
 
   const center: [number, number] = hasLocation && myLocation.latitude && myLocation.longitude
     ? [myLocation.latitude, myLocation.longitude]
@@ -143,16 +158,30 @@ export default function ResourceMapInner({ resources, height }: ResourceMapInner
 
   return (
     <div className="rounded-lg overflow-hidden border border-gray-200 dark:border-ocean-light relative" style={{ height }}>
+      {!mapInteractive && (
+        <div
+          onClick={() => setMapInteractive(true)}
+          className="absolute inset-0 z-[500] flex items-center justify-center cursor-pointer"
+          style={{ background: "rgba(0,0,0,0.05)" }}
+        >
+          <span className="bg-white dark:bg-ocean-dark px-4 py-2 rounded-lg shadow text-sm text-gray-700 dark:text-gray-300 font-medium">
+            Tap to interact with map
+          </span>
+        </div>
+      )}
       <MapContainer
         center={center}
         zoom={13}
         style={{ height: "100%", width: "100%" }}
         scrollWheelZoom={false}
+        dragging={mapInteractive}
+        touchZoom={mapInteractive}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        <MapInteractionToggle enabled={mapInteractive} />
         <ShiftScrollZoom />
         <MapContextMenu />
         {hasLocation ? <FitToMyLocation /> : mappable.length > 1 && <FitBounds resources={mappable} />}
