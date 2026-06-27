@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { searchResources } from "@/lib/searchUtils";
 import type { SearchableResource } from "@/lib/searchUtils";
 import { loadFilters, saveFilters, saveLastWhy } from "@/lib/filterStorage";
-import ViewToggle from "@/components/ViewToggle";
+import ViewToggle, { MapToggleButton } from "@/components/ViewToggle";
 import ResourceFilter from "@/components/ResourceFilter";
 
 const JUNCTION_MAP: Record<string, { table: string; fk: string }> = {
@@ -32,6 +32,7 @@ function SearchPageInner() {
 
   const [selected, setSelected] = useState<Record<string, Set<string>>>({});
   const [loaded, setLoaded] = useState(false);
+  const [showMap, setShowMap] = useState(false);
   const [junctionData, setJunctionData] = useState<Record<string, Record<string, string[]>>>({});
 
   // Sync query from URL when it changes
@@ -56,7 +57,7 @@ function SearchPageInner() {
     setLoading(true);
 
     const [resourcesRes, ...junctionResults] = await Promise.all([
-      supabase.from("resources").select("*, what_topics(name)").order("title"),
+      supabase.from("resources").select("*, what_topics(name)").or(`expiration_date.is.null,expiration_date.gte.${new Date().toISOString().split("T")[0]}`).order("title"),
       ...Object.entries(JUNCTION_MAP).map(([, config]) =>
         supabase.from(config.table).select(`resource_id, ${config.fk}`)
       ),
@@ -121,6 +122,9 @@ function SearchPageInner() {
       </p>
 
       <ResourceFilter selected={selected} onSelectionChange={handleSelectionChange} />
+      <div className="mb-4">
+        <MapToggleButton showMap={showMap} onToggle={() => setShowMap((v) => !v)} />
+      </div>
 
       {loading ? (
         <p className="text-gray-500">Loading resources...</p>
@@ -130,7 +134,7 @@ function SearchPageInner() {
           <p className="text-sm text-gray-400 dark:text-gray-500">Try different keywords or check spelling</p>
         </div>
       ) : (
-        <ViewToggle resources={searchResults} />
+        <ViewToggle resources={searchResults} showMap={showMap} />
       )}
     </div>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ViewToggle from "@/components/ViewToggle";
+import ViewToggle, { MapToggleButton } from "@/components/ViewToggle";
 import ResourceFilter from "@/components/ResourceFilter";
 import { useInfiniteResources } from "@/lib/useInfiniteResources";
 import { loadFilters, saveFilters, saveLastWhy } from "@/lib/filterStorage";
@@ -9,6 +9,7 @@ import { loadFilters, saveFilters, saveLastWhy } from "@/lib/filterStorage";
 export default function HomePage() {
   const [selected, setSelected] = useState<Record<string, Set<string>>>({});
   const [loaded, setLoaded] = useState(false);
+  const [showMap, setShowMap] = useState(false);
 
   useEffect(() => {
     setSelected(loadFilters());
@@ -34,6 +35,9 @@ export default function HomePage() {
     <div>
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">All Resources</h1>
       <ResourceFilter selected={selected} onSelectionChange={handleSelectionChange} />
+      <div className="mb-4">
+        <MapToggleButton showMap={showMap} onToggle={() => setShowMap((v) => !v)} />
+      </div>
       {loading ? (
         <p className="text-gray-500">Loading resources...</p>
       ) : (
@@ -42,6 +46,7 @@ export default function HomePage() {
           hasMore={hasMore}
           loadingMore={loadingMore}
           onLoadMore={loadMore}
+          showMap={showMap}
         />
       )}
     </div>

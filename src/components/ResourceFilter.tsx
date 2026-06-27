@@ -72,7 +72,7 @@ export default function ResourceFilter({ selected, onSelectionChange, whyCategor
   const totalSelected = Object.values(selected).reduce((sum, set) => sum + set.size, 0);
 
   return (
-    <div className="mb-6">
+    <div className="mb-2">
       <button
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-ocean-light hover:bg-gray-200 dark:hover:bg-ocean-dark text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors"

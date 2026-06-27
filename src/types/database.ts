@@ -17,6 +17,8 @@ export type Resource = {
   email: string | null;
   website: string | null;
   what_topic_id: string | null;
+  engage: string | null;
+  expiration_date: string | null;
   created_by: string;
   created_at: string;
   updated_at: string;

@@ -17,6 +17,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     setSidebarExpanded(window.innerWidth >= 768);
   }, []);
 
+  // Listen for custom event to open right sidebar (from map pin click)
+  useEffect(() => {
+    function handleOpenRight() { setRightSidebarExpanded(true); }
+    window.addEventListener("open-right-sidebar", handleOpenRight);
+    return () => window.removeEventListener("open-right-sidebar", handleOpenRight);
+  }, []);
+
   const handleScroll = useCallback(() => {
     if (mainRef.current) {
       setShowScrollTop(mainRef.current.scrollTop > 300);

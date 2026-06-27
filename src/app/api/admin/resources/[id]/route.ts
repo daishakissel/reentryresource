@@ -28,7 +28,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
   const body = await req.json();
   const {
-    title, slug, description, content, featured_image,
+    title, slug, description, engage, content, featured_image,
+    expiration_date,
     street_address, city, state, zip, region, country,
     latitude, longitude, phone, email, website,
     what_topic_id,
@@ -43,7 +44,9 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       title,
       slug: slug || title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
       description: description || null,
+      engage: engage || null,
       content: content || null,
+      expiration_date: expiration_date || null,
       featured_image: featured_image || null,
       street_address: street_address || null,
       city: city || null,

@@ -15,6 +15,27 @@ function getAdmin() {
   });
 }
 
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+  const caller = await verifyAuth(req);
+  if (!caller) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { name, short_name, slug, organization_name, email, website, street_address, city, state, zip, phone, latitude, longitude } = await req.json();
+  if (!name || !slug) return NextResponse.json({ error: "Name and slug are required" }, { status: 400 });
+
+  const client = getAdmin();
+  const { error } = await client.from("shelters").update({
+    name, short_name: short_name || null, slug,
+    organization_name: organization_name || null,
+    email: email || null, website: website || null,
+    street_address: street_address || null, city: city || null,
+    state: state || null, zip: zip || null, phone: phone || null,
+    latitude: latitude ?? null, longitude: longitude ?? null,
+  }).eq("id", params.id);
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  return NextResponse.json({ success: true });
+}
+
 export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   const caller = await verifyAuth(req);
   if (!caller) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

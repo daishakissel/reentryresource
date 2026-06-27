@@ -69,12 +69,13 @@ export async function GET(req: NextRequest) {
   // Build CSV
   const headers = [
     "title", "slug", "organization_name", "facility_name",
-    "description", "content", "featured_image",
+    "description", "engage", "content", "featured_image",
     "what_topic",
     "where_location_types", "when_times", "how_formats", "who_centerings",
     "street_address", "city", "state", "zip", "region", "country",
     "latitude", "longitude",
     "phone", "email", "website",
+    "expiration_date",
     "created_by", "created_at", "updated_at",
   ];
 
@@ -85,7 +86,7 @@ export async function GET(req: NextRequest) {
 
   const rows = resources.map((r: any) => [
     esc(r.title), esc(r.slug), esc(r.organization_name), esc(r.facility_name),
-    esc(r.description), esc(r.content), esc(r.featured_image),
+    esc(r.description), esc(r.engage), esc(r.content), esc(r.featured_image),
     esc(r.what_topics?.name ?? ""),
     esc((whereMap[r.id] ?? []).join("; ")),
     esc((whenMap[r.id] ?? []).join("; ")),
@@ -94,6 +95,7 @@ export async function GET(req: NextRequest) {
     esc(r.street_address), esc(r.city), esc(r.state), esc(r.zip), esc(r.region), esc(r.country),
     esc(r.latitude), esc(r.longitude),
     esc(r.phone), esc(r.email), esc(r.website),
+    esc(r.expiration_date),
     esc(r.created_by), esc(r.created_at), esc(r.updated_at),
   ].join(","));
 

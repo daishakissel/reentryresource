@@ -93,10 +93,12 @@ export function useInfiniteResources({ topicIds, whyCategoryId, filters }: UseIn
       return;
     }
 
-    // Build query
+    // Build query — exclude expired resources
+    const today = new Date().toISOString().split("T")[0];
     let query = supabase
       .from("resources")
       .select("*, what_topics(name)")
+      .or(`expiration_date.is.null,expiration_date.gte.${today}`)
       .order("created_at", { ascending: false })
       .range(offset, offset + PAGE_SIZE - 1);
 

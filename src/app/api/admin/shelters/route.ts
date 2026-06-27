@@ -28,13 +28,20 @@ export async function POST(req: NextRequest) {
   const caller = await verifyAuth(req);
   if (!caller) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { name, slug, password } = await req.json();
+  const { name, short_name, slug, password, organization_name, phone, email, website, street_address, city, state, zip, latitude, longitude } = await req.json();
   if (!name || !slug || !password) {
     return NextResponse.json({ error: "Name, slug, and password are required" }, { status: 400 });
   }
 
   const client = getAdmin();
-  const { error } = await client.from("shelters").insert({ name, slug, password_hash: password });
+  const { error } = await client.from("shelters").insert({
+    name, short_name: short_name || null, slug, password_hash: password,
+    organization_name: organization_name || null, phone: phone || null,
+    email: email || null, website: website || null,
+    street_address: street_address || null, city: city || null,
+    state: state || null, zip: zip || null,
+    latitude: latitude ?? null, longitude: longitude ?? null,
+  });
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 
   return NextResponse.json({ success: true });

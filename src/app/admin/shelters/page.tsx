@@ -20,8 +20,20 @@ export default function ManageSheltersPage() {
   const [loadingShelters, setLoadingShelters] = useState(true);
 
   const [newName, setNewName] = useState("");
+  const [newShortName, setNewShortName] = useState("");
   const [newSlug, setNewSlug] = useState("");
+  const [newOrgName, setNewOrgName] = useState("");
+  const [newPhone, setNewPhone] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [newWebsite, setNewWebsite] = useState("");
+  const [newStreetAddress, setNewStreetAddress] = useState("");
+  const [newCity, setNewCity] = useState("");
+  const [newState, setNewState] = useState("");
+  const [newZip, setNewZip] = useState("");
+  const [newLatitude, setNewLatitude] = useState("");
+  const [newLongitude, setNewLongitude] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [newGeocoding, setNewGeocoding] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
   const [createSuccess, setCreateSuccess] = useState<string | null>(null);
 
@@ -59,14 +71,21 @@ export default function ManageSheltersPage() {
     const res = await fetch("/api/admin/shelters", {
       method: "POST",
       headers: { "Content-Type": "application/json", ...headers },
-      body: JSON.stringify({ name: newName, slug: newSlug, password: newPassword }),
+      body: JSON.stringify({
+        name: newName, short_name: newShortName, slug: newSlug, password: newPassword,
+        organization_name: newOrgName, phone: newPhone, email: newEmail, website: newWebsite,
+        street_address: newStreetAddress, city: newCity, state: newState, zip: newZip,
+        latitude: newLatitude ? parseFloat(newLatitude) : null,
+        longitude: newLongitude ? parseFloat(newLongitude) : null,
+      }),
     });
 
     if (res.ok) {
       setCreateSuccess(`Shelter "${newName}" created.`);
-      setNewName("");
-      setNewSlug("");
-      setNewPassword("");
+      setNewName(""); setNewShortName(""); setNewSlug(""); setNewOrgName("");
+      setNewPhone(""); setNewEmail(""); setNewWebsite("");
+      setNewStreetAddress(""); setNewCity(""); setNewState(""); setNewZip("");
+      setNewLatitude(""); setNewLongitude(""); setNewPassword("");
       fetchShelters();
     } else {
       const data = await res.json();
@@ -104,8 +123,23 @@ export default function ManageSheltersPage() {
     else alert("Failed to delete shelter");
   }
 
+  async function handleNewGeocode() {
+    const addr = [newStreetAddress, newCity, newState, newZip].filter(Boolean).join(", ");
+    if (!addr) return;
+    setNewGeocoding(true);
+    const res = await fetch(`/api/geocode?address=${encodeURIComponent(addr)}`);
+    if (res.ok) {
+      const data = await res.json();
+      setNewLatitude(data.latitude.toString());
+      setNewLongitude(data.longitude.toString());
+    }
+    setNewGeocoding(false);
+  }
+
   if (authLoading) return <p className="text-gray-500">Loading...</p>;
   if (!user) return null;
+
+  const inputClass = "w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent";
 
   return (
     <div className="max-w-3xl space-y-10">
@@ -113,42 +147,78 @@ export default function ManageSheltersPage() {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Manage Shelters</h1>
 
         <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-3">Add Shelter</h2>
-        <form onSubmit={handleCreate} className="space-y-3">
+        <form onSubmit={handleCreate} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
-              <input
-                type="text"
-                value={newName}
-                onChange={(e) => { setNewName(e.target.value); setNewSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")); }}
-                required
-                className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent"
-                placeholder="Bybee Lakes"
-              />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full Name <span className="text-red-500">*</span></label>
+              <input type="text" value={newName} onChange={(e) => { setNewName(e.target.value); setNewSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")); }} required className={inputClass} placeholder="Bybee Lakes Hope Center" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Slug</label>
-              <input
-                type="text"
-                value={newSlug}
-                onChange={(e) => setNewSlug(e.target.value)}
-                required
-                className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent"
-                placeholder="bybee-lakes"
-              />
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Short Name (dropdown)</label>
+              <input type="text" value={newShortName} onChange={(e) => setNewShortName(e.target.value)} className={inputClass} placeholder="Bybee" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Slug <span className="text-red-500">*</span></label>
+              <input type="text" value={newSlug} onChange={(e) => setNewSlug(e.target.value)} required className={inputClass} placeholder="bybee-lakes" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Organization Name</label>
+              <input type="text" value={newOrgName} onChange={(e) => setNewOrgName(e.target.value)} className={inputClass} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
+              <input type="tel" value={newPhone} onChange={(e) => setNewPhone(e.target.value)} className={inputClass} />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+              <input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} className={inputClass} />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Website</label>
+              <input type="url" value={newWebsite} onChange={(e) => setNewWebsite(e.target.value)} className={inputClass} placeholder="https://..." />
             </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
-            <input
-              type="text"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              required
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent"
-              placeholder="Shelter access password"
-            />
+
+          <div className="space-y-3">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Address</h3>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Street Address</label>
+              <input type="text" value={newStreetAddress} onChange={(e) => setNewStreetAddress(e.target.value)} className={inputClass} />
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">City</label>
+                <input type="text" value={newCity} onChange={(e) => setNewCity(e.target.value)} className={inputClass} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">State</label>
+                <input type="text" value={newState} onChange={(e) => setNewState(e.target.value)} className={inputClass} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ZIP</label>
+                <input type="text" value={newZip} onChange={(e) => setNewZip(e.target.value)} className={inputClass} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Latitude</label>
+                <input type="number" step="any" value={newLatitude} onChange={(e) => setNewLatitude(e.target.value)} className={inputClass} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Longitude</label>
+                <input type="number" step="any" value={newLongitude} onChange={(e) => setNewLongitude(e.target.value)} className={inputClass} />
+              </div>
+            </div>
+            <button type="button" onClick={handleNewGeocode} disabled={newGeocoding} className="px-3 py-2 rounded-lg text-sm font-medium text-white bg-brand-gray hover:bg-brand-gray/90 transition-colors disabled:opacity-50">
+              {newGeocoding ? "Looking up..." : "Lookup Coordinates"}
+            </button>
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password <span className="text-red-500">*</span></label>
+            <input type="text" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required className={inputClass} placeholder="Shelter access password" />
+          </div>
+
           {createError && <p className="text-sm text-red-600">{createError}</p>}
           {createSuccess && <p className="text-sm text-green-600">{createSuccess}</p>}
           <button type="submit" className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-brand-gold hover:bg-brand-gold/90 transition-colors">
@@ -206,6 +276,15 @@ export default function ManageSheltersPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
+                        <Link
+                          href={`/admin/shelter/${s.id}/edit`}
+                          title="Edit shelter"
+                          className="text-gray-400 hover:text-brand-gold transition-colors"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        </Link>
                         <Link
                           href={`/admin/shelter/${s.id}/pages`}
                           title="Manage pages"

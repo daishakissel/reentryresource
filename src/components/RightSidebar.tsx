@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { useShelter } from "@/context/ShelterContext";
+import { useMyLocation, RADIUS_OPTIONS } from "@/context/MyLocationContext";
 import { useState, useEffect, useCallback, useRef } from "react";
 
 interface RightSidebarProps {
@@ -102,10 +103,51 @@ export default function RightSidebar({ expanded, onClose }: RightSidebarProps) {
   const { user, signOut, role, canAccessAdminPages } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { currentShelter, selectShelter, isShelterUnlocked, unlockShelter } = useShelter();
+  const { myLocation, setMyLocation, clearMyLocation, hasLocation, radiusMiles, setRadiusMiles } = useMyLocation();
   const isLoggedIn = !!user;
   const touchStartX = useRef<number>(0);
+  const [locationAddress, setLocationAddress] = useState("");
+  const [suggestions, setSuggestions] = useState<{ display: string; lat: number; lng: number }[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => { onClose(); }, [pathname]);
+
+  useEffect(() => { setLocationAddress(myLocation.address); }, [myLocation.address]);
+
+  function handleAddressInput(value: string) {
+    setLocationAddress(value);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (value.trim().length < 3) { setSuggestions([]); setShowSuggestions(false); return; }
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `https://photon.komoot.io/api/?q=${encodeURIComponent(value)}&limit=5&lang=en&lat=45.5&lon=-122.6&osm_tag=place&osm_tag=highway&osm_tag=building`
+        );
+        if (res.ok) {
+          const data = await res.json();
+          const results = (data.features ?? []).map((f: any) => {
+            const p = f.properties;
+            const parts = [p.housenumber, p.street, p.city, p.state, p.postcode, p.country].filter(Boolean);
+            return {
+              display: parts.length > 0 ? parts.join(", ") : p.name || "Unknown",
+              lat: f.geometry.coordinates[1],
+              lng: f.geometry.coordinates[0],
+            };
+          });
+          setSuggestions(results);
+          setShowSuggestions(results.length > 0);
+        }
+      } catch {}
+    }, 300);
+  }
+
+  function selectSuggestion(s: { display: string; lat: number; lng: number }) {
+    setMyLocation({ address: s.display, latitude: s.lat, longitude: s.lng });
+    setLocationAddress(s.display);
+    setSuggestions([]);
+    setShowSuggestions(false);
+  }
 
   function handleTouchStart(e: React.TouchEvent) {
     touchStartX.current = e.touches[0].clientX;
@@ -116,7 +158,7 @@ export default function RightSidebar({ expanded, onClose }: RightSidebarProps) {
     if (diff > 60) onClose();
   }
 
-  const [shelters, setShelters] = useState<{ id: string; name: string; slug: string }[]>([]);
+  const [shelters, setShelters] = useState<{ id: string; name: string; short_name?: string; slug: string; street_address?: string; city?: string; state?: string; zip?: string; latitude?: number; longitude?: number }[]>([]);
   const [shelterPages, setShelterPages] = useState<ShelterPageItem[]>([]);
   const [loadingShelterPages, setLoadingShelterPages] = useState(false);
   const [shelterPassword, setShelterPassword] = useState("");
@@ -124,7 +166,7 @@ export default function RightSidebar({ expanded, onClose }: RightSidebarProps) {
 
   const fetchShelters = useCallback(async () => {
     const { supabase } = await import("@/lib/supabase");
-    const { data } = await supabase.from("shelters").select("id, name, slug").order("name");
+    const { data } = await supabase.from("shelters").select("id, name, short_name, slug, street_address, city, state, zip, latitude, longitude").order("name");
     setShelters(data ?? []);
   }, []);
 
@@ -187,6 +229,64 @@ export default function RightSidebar({ expanded, onClose }: RightSidebarProps) {
           </button>
         </div>
 
+        {/* My Location Section */}
+        <div className="mb-6">
+          <h3 className="px-4 text-xs font-semibold text-brand-gray dark:text-gray-400 uppercase tracking-wider mb-2 whitespace-nowrap">
+            My Location
+          </h3>
+          <div className="px-2 space-y-2">
+            <div className="relative">
+              <input
+                type="text"
+                value={locationAddress}
+                onChange={(e) => handleAddressInput(e.target.value)}
+                onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                placeholder="Search for an address..."
+                className="w-full px-2 py-1.5 rounded-md border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold"
+              />
+              {showSuggestions && (
+                <div className="absolute left-0 right-0 top-full mt-1 bg-white dark:bg-ocean-dark border border-gray-200 dark:border-ocean-light rounded-md shadow-lg z-10 max-h-48 overflow-y-auto">
+                  {suggestions.map((s, i) => (
+                    <button
+                      key={i}
+                      onMouseDown={() => selectSuggestion(s)}
+                      className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-ocean-light border-b border-gray-50 dark:border-ocean-light last:border-b-0"
+                    >
+                      {s.display}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            {hasLocation && (
+              <div className="space-y-2">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Lat: {myLocation.latitude?.toFixed(5)} &nbsp; Lng: {myLocation.longitude?.toFixed(5)}
+                </p>
+                <div className="flex items-center gap-2">
+                  <label className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">Radius:</label>
+                  <select
+                    value={radiusMiles}
+                    onChange={(e) => setRadiusMiles(parseInt(e.target.value) as any)}
+                    className="flex-1 px-2 py-1 rounded-md border border-gray-300 text-xs focus:outline-none focus:ring-1 focus:ring-brand-gold"
+                  >
+                    {RADIUS_OPTIONS.map((r) => (
+                      <option key={r} value={r}>{r} Miles</option>
+                    ))}
+                  </select>
+                </div>
+                <button
+                  onClick={() => { clearMyLocation(); setLocationAddress(""); }}
+                  className="text-xs text-red-500 hover:underline"
+                >
+                  Clear location
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Shelter Section */}
         <div className="mb-6">
           <h3 className="px-4 text-xs font-semibold text-brand-gray dark:text-gray-400 uppercase tracking-wider mb-2 whitespace-nowrap">
@@ -195,12 +295,22 @@ export default function RightSidebar({ expanded, onClose }: RightSidebarProps) {
           <div className="px-2">
             <select
               value={currentShelter ?? "none"}
-              onChange={(e) => selectShelter(e.target.value)}
+              onChange={(e) => {
+                selectShelter(e.target.value);
+                // Auto-fill My Location from shelter address if not already set
+                if (!hasLocation && e.target.value !== "none") {
+                  const shelter = shelters.find((s) => s.slug === e.target.value);
+                  if (shelter?.latitude && shelter?.longitude) {
+                    const addr = [shelter.street_address, shelter.city, shelter.state, shelter.zip].filter(Boolean).join(", ");
+                    setMyLocation({ address: addr || shelter.name, latitude: shelter.latitude, longitude: shelter.longitude });
+                  }
+                }
+              }}
               className="w-full px-3 py-2 rounded-md border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold"
             >
               <option value="none">None</option>
               {shelters.map((s) => (
-                <option key={s.slug} value={s.slug}>{s.name}</option>
+                <option key={s.slug} value={s.slug}>{s.short_name || s.name}</option>
               ))}
             </select>
             {currentShelter && !isShelterUnlocked(currentShelter) && (

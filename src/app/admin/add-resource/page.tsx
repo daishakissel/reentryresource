@@ -31,8 +31,10 @@ export default function AddResourcePage() {
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
+  const [engage, setEngage] = useState("");
   const [content, setContent] = useState("");
   const [featuredImage, setFeaturedImage] = useState("");
+  const [expirationDate, setExpirationDate] = useState("");
   const [streetAddress, setStreetAddress] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
@@ -95,7 +97,8 @@ export default function AddResourcePage() {
     const token = data.session?.access_token;
 
     const body: Record<string, unknown> = {
-      title, slug, description, content, featured_image: featuredImage,
+      title, slug, description, engage, content, featured_image: featuredImage,
+      expiration_date: expirationDate || null,
       street_address: streetAddress, city, state, zip, region, country,
       latitude, longitude, phone, email, website,
       what_topic_id: whatTopicId || null,
@@ -128,7 +131,7 @@ export default function AddResourcePage() {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Resource Created</h1>
         <p className="text-gray-600 dark:text-gray-300 mb-6">The resource has been added successfully.</p>
         <div className="flex justify-center gap-4">
-          <button onClick={() => { setSuccess(false); setTitle(""); setSlug(""); setDescription(""); setContent(""); setFeaturedImage(""); setStreetAddress(""); setCity(""); setState(""); setZip(""); setRegion(""); setCountry(""); setLatitude(""); setLongitude(""); setPhone(""); setEmail(""); setWebsite(""); setWhatTopicId(""); setSelected({ where_location_type_ids: new Set(), when_time_ids: new Set(), how_format_ids: new Set(), who_centering_ids: new Set() }); }} className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-brand-gold hover:bg-brand-gold/90 transition-colors">Add Another</button>
+          <button onClick={() => { setSuccess(false); setTitle(""); setSlug(""); setDescription(""); setEngage(""); setContent(""); setExpirationDate(""); setFeaturedImage(""); setStreetAddress(""); setCity(""); setState(""); setZip(""); setRegion(""); setCountry(""); setLatitude(""); setLongitude(""); setPhone(""); setEmail(""); setWebsite(""); setWhatTopicId(""); setSelected({ where_location_type_ids: new Set(), when_time_ids: new Set(), how_format_ids: new Set(), who_centering_ids: new Set() }); }} className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-brand-gold hover:bg-brand-gold/90 transition-colors">Add Another</button>
           <button onClick={() => router.push("/")} className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors">Go to Resources</button>
         </div>
       </div>
@@ -163,6 +166,10 @@ export default function AddResourcePage() {
               <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent" placeholder="Brief summary shown on resource cards" />
             </div>
             <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">How to Engage</label>
+              <textarea value={engage} onChange={(e) => setEngage(e.target.value)} rows={3} className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent" placeholder="Steps to access or engage with this resource..." />
+            </div>
+            <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Content</label>
                 <ContentImageInsert bucket="resources" folder="content" onInsert={(tag) => setContent((prev) => prev + "\n" + tag + "\n")} />
@@ -177,6 +184,11 @@ export default function AddResourcePage() {
                   <option key={t.id} value={t.id}>{t.name}</option>
                 ))}
               </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Expiration Date</label>
+              <input type="date" value={expirationDate} onChange={(e) => setExpirationDate(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent" />
+              <p className="text-xs text-gray-400 mt-1">Leave empty for no expiration</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Featured Image</label>

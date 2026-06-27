@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { ShelterProvider } from "@/context/ShelterContext";
+import { MyLocationProvider } from "@/context/MyLocationContext";
 import AppShell from "@/components/AppShell";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -24,7 +25,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <AuthProvider>
             <ShelterProvider>
-              <AppShell>{children}</AppShell>
+              <MyLocationProvider>
+                <AppShell>{children}</AppShell>
+              </MyLocationProvider>
             </ShelterProvider>
           </AuthProvider>
         </ThemeProvider>

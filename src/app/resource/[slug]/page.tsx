@@ -11,6 +11,7 @@ interface ResourceDetail {
   id: string;
   title: string;
   description: string | null;
+  engage: string | null;
   content: string | null;
   featured_image: string | null;
   street_address: string | null;
@@ -78,27 +79,12 @@ async function fetchResource(slug: string): Promise<ResourceDetail | null> {
   return detail;
 }
 
-function TagList({ label, items }: { label: string; items: string[] }) {
-  if (items.length === 0) return null;
-  return (
-    <div>
-      <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">{label}</h3>
-      <div className="flex flex-wrap gap-2">
-        {items.map((item) => (
-          <span key={item} className="px-2 py-1 bg-brand-gold-light text-brand-brown rounded-md text-sm">
-            {item}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 export default function ResourceDetailPage({ params }: { params: { slug: string } }) {
   const [resource, setResource] = useState<ResourceDetail | null>(null);
   const [loading, setLoading] = useState(true);
-  const [detailsOpen, setDetailsOpen] = useState(false);
   const [lastWhy, setLastWhy] = useState({ label: "All", href: "/" });
+  const [openSections, setOpenSections] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     setLastWhy(loadLastWhy());
@@ -114,101 +100,141 @@ export default function ResourceDetailPage({ params }: { params: { slug: string 
   const hasLocation = resource.latitude && resource.longitude;
   const fullAddress = [resource.street_address, resource.city, resource.state, resource.zip].filter(Boolean).join(", ");
 
+  const allLabels = [
+    ...(resource.why_categories.length > 0 ? resource.why_categories : []),
+    ...(resource.what_topic ? [resource.what_topic] : []),
+    ...resource.where_types,
+    ...resource.when_times,
+    ...resource.how_formats,
+    ...resource.who_centerings,
+  ];
+
+  const lastModified = resource.updated_at && resource.updated_at !== resource.created_at
+    ? resource.updated_at
+    : resource.created_at;
+
+  function toggleSection(key: string) {
+    setOpenSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  }
+
+  function SectionToggle({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
+    const isOpen = openSections.has(id);
+    return (
+      <div className="border-b border-gray-200 dark:border-ocean-light">
+        <button
+          onClick={() => toggleSection(id)}
+          className="w-full flex items-center justify-between py-3 text-left"
+        >
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h2>
+          <svg className={`w-5 h-5 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        {isOpen && <div className="pb-4">{children}</div>}
+      </div>
+    );
+  }
+
   return (
     <div>
-      <button onClick={() => window.history.back()} className="text-sm text-brand-gold hover:underline mb-4 inline-block">&larr; Back to {lastWhy.label} resources</button>
+      <button onClick={() => window.history.back()} className="text-sm text-brand-gold hover:underline mb-6 inline-block">&larr; Back to {lastWhy.label} resources</button>
 
+      {/* Title */}
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{resource.title}</h1>
+
+      {/* Labels */}
+      {allLabels.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-6">
+          {allLabels.map((label) => (
+            <span key={label} className="text-xs px-2 py-0.5 rounded bg-brand-gold-light text-brand-brown">
+              {label}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Map */}
       {hasLocation && (
         <div className="mb-6">
           <ResourceMap
-            resources={[{
-              ...resource,
-              updated_at: resource.created_at,
-            } as any]}
+            resources={[{ ...resource, updated_at: resource.created_at } as any]}
             height="300px"
           />
         </div>
       )}
 
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{resource.title}</h1>
-
-      {resource.what_topic && (
-        <span className="inline-block px-2 py-1 bg-gray-100 dark:bg-ocean-light text-gray-600 dark:text-gray-300 rounded-md text-sm mb-4">
-          {resource.what_topic}
-        </span>
-      )}
-
-      {resource.description && (
-        <p className="text-gray-600 dark:text-gray-300 mt-2 mb-4">{resource.description}</p>
-      )}
-
-      {resource.content && (
-        <div className="mt-4 mb-6">
-          <ContentRenderer content={resource.content} />
-        </div>
-      )}
-
-      {/* Contact & Location */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="space-y-3">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200">Contact</h2>
-          {resource.phone && (
-            <p className="text-sm text-gray-700 dark:text-gray-300">
-              <span className="font-medium">Phone:</span>{" "}
-              <a href={`tel:${resource.phone}`} className="text-brand-gold hover:underline">{resource.phone}</a>
-            </p>
-          )}
-          {resource.email && (
-            <p className="text-sm text-gray-700 dark:text-gray-300">
-              <span className="font-medium">Email:</span>{" "}
-              <a href={`mailto:${resource.email}`} className="text-brand-gold hover:underline">{resource.email}</a>
-            </p>
-          )}
-          {resource.website && (
-            <p className="text-sm text-gray-700 dark:text-gray-300">
-              <span className="font-medium">Website:</span>{" "}
-              <a href={resource.website} target="_blank" rel="noopener noreferrer" className="text-brand-gold hover:underline">{resource.website}</a>
-            </p>
-          )}
-        </div>
-
-        <div className="space-y-3">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200">Location</h2>
-          {fullAddress ? (
-            <p className="text-sm text-gray-700 dark:text-gray-300">{fullAddress}</p>
+      {/* Toggled sections */}
+      <div className="space-y-0">
+        <SectionToggle id="description" title="Description">
+          {resource.description ? (
+            <p className="text-gray-600 dark:text-gray-300">{resource.description}</p>
           ) : (
-            <p className="text-sm text-gray-400 italic">No address provided</p>
+            <p className="text-sm text-gray-400 italic">No description available</p>
           )}
-          {resource.region && (
-            <p className="text-sm text-gray-500 dark:text-gray-400">Region: {resource.region}</p>
+        </SectionToggle>
+
+        <SectionToggle id="engage" title="Engage">
+          {resource.engage ? (
+            <p className="text-gray-600 dark:text-gray-300">{resource.engage}</p>
+          ) : (
+            <p className="text-sm text-gray-400 italic">No engagement information available</p>
           )}
-        </div>
+        </SectionToggle>
+
+        <SectionToggle id="content" title="More Info">
+          {resource.content ? (
+            <ContentRenderer content={resource.content} />
+          ) : (
+            <p className="text-sm text-gray-400 italic">No additional information available</p>
+          )}
+        </SectionToggle>
+
+        <SectionToggle id="contact" title="Contact">
+          {(resource.phone || resource.email || resource.website || fullAddress) ? (
+            <div className="space-y-2">
+              {resource.phone && (
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="font-medium">Phone:</span>{" "}
+                  <a href={`tel:${resource.phone}`} className="text-brand-gold hover:underline">{resource.phone}</a>
+                </p>
+              )}
+              {resource.email && (
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="font-medium">Email:</span>{" "}
+                  <a href={`mailto:${resource.email}`} className="text-brand-gold hover:underline">{resource.email}</a>
+                </p>
+              )}
+              {resource.website && (
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="font-medium">Website:</span>{" "}
+                  <a href={resource.website} target="_blank" rel="noopener noreferrer" className="text-brand-gold hover:underline">{resource.website}</a>
+                </p>
+              )}
+              {fullAddress && (
+                <p className="text-sm text-gray-700 dark:text-gray-300">
+                  <span className="font-medium">Address:</span> {fullAddress}
+                </p>
+              )}
+              {resource.region && (
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <span className="font-medium">Region:</span> {resource.region}
+                </p>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-400 italic">No contact information available</p>
+          )}
+        </SectionToggle>
       </div>
 
-      {/* Classifications dropdown */}
-      <div className="mb-8">
-        <button
-          onClick={() => setDetailsOpen((v) => !v)}
-          className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-gray-200 hover:text-brand-gold transition-colors"
-        >
-          <span>Details</span>
-          <svg className={`w-5 h-5 transition-transform ${detailsOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
-        {detailsOpen && (
-          <div className="mt-4 space-y-4">
-            {resource.what_topic && <TagList label="What" items={[resource.what_topic]} />}
-            <TagList label="Why" items={resource.why_categories} />
-            <TagList label="Where" items={resource.where_types} />
-            <TagList label="When" items={resource.when_times} />
-            <TagList label="How" items={resource.how_formats} />
-            <TagList label="Who" items={resource.who_centerings} />
-          </div>
-        )}
-      </div>
-
-      <p className="text-xs text-gray-400">Added {new Date(resource.created_at).toLocaleDateString()}</p>
+      {/* Last Modified */}
+      <p className="text-xs text-gray-400 mt-8">
+        Last Modified: {new Date(lastModified).toLocaleDateString()} {new Date(lastModified).toLocaleTimeString()}
+      </p>
     </div>
   );
 }

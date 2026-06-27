@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { notFound } from "next/navigation";
-import ViewToggle from "@/components/ViewToggle";
+import ViewToggle, { MapToggleButton } from "@/components/ViewToggle";
 import ResourceFilter from "@/components/ResourceFilter";
 import { supabase } from "@/lib/supabase";
 import { WHY_CATEGORIES } from "@/lib/constants";
@@ -20,6 +20,7 @@ export default function WhyPage({ params }: WhyPageProps) {
   const [whyCategoryId, setWhyCategoryId] = useState<string | undefined>(undefined);
   const [topicIds, setTopicIds] = useState<string[] | undefined>(undefined);
   const [resolving, setResolving] = useState(true);
+  const [showMap, setShowMap] = useState(false);
 
   useEffect(() => {
     const stored = loadFilters();
@@ -79,8 +80,11 @@ export default function WhyPage({ params }: WhyPageProps) {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{category.label}</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{category.label} Resources</h1>
       <ResourceFilter selected={selected} onSelectionChange={handleSelectionChange} whyCategoryId={whyCategoryId} />
+      <div className="mb-4">
+        <MapToggleButton showMap={showMap} onToggle={() => setShowMap((v) => !v)} />
+      </div>
       {loading || resolving ? (
         <p className="text-gray-500">Loading resources...</p>
       ) : (
@@ -88,6 +92,7 @@ export default function WhyPage({ params }: WhyPageProps) {
           resources={resources}
           hasMore={hasMore}
           loadingMore={loadingMore}
+          showMap={showMap}
           onLoadMore={loadMore}
         />
       )}

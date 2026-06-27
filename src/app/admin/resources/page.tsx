@@ -10,6 +10,7 @@ interface ResourceRow {
   id: string;
   title: string;
   topic: string | null;
+  expiration_date: string | null;
   created_at: string;
 }
 
@@ -29,7 +30,7 @@ export default function AdminResourcesPage() {
   const fetchResources = useCallback(async () => {
     let query = supabase
       .from("resources")
-      .select("id, title, created_at, created_by, what_topics(name)")
+      .select("id, title, expiration_date, created_at, created_by, what_topics(name)")
       .order("created_at", { ascending: false });
 
     if (isAuthor && user) {
@@ -43,6 +44,7 @@ export default function AdminResourcesPage() {
         id: r.id,
         title: r.title,
         topic: r.what_topics?.name ?? null,
+        expiration_date: r.expiration_date ?? null,
         created_at: r.created_at,
       }))
     );
@@ -223,6 +225,7 @@ export default function AdminResourcesPage() {
               <tr>
                 <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Title</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Topic</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Status</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Created</th>
                 <th className="px-4 py-3 w-20"></th>
               </tr>
@@ -232,6 +235,16 @@ export default function AdminResourcesPage() {
                 <tr key={r.id} className="border-t border-gray-100 dark:border-ocean-light hover:bg-gray-50 dark:hover:bg-ocean-light">
                   <td className="px-4 py-3 font-medium">{r.title}</td>
                   <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{r.topic ?? "—"}</td>
+                  <td className="px-4 py-3">
+                    {(() => {
+                      const expired = r.expiration_date && new Date(r.expiration_date) < new Date();
+                      return (
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${expired ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
+                          {expired ? "Expired" : "Active"}
+                        </span>
+                      );
+                    })()}
+                  </td>
                   <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{new Date(r.created_at).toLocaleDateString()}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
