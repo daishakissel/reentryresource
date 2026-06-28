@@ -125,44 +125,44 @@ async function main() {
   lines.push("> Run \`npm run export-db-schema\` to regenerate");
   lines.push("");
 
-  // WHY Categories
-  const whys = await fetchTable("why_categories", "id,name,slug,definition,sort_order");
-  console.log(`  why_categories: ${whys.length} rows`);
-  lines.push(`## WHY Categories (${whys.length})`);
+  // Elements
+  const whys = await fetchTable("elements", "id,name,slug,definition,sort_order");
+  console.log(`  elements: ${whys.length} rows`);
+  lines.push(`## Elements (${whys.length})`);
   lines.push("");
   lines.push("| # | Name | Slug | Definition |");
   lines.push("|---|---|---|---|");
   whys.forEach((w, i) => lines.push(`| ${i + 1} | ${w.name} | ${w.slug} | ${w.definition || "—"} |`));
   lines.push("");
 
-  // WHAT Topics
-  const whats = await fetchTable("what_topics", "id,name,slug,sort_order");
-  console.log(`  what_topics: ${whats.length} rows`);
-  lines.push(`## WHAT Topics (${whats.length})`);
+  // Categories
+  const whats = await fetchTable("categories", "id,name,slug,sort_order");
+  console.log(`  categories: ${whats.length} rows`);
+  lines.push(`## Categories (${whats.length})`);
   lines.push("");
   lines.push("| # | Name | Slug |");
   lines.push("|---|---|---|");
   whats.forEach((w, i) => lines.push(`| ${i + 1} | ${w.name} | ${w.slug} |`));
   lines.push("");
 
-  // WHAT → WHY mappings
-  const mappings = await fetchTable("what_topics_why_categories", "what_topic_id,why_category_id", "what_topic_id");
+  // Category → Element mappings
+  const mappings = await fetchTable("categories_elements", "category_id,element_id", "category_id");
   console.log(`  what→why mappings: ${mappings.length} rows`);
   const whyLookup = Object.fromEntries(whys.map((w) => [w.id, w.name]));
   const whatLookup = Object.fromEntries(whats.map((w) => [w.id, w.name]));
-  lines.push(`## WHAT → WHY Mappings (${mappings.length})`);
+  lines.push(`## Category → Element Mappings (${mappings.length})`);
   lines.push("");
-  lines.push("| WHAT Topic | WHY Category |");
+  lines.push("| Category | Element |");
   lines.push("|---|---|");
   mappings.forEach((m) => {
-    lines.push(`| ${whatLookup[m.what_topic_id] || "?"} | ${whyLookup[m.why_category_id] || "?"} |`);
+    lines.push(`| ${whatLookup[m.category_id] || "?"} | ${whyLookup[m.element_id] || "?"} |`);
   });
   lines.push("");
 
   // WHERE
-  const wheres = await fetchTable("where_location_types", "id,name,definition,sort_order");
-  console.log(`  where_location_types: ${wheres.length} rows`);
-  lines.push(`## WHERE Location Types (${wheres.length})`);
+  const wheres = await fetchTable("modes", "id,name,definition,sort_order");
+  console.log(`  modes: ${wheres.length} rows`);
+  lines.push(`## Modes (${wheres.length})`);
   lines.push("");
   lines.push("| # | Name | Definition |");
   lines.push("|---|---|---|");
@@ -170,8 +170,6 @@ async function main() {
   lines.push("");
 
   // WHEN
-  const whens = await fetchTable("when_times", "id,name,definition,sort_order");
-  console.log(`  when_times: ${whens.length} rows`);
   lines.push(`## WHEN Times (${whens.length})`);
   lines.push("");
   lines.push("| # | Name | Definition |");
@@ -180,9 +178,9 @@ async function main() {
   lines.push("");
 
   // HOW
-  const hows = await fetchTable("how_formats", "id,name,definition,sort_order");
-  console.log(`  how_formats: ${hows.length} rows`);
-  lines.push(`## HOW Formats (${hows.length})`);
+  const hows = await fetchTable("formats", "id,name,definition,sort_order");
+  console.log(`  formats: ${hows.length} rows`);
+  lines.push(`## Formats (${hows.length})`);
   lines.push("");
   lines.push("| # | Name | Definition |");
   lines.push("|---|---|---|");
@@ -190,9 +188,9 @@ async function main() {
   lines.push("");
 
   // WHO
-  const whos = await fetchTable("who_centerings", "id,name,definition,sort_order");
-  console.log(`  who_centerings: ${whos.length} rows`);
-  lines.push(`## WHO Centerings (${whos.length})`);
+  const whos = await fetchTable("centerings", "id,name,definition,sort_order");
+  console.log(`  centerings: ${whos.length} rows`);
+  lines.push(`## Centerings (${whos.length})`);
   lines.push("");
   lines.push("| # | Name | Definition |");
   lines.push("|---|---|---|");
@@ -202,10 +200,8 @@ async function main() {
   // Row counts
   console.log("\n  Counting rows...");
   const countTables = [
-    "resources", "why_categories", "what_topics", "where_location_types",
-    "when_times", "how_formats", "who_centerings", "what_topics_why_categories",
-    "resources_where_location_types", "resources_when_times",
-    "resources_how_formats", "resources_who_centerings",
+    "resources", "elements", "categories", "modes",
+    "resources_formats", "resources_centerings",
     "shelters", "shelter_pages",
   ];
 
@@ -252,7 +248,7 @@ async function main() {
   lines.push("| phone | Phone number |");
   lines.push("| email | Email address |");
   lines.push("| website | URL |");
-  lines.push("| what_topic_id | FK to what_topics |");
+  lines.push("| category_id | FK to categories |");
   lines.push("| created_by | Admin email who created |");
   lines.push("| created_at | Auto timestamp |");
   lines.push("| updated_at | Auto timestamp |");

@@ -154,7 +154,7 @@ export default function RightSidebar({ expanded, onClose }: RightSidebarProps) {
   }
 
   function handleTouchEnd(e: React.TouchEvent) {
-    const diff = e.changedTouches[0].clientX - touchStartX.current;
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
     if (diff > 60) onClose();
   }
 
@@ -215,13 +215,13 @@ export default function RightSidebar({ expanded, onClose }: RightSidebarProps) {
     <aside
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      className={`fixed top-0 right-0 bottom-0 z-[1001] bg-white dark:bg-ocean-deeper flex flex-col transition-transform duration-300 ease-in-out overflow-y-auto w-64 ${
-        expanded ? "translate-x-0" : "translate-x-full"
+      className={`fixed top-0 left-0 bottom-0 z-[1001] bg-white dark:bg-ocean-deeper flex flex-col transition-transform duration-300 ease-in-out overflow-y-auto w-64 ${
+        expanded ? "translate-x-0" : "-translate-x-full"
       }`}
     >
       <div className="py-4">
-        {/* Close button - top left */}
-        <div className="flex justify-start px-3 mb-2">
+        {/* Close button - top right */}
+        <div className="flex justify-end px-3 mb-2">
           <button onClick={onClose} className="p-1 text-brand-gray dark:text-gray-400 hover:text-brand-gold" aria-label="Close menu">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

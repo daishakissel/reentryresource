@@ -7,9 +7,11 @@ interface ResourceGridProps {
   hasMore?: boolean;
   loadingMore?: boolean;
   onLoadMore?: () => void;
+  resourceModeMap?: Record<string, string[]>;
+  modeLookup?: Record<string, string>;
 }
 
-export default function ResourceGrid({ resources, hasMore, loadingMore, onLoadMore }: ResourceGridProps) {
+export default function ResourceGrid({ resources, hasMore, loadingMore, onLoadMore, resourceModeMap, modeLookup }: ResourceGridProps) {
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,9 +41,12 @@ export default function ResourceGrid({ resources, hasMore, loadingMore, onLoadMo
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
-        {resources.map((resource) => (
-          <ResourceCard key={resource.id} resource={resource} />
-        ))}
+        {resources.map((resource) => {
+          const modeNames = resourceModeMap && modeLookup
+            ? (resourceModeMap[resource.id] ?? []).map((id) => modeLookup[id]).filter(Boolean)
+            : [];
+          return <ResourceCard key={resource.id} resource={resource} modeLabels={modeNames} />;
+        })}
       </div>
       {hasMore && (
         <div ref={sentinelRef} className="py-8 text-center">

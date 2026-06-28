@@ -6,9 +6,10 @@ import type { Resource } from "@/types/database";
 
 interface ResourceCardProps {
   resource: Resource;
+  modeLabels?: string[];
 }
 
-export default function ResourceCard({ resource }: ResourceCardProps) {
+export default function ResourceCard({ resource, modeLabels = [] }: ResourceCardProps) {
   const href = `/resource/${resource.slug || resource.id}`;
   const [expanded, setExpanded] = useState(false);
   const descriptionLong = (resource.description?.length ?? 0) > 100;
@@ -49,10 +50,10 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
               </div>
             )}
             <div className="mt-auto flex items-end justify-between">
-              {resource.what_topics?.name ? (
+              {resource.categories?.name ? (
                 <div className="flex flex-wrap gap-1">
                   <span className="text-xs px-2 py-0.5 rounded bg-brand-gold-light text-brand-brown">
-                    {resource.what_topics.name}
+                    {resource.categories.name}
                   </span>
                 </div>
               ) : (
@@ -74,6 +75,15 @@ export default function ResourceCard({ resource }: ResourceCardProps) {
                 </button>
               )}
             </div>
+            {modeLabels.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {modeLabels.map((label) => (
+                  <span key={label} className="text-xs px-1.5 py-0.5 rounded bg-gray-100 dark:bg-ocean text-gray-600 dark:text-gray-400">
+                    {label}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </Link>

@@ -10,31 +10,21 @@ export async function GET() {
     { auth: { autoRefreshToken: false, persistSession: false } }
   );
 
-  const [
-    whyRes,
-    whatRes,
-    whereRes,
-    whenRes,
-    howRes,
-    whoRes,
-    whatWhyRes,
-  ] = await Promise.all([
-    client.from("why_categories").select("id, name, slug, definition, sort_order").order("sort_order"),
-    client.from("what_topics").select("id, name, slug, sort_order").order("sort_order"),
-    client.from("where_location_types").select("id, name, definition, sort_order").order("sort_order"),
-    client.from("when_times").select("id, name, definition, sort_order").order("sort_order"),
-    client.from("how_formats").select("id, name, definition, sort_order").order("sort_order"),
-    client.from("who_centerings").select("id, name, definition, sort_order").order("sort_order"),
-    client.from("what_topics_why_categories").select("what_topic_id, why_category_id"),
+  const [whyRes, whatRes, whereRes, howRes, whoRes, whatWhyRes] = await Promise.all([
+    client.from("elements").select("id, name, slug, definition, sort_order").order("sort_order"),
+    client.from("categories").select("id, name, slug, sort_order").order("sort_order"),
+    client.from("modes").select("id, name, definition, sort_order").order("sort_order"),
+    client.from("formats").select("id, name, definition, sort_order").order("sort_order"),
+    client.from("centerings").select("id, name, definition, sort_order").order("sort_order"),
+    client.from("categories_elements").select("category_id, element_id"),
   ]);
 
   return NextResponse.json({
-    why_categories: whyRes.data ?? [],
-    what_topics: whatRes.data ?? [],
-    where_location_types: whereRes.data ?? [],
-    when_times: whenRes.data ?? [],
-    how_formats: howRes.data ?? [],
-    who_centerings: whoRes.data ?? [],
-    what_topics_why_categories: whatWhyRes.data ?? [],
+    elements: whyRes.data ?? [],
+    categories: whatRes.data ?? [],
+    modes: whereRes.data ?? [],
+    formats: howRes.data ?? [],
+    centerings: whoRes.data ?? [],
+    categories_elements: whatWhyRes.data ?? [],
   });
 }

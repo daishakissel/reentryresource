@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { WHY_CATEGORIES } from "@/lib/constants";
+import { ELEMENTS } from "@/lib/constants";
 import { useEffect, useRef } from "react";
 
 interface SidebarProps {
@@ -10,7 +10,7 @@ interface SidebarProps {
   onClose: () => void;
 }
 
-const WHY_ICONS: Record<string, React.ReactNode> = {
+const ELEMENT_ICONS: Record<string, React.ReactNode> = {
   all: (
     <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
@@ -56,18 +56,18 @@ export default function Sidebar({ expanded, onClose }: SidebarProps) {
   useEffect(() => { onClose(); }, [pathname]);
 
   function handleTouchStart(e: React.TouchEvent) { touchStartX.current = e.touches[0].clientX; }
-  function handleTouchEnd(e: React.TouchEvent) { if (touchStartX.current - e.changedTouches[0].clientX > 60) onClose(); }
+  function handleTouchEnd(e: React.TouchEvent) { if (e.changedTouches[0].clientX - touchStartX.current > 60) onClose(); }
 
   return (
       <aside
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
-        className={`fixed top-0 left-0 bottom-0 z-[1001] bg-white dark:bg-ocean-deeper flex flex-col transition-transform duration-300 ease-in-out overflow-y-auto w-64 ${
-          expanded ? "translate-x-0" : "-translate-x-full"
+        className={`fixed top-0 right-0 bottom-0 z-[1001] bg-white dark:bg-ocean-deeper flex flex-col transition-transform duration-300 ease-in-out overflow-y-auto w-64 ${
+          expanded ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="py-4">
-          <div className="flex justify-end px-3 mb-2">
+          <div className="flex justify-start px-3 mb-2">
             <button onClick={onClose} className="p-1 text-brand-gray dark:text-gray-400 hover:text-brand-gold" aria-label="Close menu">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -81,7 +81,7 @@ export default function Sidebar({ expanded, onClose }: SidebarProps) {
               </h3>
             )}
             <nav className="space-y-1 px-2">
-              {WHY_CATEGORIES.map((cat) => {
+              {ELEMENTS.map((cat) => {
                 const isActive = cat.slug === "all" ? pathname === "/" : pathname === cat.href;
                 return (
                   <Link
@@ -95,7 +95,7 @@ export default function Sidebar({ expanded, onClose }: SidebarProps) {
                         : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-ocean-light"
                     } `}
                   >
-                    {WHY_ICONS[cat.slug]}
+                    {ELEMENT_ICONS[cat.slug]}
                     {<span>{cat.label}</span>}
                   </Link>
                 );

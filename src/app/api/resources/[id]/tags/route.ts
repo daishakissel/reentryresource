@@ -4,10 +4,9 @@ import { createClient } from "@supabase/supabase-js";
 export const dynamic = "force-dynamic";
 
 const TAG_JUNCTIONS = [
-  { label: "Where", table: "resources_where_location_types", fk: "where_location_type_id", lookup: "where_location_types" },
-  { label: "When", table: "resources_when_times", fk: "when_time_id", lookup: "when_times" },
-  { label: "How", table: "resources_how_formats", fk: "how_format_id", lookup: "how_formats" },
-  { label: "Who", table: "resources_who_centerings", fk: "who_centering_id", lookup: "who_centerings" },
+  { label: "Mode", table: "resources_modes", fk: "mode_id", lookup: "modes" },
+  { label: "Format", table: "resources_formats", fk: "format_id", lookup: "formats" },
+  { label: "Centering", table: "resources_centerings", fk: "centering_id", lookup: "centerings" },
 ];
 
 export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
@@ -19,34 +18,34 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
 
   const result: Record<string, string[]> = {};
 
-  // Get WHAT topic and its WHY categories
+  // Get WHAT topic and its elementies
   const { data: resource } = await client
     .from("resources")
-    .select("what_topic_id")
+    .select("category_id")
     .eq("id", params.id)
     .single();
 
-  if (resource?.what_topic_id) {
+  if (resource?.category_id) {
     const { data: topic } = await client
-      .from("what_topics")
+      .from("categories")
       .select("name")
-      .eq("id", resource.what_topic_id)
+      .eq("id", resource.category_id)
       .single();
-    if (topic) result["What"] = [topic.name];
+    if (topic) result["Category"] = [topic.name];
 
   }
 
   // Get WHY from direct junction table
   const { data: whyLinks } = await client
-    .from("resources_why_categories")
-    .select("why_category_id")
+    .from("resources_elements")
+    .select("element_id")
     .eq("resource_id", params.id);
   if (whyLinks && whyLinks.length > 0) {
     const { data: whys } = await client
-      .from("why_categories")
+      .from("elements")
       .select("name")
-      .in("id", whyLinks.map((l: any) => l.why_category_id));
-    if (whys) result["Why"] = whys.map((w: any) => w.name);
+      .in("id", whyLinks.map((l: any) => l.element_id));
+    if (whys) result["Element"] = whys.map((w: any) => w.name);
   }
 
   // Get junction table tags

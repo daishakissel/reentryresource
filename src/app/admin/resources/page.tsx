@@ -30,7 +30,7 @@ export default function AdminResourcesPage() {
   const fetchResources = useCallback(async () => {
     let query = supabase
       .from("resources")
-      .select("id, title, expiration_date, created_at, created_by, what_topics(name)")
+      .select("id, title, expiration_date, created_at, created_by, categories(name)")
       .order("created_at", { ascending: false });
 
     if (isAuthor && user) {
@@ -43,7 +43,7 @@ export default function AdminResourcesPage() {
       (data ?? []).map((r: any) => ({
         id: r.id,
         title: r.title,
-        topic: r.what_topics?.name ?? null,
+        topic: r.categories?.name ?? null,
         expiration_date: r.expiration_date ?? null,
         created_at: r.created_at,
       }))

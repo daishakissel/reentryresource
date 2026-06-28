@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
   // Fetch resources with topic name
   const { data: resources } = await client
     .from("resources")
-    .select("*, what_topics(name)")
+    .select("*, categories(name)")
     .order("title");
 
   if (!resources || resources.length === 0) {
@@ -28,23 +28,20 @@ export async function GET(req: NextRequest) {
   }
 
   // Fetch all junction data
-  const [whereRes, whenRes, howRes, whoRes] = await Promise.all([
-    client.from("resources_where_location_types").select("resource_id, where_location_type_id"),
-    client.from("resources_when_times").select("resource_id, when_time_id"),
-    client.from("resources_how_formats").select("resource_id, how_format_id"),
-    client.from("resources_who_centerings").select("resource_id, who_centering_id"),
+  const [whereRes, howRes, whoRes] = await Promise.all([
+    client.from("resources_modes").select("resource_id, mode_id"),
+    client.from("resources_formats").select("resource_id, format_id"),
+    client.from("resources_centerings").select("resource_id, centering_id"),
   ]);
 
   // Fetch lookup tables
-  const [whereTypes, whenTimes, howFormats, whoCenterings] = await Promise.all([
-    client.from("where_location_types").select("id, name"),
-    client.from("when_times").select("id, name"),
-    client.from("how_formats").select("id, name"),
-    client.from("who_centerings").select("id, name"),
+  const [whereTypes, howFormats, whoCenterings] = await Promise.all([
+    client.from("modes").select("id, name"),
+    client.from("formats").select("id, name"),
+    client.from("centerings").select("id, name"),
   ]);
 
   const whereLookup = Object.fromEntries((whereTypes.data ?? []).map((w: any) => [w.id, w.name]));
-  const whenLookup = Object.fromEntries((whenTimes.data ?? []).map((w: any) => [w.id, w.name]));
   const howLookup = Object.fromEntries((howFormats.data ?? []).map((w: any) => [w.id, w.name]));
   const whoLookup = Object.fromEntries((whoCenterings.data ?? []).map((w: any) => [w.id, w.name]));
 
@@ -61,17 +58,16 @@ export async function GET(req: NextRequest) {
     return map;
   }
 
-  const whereMap = buildMap(whereRes.data ?? [], "where_location_type_id", whereLookup);
-  const whenMap = buildMap(whenRes.data ?? [], "when_time_id", whenLookup);
-  const howMap = buildMap(howRes.data ?? [], "how_format_id", howLookup);
-  const whoMap = buildMap(whoRes.data ?? [], "who_centering_id", whoLookup);
+  const whereMap = buildMap(whereRes.data ?? [], "mode_id", whereLookup);
+  const howMap = buildMap(howRes.data ?? [], "format_id", howLookup);
+  const whoMap = buildMap(whoRes.data ?? [], "centering_id", whoLookup);
 
   // Build CSV
   const headers = [
     "title", "slug", "organization_name", "facility_name",
     "description", "engage", "content", "featured_image",
-    "what_topic",
-    "where_location_types", "when_times", "how_formats", "who_centerings",
+    "category",
+    "modes", "formats", "centerings",
     "street_address", "city", "state", "zip", "region", "country",
     "latitude", "longitude",
     "phone", "email", "website",
@@ -87,9 +83,8 @@ export async function GET(req: NextRequest) {
   const rows = resources.map((r: any) => [
     esc(r.title), esc(r.slug), esc(r.organization_name), esc(r.facility_name),
     esc(r.description), esc(r.engage), esc(r.content), esc(r.featured_image),
-    esc(r.what_topics?.name ?? ""),
+    esc(r.categories?.name ?? ""),
     esc((whereMap[r.id] ?? []).join("; ")),
-    esc((whenMap[r.id] ?? []).join("; ")),
     esc((howMap[r.id] ?? []).join("; ")),
     esc((whoMap[r.id] ?? []).join("; ")),
     esc(r.street_address), esc(r.city), esc(r.state), esc(r.zip), esc(r.region), esc(r.country),

@@ -2,10 +2,10 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { notFound } from "next/navigation";
-import ViewToggle, { MapToggleButton } from "@/components/ViewToggle";
+import ViewToggle, { MapToggleButton, ModeToggleButtons } from "@/components/ViewToggle";
 import ResourceFilter from "@/components/ResourceFilter";
 import { supabase } from "@/lib/supabase";
-import { WHY_CATEGORIES } from "@/lib/constants";
+import { ELEMENTS } from "@/lib/constants";
 import { useInfiniteResources } from "@/lib/useInfiniteResources";
 import { loadFilters, saveFilters, saveLastWhy } from "@/lib/filterStorage";
 
@@ -14,19 +14,21 @@ interface WhyPageProps {
 }
 
 export default function WhyPage({ params }: WhyPageProps) {
-  const category = WHY_CATEGORIES.find((c) => c.slug === params.slug);
+  const category = ELEMENTS.find((c) => c.slug === params.slug);
   const [selected, setSelected] = useState<Record<string, Set<string>>>({});
   const [loaded, setLoaded] = useState(false);
-  const [whyCategoryId, setWhyCategoryId] = useState<string | undefined>(undefined);
+  const [elementId, setWhyCategoryId] = useState<string | undefined>(undefined);
   const [topicIds, setTopicIds] = useState<string[] | undefined>(undefined);
   const [resolving, setResolving] = useState(true);
   const [showMap, setShowMap] = useState(false);
+  const [showInPerson, setShowInPerson] = useState(true);
+  const [showOnline, setShowOnline] = useState(true);
 
   useEffect(() => {
     const stored = loadFilters();
-    // Clear WHAT topics when switching WHY categories since they don't carry over
-    if (stored.what_topics) {
-      delete stored.what_topics;
+    // Clear WHAT topics when switching elementies since they don't carry over
+    if (stored.categories) {
+      delete stored.categories;
       saveFilters(stored);
     }
     setSelected(stored);
@@ -43,21 +45,21 @@ export default function WhyPage({ params }: WhyPageProps) {
     if (!category || category.slug === "all") return;
     setResolving(true);
 
-    const { data: whyCat } = await supabase
-      .from("why_categories")
+    const { data: elementCat } = await supabase
+      .from("elements")
       .select("id")
       .eq("slug", params.slug)
       .single();
 
-    if (!whyCat) { setResolving(false); return; }
-    setWhyCategoryId(whyCat.id);
+    if (!elementCat) { setResolving(false); return; }
+    setWhyCategoryId(elementCat.id);
 
     const { data: topicLinks } = await supabase
-      .from("what_topics_why_categories")
-      .select("what_topic_id")
-      .eq("why_category_id", whyCat.id);
+      .from("categories_elements")
+      .select("category_id")
+      .eq("element_id", elementCat.id);
 
-    setTopicIds((topicLinks ?? []).map((l: any) => l.what_topic_id));
+    setTopicIds((topicLinks ?? []).map((l: any) => l.category_id));
     setResolving(false);
   }, [params.slug, category]);
 
@@ -66,7 +68,7 @@ export default function WhyPage({ params }: WhyPageProps) {
   }, [resolveTopics]);
 
   const { resources, loading, loadingMore, hasMore, loadInitial, loadMore } =
-    useInfiniteResources({ topicIds, whyCategoryId, filters: selected });
+    useInfiniteResources({ topicIds, elementId, filters: selected });
 
   useEffect(() => {
     if (loaded && !resolving && topicIds !== undefined) {
@@ -81,9 +83,10 @@ export default function WhyPage({ params }: WhyPageProps) {
   return (
     <div>
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{category.label} Resources</h1>
-      <ResourceFilter selected={selected} onSelectionChange={handleSelectionChange} whyCategoryId={whyCategoryId} />
-      <div className="mb-4">
+      <ResourceFilter selected={selected} onSelectionChange={handleSelectionChange} elementId={elementId} />
+      <div className="flex flex-wrap gap-2 mb-4">
         <MapToggleButton showMap={showMap} onToggle={() => setShowMap((v) => !v)} />
+        <ModeToggleButtons showInPerson={showInPerson} showOnline={showOnline} onToggleInPerson={() => setShowInPerson((v) => !v)} onToggleOnline={() => setShowOnline((v) => !v)} />
       </div>
       {loading || resolving ? (
         <p className="text-gray-500">Loading resources...</p>
@@ -93,6 +96,8 @@ export default function WhyPage({ params }: WhyPageProps) {
           hasMore={hasMore}
           loadingMore={loadingMore}
           showMap={showMap}
+          showInPerson={showInPerson}
+          showOnline={showOnline}
           onLoadMore={loadMore}
         />
       )}

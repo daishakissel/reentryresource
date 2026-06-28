@@ -5,19 +5,18 @@ import type { Resource } from "@/types/database";
 const PAGE_SIZE = 10;
 
 const JUNCTION_MAP: Record<string, { table: string; fk: string }> = {
-  where_location_types: { table: "resources_where_location_types", fk: "where_location_type_id" },
-  when_times: { table: "resources_when_times", fk: "when_time_id" },
-  how_formats: { table: "resources_how_formats", fk: "how_format_id" },
-  who_centerings: { table: "resources_who_centerings", fk: "who_centering_id" },
+  modes: { table: "resources_modes", fk: "mode_id" },
+  formats: { table: "resources_formats", fk: "format_id" },
+  centerings: { table: "resources_centerings", fk: "centering_id" },
 };
 
 interface UseInfiniteResourcesOptions {
   topicIds?: string[];
-  whyCategoryId?: string;
+  elementId?: string;
   filters: Record<string, Set<string>>;
 }
 
-export function useInfiniteResources({ topicIds, whyCategoryId, filters }: UseInfiniteResourcesOptions) {
+export function useInfiniteResources({ topicIds, elementId, filters }: UseInfiniteResourcesOptions) {
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -38,19 +37,19 @@ export function useInfiniteResources({ topicIds, whyCategoryId, filters }: UseIn
     if (reset && activeFilters.length > 0) {
       let matchingIds: Set<string> | null = null;
 
-      // WHAT topic filter: strict match on what_topic_id
-      const whatFilter = activeFilters.find(([key]) => key === "what_topics");
+      // WHAT topic filter: strict match on category_id
+      const whatFilter = activeFilters.find(([key]) => key === "categories");
       if (whatFilter) {
         const { data: resources } = await supabase
           .from("resources")
           .select("id")
-          .in("what_topic_id", Array.from(whatFilter[1]));
+          .in("category_id", Array.from(whatFilter[1]));
         matchingIds = new Set((resources ?? []).map((r: any) => r.id));
       }
 
       // Junction filters: only narrow results for resources that HAVE entries
       for (const [filterKey, ids] of activeFilters) {
-        if (filterKey === "what_topics") continue;
+        if (filterKey === "categories") continue;
         const junction = JUNCTION_MAP[filterKey];
         if (!junction) continue;
         const { data: links } = await supabase
@@ -70,12 +69,12 @@ export function useInfiniteResources({ topicIds, whyCategoryId, filters }: UseIn
       matchedIdsRef.current = null;
     }
 
-    // If scoped to a WHY category, intersect with resources in that category
-    if (reset && whyCategoryId) {
+    // If scoped to a element, intersect with resources in that category
+    if (reset && elementId) {
       const { data: whyLinks } = await supabase
-        .from("resources_why_categories")
+        .from("resources_elements")
         .select("resource_id")
-        .eq("why_category_id", whyCategoryId);
+        .eq("element_id", elementId);
       const whyResourceIds = new Set((whyLinks ?? []).map((l: any) => l.resource_id));
       if (matchedIdsRef.current === null) {
         matchedIdsRef.current = Array.from(whyResourceIds);
@@ -97,13 +96,13 @@ export function useInfiniteResources({ topicIds, whyCategoryId, filters }: UseIn
     const today = new Date().toISOString().split("T")[0];
     let query = supabase
       .from("resources")
-      .select("*, what_topics(name)")
+      .select("*, categories(name)")
       .or(`expiration_date.is.null,expiration_date.gte.${today}`)
       .order("created_at", { ascending: false })
       .range(offset, offset + PAGE_SIZE - 1);
 
     if (topicIds && topicIds.length > 0) {
-      query = query.in("what_topic_id", topicIds);
+      query = query.in("category_id", topicIds);
     }
 
     if (matchedIdsRef.current !== null) {
@@ -122,7 +121,7 @@ export function useInfiniteResources({ topicIds, whyCategoryId, filters }: UseIn
     setHasMore(newResources.length === PAGE_SIZE);
     setLoading(false);
     setLoadingMore(false);
-  }, [filters, topicIds, whyCategoryId]);
+  }, [filters, topicIds, elementId]);
 
   const loadInitial = useCallback(() => {
     fetchPage(0, true);

@@ -8,29 +8,26 @@ interface FilterOption {
 }
 
 interface Filters {
-  what_topics: (FilterOption & { slug: string })[];
-  where_location_types: FilterOption[];
-  when_times: FilterOption[];
-  how_formats: FilterOption[];
-  who_centerings: FilterOption[];
-  what_topics_why_categories: { what_topic_id: string; why_category_id: string }[];
+  categories: (FilterOption & { slug: string })[];
+  modes: FilterOption[];
+  formats: FilterOption[];
+  centerings: FilterOption[];
+  categories_elements: { category_id: string; element_id: string }[];
 }
 
 const FILTER_SECTIONS = [
-  { label: "What", filterKey: "what_topics" },
-  { label: "Where", filterKey: "where_location_types" },
-  { label: "When", filterKey: "when_times" },
-  { label: "How", filterKey: "how_formats" },
-  { label: "Who", filterKey: "who_centerings" },
+  { label: "Categories", filterKey: "categories" },
+  { label: "Formats", filterKey: "formats" },
+  { label: "Centerings", filterKey: "centerings" },
 ];
 
 interface ResourceFilterProps {
   selected: Record<string, Set<string>>;
   onSelectionChange: (selected: Record<string, Set<string>>) => void;
-  whyCategoryId?: string;
+  elementId?: string;
 }
 
-export default function ResourceFilter({ selected, onSelectionChange, whyCategoryId }: ResourceFilterProps) {
+export default function ResourceFilter({ selected, onSelectionChange, elementId }: ResourceFilterProps) {
   const [open, setOpen] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
   const [filters, setFilters] = useState<Filters | null>(null);
@@ -45,13 +42,13 @@ export default function ResourceFilter({ selected, onSelectionChange, whyCategor
   }, []);
 
   useEffect(() => {
-    const countsUrl = whyCategoryId
-      ? `/api/filters/counts?whyCategoryId=${whyCategoryId}`
+    const countsUrl = elementId
+      ? `/api/filters/counts?elementId=${elementId}`
       : "/api/filters/counts";
     fetch(countsUrl, { cache: "no-store" }).then(async (res) => {
       if (res.ok) setCounts(await res.json());
     });
-  }, [whyCategoryId]);
+  }, [elementId]);
 
   function toggleSection(key: string) {
     setExpandedSections((prev) => {
@@ -97,12 +94,12 @@ export default function ResourceFilter({ selected, onSelectionChange, whyCategor
             FILTER_SECTIONS.map((section) => {
               let options: FilterOption[] = (filters as any)[section.filterKey] ?? [];
 
-              // Filter WHAT topics by WHY category when on a specific WHY page
-              if (section.filterKey === "what_topics" && whyCategoryId && filters.what_topics_why_categories) {
+              // Filter WHAT topics by element when on a specific WHY page
+              if (section.filterKey === "categories" && elementId && filters.categories_elements) {
                 const validTopicIds = new Set(
-                  filters.what_topics_why_categories
-                    .filter((link) => link.why_category_id === whyCategoryId)
-                    .map((link) => link.what_topic_id)
+                  filters.categories_elements
+                    .filter((link) => link.element_id === elementId)
+                    .map((link) => link.category_id)
                 );
                 options = options.filter((o) => validTopicIds.has(o.id));
               }
@@ -133,7 +130,7 @@ export default function ResourceFilter({ selected, onSelectionChange, whyCategor
                   {isExpanded && (
                     <div className="px-4 pb-3 flex flex-wrap gap-x-6 gap-y-2">
                       {options.map((opt) => {
-                        const count = section.filterKey === "what_topics" ? (counts[section.filterKey]?.[opt.id] ?? 0) : null;
+                        const count = section.filterKey === "categories" ? (counts[section.filterKey]?.[opt.id] ?? 0) : null;
                         return (
                           <label key={opt.id} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                             <input

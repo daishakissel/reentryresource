@@ -25,14 +25,13 @@ interface ResourceDetail {
   phone: string | null;
   email: string | null;
   website: string | null;
-  what_topic_id: string | null;
+  category_id: string | null;
   created_at: string;
-  what_topic: string | null;
-  why_categories: string[];
-  where_types: string[];
-  when_times: string[];
-  how_formats: string[];
-  who_centerings: string[];
+  category_name: string | null;
+  elements: string[];
+  modes_list: string[];
+  formats: string[];
+  centerings: string[];
 }
 
 async function fetchResource(slug: string): Promise<ResourceDetail | null> {
@@ -56,24 +55,22 @@ async function fetchResource(slug: string): Promise<ResourceDetail | null> {
 
   const detail: ResourceDetail = {
     ...resource,
-    what_topic: null,
-    why_categories: [],
-    where_types: [],
-    when_times: [],
-    how_formats: [],
-    who_centerings: [],
+    category_name: null,
+    elements: [],
+    modes_list: [],
+    formats: [],
+    centerings: [],
   };
 
   // Fetch tags via API
   const res = await fetch(`/api/resources/${resource.id}/tags`, { cache: "no-store" });
   if (res.ok) {
     const tags = await res.json();
-    detail.what_topic = tags["What"]?.[0] ?? null;
-    detail.why_categories = tags["Why"] ?? [];
-    detail.where_types = tags["Where"] ?? [];
-    detail.when_times = tags["When"] ?? [];
-    detail.how_formats = tags["How"] ?? [];
-    detail.who_centerings = tags["Who"] ?? [];
+    detail.category_name = tags["Category"]?.[0] ?? null;
+    detail.elements = tags["Element"] ?? [];
+    detail.modes_list = tags["Mode"] ?? [];
+    detail.formats = tags["Format"] ?? [];
+    detail.centerings = tags["Centering"] ?? [];
   }
 
   return detail;
@@ -101,12 +98,11 @@ export default function ResourceDetailPage({ params }: { params: { slug: string 
   const fullAddress = [resource.street_address, resource.city, resource.state, resource.zip].filter(Boolean).join(", ");
 
   const allLabels = [
-    ...(resource.why_categories.length > 0 ? resource.why_categories : []),
-    ...(resource.what_topic ? [resource.what_topic] : []),
-    ...resource.where_types,
-    ...resource.when_times,
-    ...resource.how_formats,
-    ...resource.who_centerings,
+    ...(resource.elements.length > 0 ? resource.elements : []),
+    ...(resource.category_name ? [resource.category_name] : []),
+    ...resource.modes_list,
+    ...resource.formats,
+    ...resource.centerings,
   ];
 
   const lastModified = resource.updated_at && resource.updated_at !== resource.created_at

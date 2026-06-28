@@ -27,17 +27,15 @@ export async function POST(req: NextRequest) {
   const client = getAdmin();
 
   // Load lookup tables for name → ID matching
-  const [topicsRes, whereRes, whenRes, howRes, whoRes] = await Promise.all([
-    client.from("what_topics").select("id, name"),
-    client.from("where_location_types").select("id, name"),
-    client.from("when_times").select("id, name"),
-    client.from("how_formats").select("id, name"),
-    client.from("who_centerings").select("id, name"),
+  const [topicsRes, whereRes, howRes, whoRes] = await Promise.all([
+    client.from("categories").select("id, name"),
+    client.from("modes").select("id, name"),
+    client.from("formats").select("id, name"),
+    client.from("centerings").select("id, name"),
   ]);
 
   const topicLookup = Object.fromEntries((topicsRes.data ?? []).map((t: any) => [t.name.toLowerCase(), t.id]));
   const whereLookup = Object.fromEntries((whereRes.data ?? []).map((w: any) => [w.name.toLowerCase(), w.id]));
-  const whenLookup = Object.fromEntries((whenRes.data ?? []).map((w: any) => [w.name.toLowerCase(), w.id]));
   const howLookup = Object.fromEntries((howRes.data ?? []).map((w: any) => [w.name.toLowerCase(), w.id]));
   const whoLookup = Object.fromEntries((whoRes.data ?? []).map((w: any) => [w.name.toLowerCase(), w.id]));
 
@@ -55,9 +53,9 @@ export async function POST(req: NextRequest) {
     const row = rows[i];
     if (!row.title) { skipped++; continue; }
 
-    // Match what_topic by name
-    const topicName = (row.what_topic || "").trim().toLowerCase();
-    const what_topic_id = topicName ? (topicLookup[topicName] || null) : null;
+    // Match category by name
+    const topicName = (row.category || "").trim().toLowerCase();
+    const category_id = topicName ? (topicLookup[topicName] || null) : null;
 
     // Generate slug
     const slug = (row.slug || row.title).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -75,7 +73,7 @@ export async function POST(req: NextRequest) {
         content: row.content || null,
         featured_image: row.featured_image || null,
         expiration_date: row.expiration_date || null,
-        what_topic_id,
+        category_id,
         street_address: row.street_address || null,
         city: row.city || null,
         state: row.state || null,
@@ -100,41 +98,35 @@ export async function POST(req: NextRequest) {
     }
 
     // Insert junction table entries
-    const whereIds = matchIds(row.where_location_types || "", whereLookup);
-    const whenIds = matchIds(row.when_times || "", whenLookup);
-    const howIds = matchIds(row.how_formats || "", howLookup);
-    const whoIds = matchIds(row.who_centerings || "", whoLookup);
+    const whereIds = matchIds(row.modes || "", whereLookup);
+    const howIds = matchIds(row.formats || "", howLookup);
+    const whoIds = matchIds(row.centerings || "", whoLookup);
 
     if (whereIds.length > 0) {
-      await client.from("resources_where_location_types").insert(
-        whereIds.map((id) => ({ resource_id: resource.id, where_location_type_id: id }))
-      );
-    }
-    if (whenIds.length > 0) {
-      await client.from("resources_when_times").insert(
-        whenIds.map((id) => ({ resource_id: resource.id, when_time_id: id }))
+      await client.from("resources_modes").insert(
+        whereIds.map((id) => ({ resource_id: resource.id, mode_id: id }))
       );
     }
     if (howIds.length > 0) {
-      await client.from("resources_how_formats").insert(
-        howIds.map((id) => ({ resource_id: resource.id, how_format_id: id }))
+      await client.from("resources_formats").insert(
+        howIds.map((id) => ({ resource_id: resource.id, format_id: id }))
       );
     }
     if (whoIds.length > 0) {
-      await client.from("resources_who_centerings").insert(
-        whoIds.map((id) => ({ resource_id: resource.id, who_centering_id: id }))
+      await client.from("resources_centerings").insert(
+        whoIds.map((id) => ({ resource_id: resource.id, centering_id: id }))
       );
     }
 
-    // Auto-populate WHY categories from WHAT topic
-    if (what_topic_id) {
+    // Auto-populate elementies from WHAT topic
+    if (category_id) {
       const { data: whyLinks } = await client
-        .from("what_topics_why_categories")
-        .select("why_category_id")
-        .eq("what_topic_id", what_topic_id);
+        .from("categories_elements")
+        .select("element_id")
+        .eq("category_id", category_id);
       if (whyLinks && whyLinks.length > 0) {
-        await client.from("resources_why_categories").insert(
-          whyLinks.map((l: any) => ({ resource_id: resource.id, why_category_id: l.why_category_id }))
+        await client.from("resources_elements").insert(
+          whyLinks.map((l: any) => ({ resource_id: resource.id, element_id: l.element_id }))
         );
       }
     }

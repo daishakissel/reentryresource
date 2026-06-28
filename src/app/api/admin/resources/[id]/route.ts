@@ -16,10 +16,9 @@ function getAdmin() {
 }
 
 const JUNCTION_TABLES: Record<string, { table: string; fk: string }> = {
-  where_location_type_ids: { table: "resources_where_location_types", fk: "where_location_type_id" },
-  when_time_ids: { table: "resources_when_times", fk: "when_time_id" },
-  how_format_ids: { table: "resources_how_formats", fk: "how_format_id" },
-  who_centering_ids: { table: "resources_who_centerings", fk: "who_centering_id" },
+  mode_ids: { table: "resources_modes", fk: "mode_id" },
+  format_ids: { table: "resources_formats", fk: "format_id" },
+  centering_ids: { table: "resources_centerings", fk: "centering_id" },
 };
 
 export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
@@ -32,7 +31,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     expiration_date,
     street_address, city, state, zip, region, country,
     latitude, longitude, phone, email, website,
-    what_topic_id,
+    category_id,
     ...junctionData
   } = body;
 
@@ -59,7 +58,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       phone: phone || null,
       email: email || null,
       website: website || null,
-      what_topic_id: what_topic_id || null,
+      category_id: category_id || null,
       updated_at: new Date().toISOString(),
     })
     .eq("id", params.id);
@@ -75,19 +74,19 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     }
   }
 
-  // Re-populate WHY categories from WHAT topic
-  await client.from("resources_why_categories").delete().eq("resource_id", params.id);
-  if (what_topic_id) {
+  // Re-populate elementies from WHAT topic
+  await client.from("resources_elements").delete().eq("resource_id", params.id);
+  if (category_id) {
     const { data: whyLinks } = await client
-      .from("what_topics_why_categories")
-      .select("why_category_id")
-      .eq("what_topic_id", what_topic_id);
+      .from("categories_elements")
+      .select("element_id")
+      .eq("category_id", category_id);
     if (whyLinks && whyLinks.length > 0) {
       const whyRows = whyLinks.map((l: any) => ({
         resource_id: params.id,
-        why_category_id: l.why_category_id,
+        element_id: l.element_id,
       }));
-      await client.from("resources_why_categories").insert(whyRows);
+      await client.from("resources_elements").insert(whyRows);
     }
   }
 

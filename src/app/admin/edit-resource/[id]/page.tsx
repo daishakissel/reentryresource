@@ -8,13 +8,12 @@ import ImageUpload from "@/components/ImageUpload";
 import ContentImageInsert from "@/components/ContentImageInsert";
 
 interface FilterOption { id: string; name: string }
-interface Filters { what_topics: FilterOption[]; where_location_types: FilterOption[]; when_times: FilterOption[]; how_formats: FilterOption[]; who_centerings: FilterOption[] }
+interface Filters { categories: FilterOption[]; modes: FilterOption[]; formats: FilterOption[]; centerings: FilterOption[] }
 
 const JUNCTION_LOAD: { key: string; table: string; fk: string }[] = [
-  { key: "where_location_type_ids", table: "resources_where_location_types", fk: "where_location_type_id" },
-  { key: "when_time_ids", table: "resources_when_times", fk: "when_time_id" },
-  { key: "how_format_ids", table: "resources_how_formats", fk: "how_format_id" },
-  { key: "who_centering_ids", table: "resources_who_centerings", fk: "who_centering_id" },
+  { key: "mode_ids", table: "resources_modes", fk: "mode_id" },
+  { key: "format_ids", table: "resources_formats", fk: "format_id" },
+  { key: "centering_ids", table: "resources_centerings", fk: "centering_id" },
 ];
 
 export default function EditResourcePage({ params }: { params: { id: string } }) {
@@ -74,7 +73,7 @@ export default function EditResourcePage({ params }: { params: { id: string } })
       setRegion(r.region ?? ""); setCountry(r.country ?? "");
       setLatitude(r.latitude?.toString() ?? ""); setLongitude(r.longitude?.toString() ?? "");
       setPhone(r.phone ?? ""); setEmail(r.email ?? ""); setWebsite(r.website ?? "");
-      setWhatTopicId(r.what_topic_id ?? "");
+      setWhatTopicId(r.category_id ?? "");
 
       const newSelected: Record<string, Set<string>> = {};
       await Promise.all(JUNCTION_LOAD.map(async (j) => {
@@ -109,7 +108,7 @@ export default function EditResourcePage({ params }: { params: { id: string } })
       title, slug, description, engage, content, featured_image: featuredImage,
       expiration_date: expirationDate || null,
       street_address: streetAddress, city, state, zip, region, country,
-      latitude, longitude, phone, email, website, what_topic_id: whatTopicId || null,
+      latitude, longitude, phone, email, website, category_id: whatTopicId || null,
     };
     for (const [key, ids] of Object.entries(selected)) { body[key] = Array.from(ids); }
 
@@ -126,10 +125,9 @@ export default function EditResourcePage({ params }: { params: { id: string } })
   if (!user) return null;
 
   const checkboxGroups = [
-    { label: "Where", key: "where_location_type_ids", filterKey: "where_location_types" },
-    { label: "When", key: "when_time_ids", filterKey: "when_times" },
-    { label: "How", key: "how_format_ids", filterKey: "how_formats" },
-    { label: "Who", key: "who_centering_ids", filterKey: "who_centerings" },
+    { label: "Mode", key: "mode_ids", filterKey: "modes" },
+    { label: "Format", key: "format_ids", filterKey: "formats" },
+    { label: "Centering", key: "centering_ids", filterKey: "centerings" },
   ];
 
   return (
@@ -163,10 +161,10 @@ export default function EditResourcePage({ params }: { params: { id: string } })
               <textarea value={content} onChange={(e) => setContent(e.target.value)} rows={10} className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent font-mono text-sm" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">What (Topic)</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
               <select value={whatTopicId} onChange={(e) => setWhatTopicId(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent">
                 <option value="">Select a topic</option>
-                {(filters?.what_topics ?? []).map((t) => (<option key={t.id} value={t.id}>{t.name}</option>))}
+                {(filters?.categories ?? []).map((t) => (<option key={t.id} value={t.id}>{t.name}</option>))}
               </select>
             </div>
             <div>

@@ -6,14 +6,13 @@ import { supabase } from "@/lib/supabase";
 import { searchResources } from "@/lib/searchUtils";
 import type { SearchableResource } from "@/lib/searchUtils";
 import { loadFilters, saveFilters, saveLastWhy } from "@/lib/filterStorage";
-import ViewToggle, { MapToggleButton } from "@/components/ViewToggle";
+import ViewToggle, { MapToggleButton, ModeToggleButtons } from "@/components/ViewToggle";
 import ResourceFilter from "@/components/ResourceFilter";
 
 const JUNCTION_MAP: Record<string, { table: string; fk: string }> = {
-  where_location_types: { table: "resources_where_location_types", fk: "where_location_type_id" },
-  when_times: { table: "resources_when_times", fk: "when_time_id" },
-  how_formats: { table: "resources_how_formats", fk: "how_format_id" },
-  who_centerings: { table: "resources_who_centerings", fk: "who_centering_id" },
+  modes: { table: "resources_modes", fk: "mode_id" },
+  formats: { table: "resources_formats", fk: "format_id" },
+  centerings: { table: "resources_centerings", fk: "centering_id" },
 };
 
 export default function SearchPage() {
@@ -33,6 +32,8 @@ function SearchPageInner() {
   const [selected, setSelected] = useState<Record<string, Set<string>>>({});
   const [loaded, setLoaded] = useState(false);
   const [showMap, setShowMap] = useState(false);
+  const [showInPerson, setShowInPerson] = useState(true);
+  const [showOnline, setShowOnline] = useState(true);
   const [junctionData, setJunctionData] = useState<Record<string, Record<string, string[]>>>({});
 
   // Sync query from URL when it changes
@@ -57,7 +58,7 @@ function SearchPageInner() {
     setLoading(true);
 
     const [resourcesRes, ...junctionResults] = await Promise.all([
-      supabase.from("resources").select("*, what_topics(name)").or(`expiration_date.is.null,expiration_date.gte.${new Date().toISOString().split("T")[0]}`).order("title"),
+      supabase.from("resources").select("*, categories(name)").or(`expiration_date.is.null,expiration_date.gte.${new Date().toISOString().split("T")[0]}`).order("title"),
       ...Object.entries(JUNCTION_MAP).map(([, config]) =>
         supabase.from(config.table).select(`resource_id, ${config.fk}`)
       ),
@@ -66,7 +67,7 @@ function SearchPageInner() {
     setAllResources(
       (resourcesRes.data ?? []).map((r: any) => ({
         ...r,
-        topic_name: r.what_topics?.name || "",
+        category_display: r.categories?.name || "",
         city_display: r.city || "",
       }))
     );
@@ -95,8 +96,8 @@ function SearchPageInner() {
 
     const activeFilters = Object.entries(selected).filter(([, ids]) => ids.size > 0);
     for (const [filterKey, ids] of activeFilters) {
-      if (filterKey === "what_topics") {
-        results = results.filter((r) => r.what_topic_id && ids.has(r.what_topic_id));
+      if (filterKey === "categories") {
+        results = results.filter((r) => r.category_id && ids.has(r.category_id));
       } else if (junctionData[filterKey]) {
         results = results.filter((r) => {
           const resourceFilterIds = junctionData[filterKey][r.id] ?? [];
@@ -124,6 +125,7 @@ function SearchPageInner() {
       <ResourceFilter selected={selected} onSelectionChange={handleSelectionChange} />
       <div className="mb-4">
         <MapToggleButton showMap={showMap} onToggle={() => setShowMap((v) => !v)} />
+        <ModeToggleButtons showInPerson={showInPerson} showOnline={showOnline} onToggleInPerson={() => setShowInPerson((v) => !v)} onToggleOnline={() => setShowOnline((v) => !v)} />
       </div>
 
       {loading ? (
@@ -134,7 +136,7 @@ function SearchPageInner() {
           <p className="text-sm text-gray-400 dark:text-gray-500">Try different keywords or check spelling</p>
         </div>
       ) : (
-        <ViewToggle resources={searchResults} showMap={showMap} />
+        <ViewToggle resources={searchResults} showMap={showMap} showInPerson={showInPerson} showOnline={showOnline} />
       )}
     </div>
   );

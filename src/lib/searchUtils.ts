@@ -2,7 +2,7 @@ import Fuse from "fuse.js";
 import type { Resource } from "@/types/database";
 
 export interface SearchableResource extends Resource {
-  topic_name?: string;
+  category_display?: string;
   city_display?: string;
 }
 
@@ -11,7 +11,7 @@ const fuseOptions: Fuse.IFuseOptions<SearchableResource> = {
     { name: "title", weight: 0.4 },
     { name: "description", weight: 0.2 },
     { name: "content", weight: 0.15 },
-    { name: "topic_name", weight: 0.15 },
+    { name: "category_display", weight: 0.15 },
     { name: "city", weight: 0.05 },
     { name: "street_address", weight: 0.05 },
   ],

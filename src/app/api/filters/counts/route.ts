@@ -10,24 +10,23 @@ export async function GET(req: NextRequest) {
     { auth: { autoRefreshToken: false, persistSession: false } }
   );
 
-  const whyCategoryId = req.nextUrl.searchParams.get("whyCategoryId");
+  const elementId = req.nextUrl.searchParams.get("elementId");
 
   const counts: Record<string, Record<string, number>> = {
-    what_topics: {},
-    where_location_types: {},
-    when_times: {},
-    how_formats: {},
-    who_centerings: {},
+    categories: {},
+    modes: {},
+    formats: {},
+    centerings: {},
   };
 
-  // If scoped to a WHY category, get resource IDs directly from junction table
+  // If scoped to a element, get resource IDs directly from junction table
   let scopedResourceIds: Set<string> | null = null;
 
-  if (whyCategoryId) {
+  if (elementId) {
     const { data: whyLinks } = await client
-      .from("resources_why_categories")
+      .from("resources_elements")
       .select("resource_id")
-      .eq("why_category_id", whyCategoryId);
+      .eq("element_id", elementId);
 
     scopedResourceIds = new Set((whyLinks ?? []).map((l: any) => l.resource_id));
 
@@ -35,34 +34,33 @@ export async function GET(req: NextRequest) {
     if (scopedResourceIds.size > 0) {
       const { data: resources } = await client
         .from("resources")
-        .select("what_topic_id")
+        .select("category_id")
         .in("id", Array.from(scopedResourceIds));
       if (resources) {
         for (const r of resources) {
-          if (r.what_topic_id) {
-            counts.what_topics[r.what_topic_id] = (counts.what_topics[r.what_topic_id] || 0) + 1;
+          if (r.category_id) {
+            counts.categories[r.category_id] = (counts.categories[r.category_id] || 0) + 1;
           }
         }
       }
     }
   } else {
     // Count all resources per topic
-    const { data: resources } = await client.from("resources").select("what_topic_id");
+    const { data: resources } = await client.from("resources").select("category_id");
     if (resources) {
       for (const r of resources) {
-        if (r.what_topic_id) {
-          counts.what_topics[r.what_topic_id] = (counts.what_topics[r.what_topic_id] || 0) + 1;
+        if (r.category_id) {
+          counts.categories[r.category_id] = (counts.categories[r.category_id] || 0) + 1;
         }
       }
     }
   }
 
-  // Junction table counts (scoped if whyCategoryId provided)
+  // Junction table counts (scoped if elementId provided)
   const junctions: { key: string; table: string; fk: string }[] = [
-    { key: "where_location_types", table: "resources_where_location_types", fk: "where_location_type_id" },
-    { key: "when_times", table: "resources_when_times", fk: "when_time_id" },
-    { key: "how_formats", table: "resources_how_formats", fk: "how_format_id" },
-    { key: "who_centerings", table: "resources_who_centerings", fk: "who_centering_id" },
+    { key: "modes", table: "resources_modes", fk: "mode_id" },
+    { key: "formats", table: "resources_formats", fk: "format_id" },
+    { key: "centerings", table: "resources_centerings", fk: "centering_id" },
   ];
 
   await Promise.all(

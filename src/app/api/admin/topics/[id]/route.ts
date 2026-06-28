@@ -19,28 +19,28 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   const caller = await verifyAuth(req);
   if (!caller) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { name, slug, why_category_ids } = await req.json();
+  const { name, slug, element_ids } = await req.json();
   if (!name || !slug) return NextResponse.json({ error: "Name and slug are required" }, { status: 400 });
-  if (!why_category_ids || why_category_ids.length === 0) {
-    return NextResponse.json({ error: "At least one WHY category is required" }, { status: 400 });
+  if (!element_ids || element_ids.length === 0) {
+    return NextResponse.json({ error: "At least one element is required" }, { status: 400 });
   }
 
   const client = getAdmin();
 
   const { error } = await client
-    .from("what_topics")
+    .from("categories")
     .update({ name, slug })
     .eq("id", params.id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 
   // Replace WHY mappings
-  await client.from("what_topics_why_categories").delete().eq("what_topic_id", params.id);
-  const rows = why_category_ids.map((whyId: string) => ({
-    what_topic_id: params.id,
-    why_category_id: whyId,
+  await client.from("categories_elements").delete().eq("category_id", params.id);
+  const rows = element_ids.map((whyId: string) => ({
+    category_id: params.id,
+    element_id: whyId,
   }));
-  await client.from("what_topics_why_categories").insert(rows);
+  await client.from("categories_elements").insert(rows);
 
   return NextResponse.json({ success: true });
 }
@@ -55,7 +55,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   const { count } = await client
     .from("resources")
     .select("id", { count: "exact", head: true })
-    .eq("what_topic_id", params.id);
+    .eq("category_id", params.id);
 
   if (count && count > 0) {
     return NextResponse.json({
@@ -64,8 +64,8 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
   }
 
   // Delete WHY mappings first, then the topic
-  await client.from("what_topics_why_categories").delete().eq("what_topic_id", params.id);
-  const { error } = await client.from("what_topics").delete().eq("id", params.id);
+  await client.from("categories_elements").delete().eq("category_id", params.id);
+  const { error } = await client.from("categories").delete().eq("id", params.id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json({ success: true });

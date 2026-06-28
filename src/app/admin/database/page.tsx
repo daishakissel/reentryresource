@@ -10,8 +10,8 @@ interface TopicRow {
   name: string;
   slug: string;
   resource_count: number;
-  why_names: string[];
-  why_ids: string[];
+  element_names: string[];
+  element_ids_list: string[];
 }
 
 interface WhyCategory {
@@ -25,7 +25,7 @@ export default function DatabasePage() {
   const router = useRouter();
 
   const [topics, setTopics] = useState<TopicRow[]>([]);
-  const [whyCategories, setWhyCategories] = useState<WhyCategory[]>([]);
+  const [elementCategories, setWhyCategories] = useState<WhyCategory[]>([]);
   const [loadingData, setLoadingData] = useState(true);
 
   // New topic form
@@ -59,7 +59,7 @@ export default function DatabasePage() {
     if (res.ok) {
       const data = await res.json();
       setTopics(data.topics);
-      setWhyCategories(data.why_categories);
+      setWhyCategories(data.elements);
     }
     setLoadingData(false);
   }, []);
@@ -74,7 +74,7 @@ export default function DatabasePage() {
     setCreateSuccess(null);
 
     if (newWhyIds.size === 0) {
-      setCreateError("Select at least one WHY category.");
+      setCreateError("Select at least one element.");
       return;
     }
 
@@ -82,7 +82,7 @@ export default function DatabasePage() {
     const res = await fetch("/api/admin/topics", {
       method: "POST",
       headers: { "Content-Type": "application/json", ...headers },
-      body: JSON.stringify({ name: newName, slug: newSlug, why_category_ids: Array.from(newWhyIds) }),
+      body: JSON.stringify({ name: newName, slug: newSlug, element_ids: Array.from(newWhyIds) }),
     });
 
     if (res.ok) {
@@ -101,14 +101,14 @@ export default function DatabasePage() {
     setEditId(topic.id);
     setEditName(topic.name);
     setEditSlug(topic.slug);
-    setEditWhyIds(new Set(topic.why_ids));
+    setEditWhyIds(new Set(topic.element_ids_list));
     setEditError(null);
   }
 
   async function handleSaveEdit() {
     if (!editId) return;
     if (editWhyIds.size === 0) {
-      setEditError("Select at least one WHY category.");
+      setEditError("Select at least one element.");
       return;
     }
 
@@ -116,7 +116,7 @@ export default function DatabasePage() {
     const res = await fetch(`/api/admin/topics/${editId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json", ...headers },
-      body: JSON.stringify({ name: editName, slug: editSlug, why_category_ids: Array.from(editWhyIds) }),
+      body: JSON.stringify({ name: editName, slug: editSlug, element_ids: Array.from(editWhyIds) }),
     });
 
     if (res.ok) {
@@ -147,7 +147,7 @@ export default function DatabasePage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Database — WHAT Topics</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Database — Categories</h1>
 
       {/* Add new topic */}
       <div className="mb-10">
@@ -180,9 +180,9 @@ export default function DatabasePage() {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">WHY Categories <span className="text-red-500">*</span></label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Elements <span className="text-red-500">*</span></label>
             <div className="flex flex-wrap gap-x-6 gap-y-2">
-              {whyCategories.map((wc) => (
+              {elementCategories.map((wc) => (
                 <label key={wc.id} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                   <input
                     type="checkbox"
@@ -218,7 +218,7 @@ export default function DatabasePage() {
               <thead className="bg-gray-50 dark:bg-ocean-dark">
                 <tr>
                   <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Topic</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">WHY Categories</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Elements</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Resources</th>
                   <th className="px-4 py-3 w-20"></th>
                 </tr>
@@ -241,7 +241,7 @@ export default function DatabasePage() {
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex flex-wrap gap-x-4 gap-y-1">
-                            {whyCategories.map((wc) => (
+                            {elementCategories.map((wc) => (
                               <label key={wc.id} className="flex items-center gap-1 text-xs text-gray-700 dark:text-gray-300">
                                 <input
                                   type="checkbox"
@@ -270,7 +270,7 @@ export default function DatabasePage() {
                     ) : (
                       <>
                         <td className="px-4 py-3 font-medium">{t.name}</td>
-                        <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{t.why_names.join(", ")}</td>
+                        <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{t.element_names.join(", ")}</td>
                         <td className="px-4 py-3 text-gray-500">{t.resource_count}</td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">

@@ -1,4 +1,4 @@
-export const WHY_CATEGORIES = [
+export const ELEMENTS = [
   { slug: "all", label: "All", href: "/" },
   { slug: "health", label: "Health", href: "/why/health" },
   { slug: "housing", label: "Housing", href: "/why/housing" },
@@ -8,4 +8,4 @@ export const WHY_CATEGORIES = [
   { slug: "my-team", label: "My Team", href: "/why/my-team" },
 ] as const;
 
-export type WhyCategorySlug = (typeof WHY_CATEGORIES)[number]["slug"];
+export type ElementSlug = (typeof ELEMENTS)[number]["slug"];

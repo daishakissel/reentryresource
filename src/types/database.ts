@@ -16,16 +16,16 @@ export type Resource = {
   phone: string | null;
   email: string | null;
   website: string | null;
-  what_topic_id: string | null;
+  category_id: string | null;
   engage: string | null;
   expiration_date: string | null;
   created_by: string;
   created_at: string;
   updated_at: string;
-  what_topics?: { name: string } | null;
+  categories?: { name: string } | null;
 };
 
-export type WhyCategory = {
+export type Element = {
   id: string;
   name: string;
   definition: string | null;
@@ -33,35 +33,28 @@ export type WhyCategory = {
   sort_order: number;
 };
 
-export type WhatTopic = {
+export type Category = {
   id: string;
   name: string;
   slug: string;
   sort_order: number;
 };
 
-export type WhereLocationType = {
+export type Mode = {
   id: string;
   name: string;
   definition: string | null;
   sort_order: number;
 };
 
-export type WhenTime = {
+export type Format = {
   id: string;
   name: string;
   definition: string | null;
   sort_order: number;
 };
 
-export type HowFormat = {
-  id: string;
-  name: string;
-  definition: string | null;
-  sort_order: number;
-};
-
-export type WhoCentering = {
+export type Centering = {
   id: string;
   name: string;
   definition: string | null;
