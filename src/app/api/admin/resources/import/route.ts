@@ -28,13 +28,14 @@ export async function POST(req: NextRequest) {
 
   // Load lookup tables for name → ID matching
   const [topicsRes, whereRes, howRes, whoRes] = await Promise.all([
-    client.from("categories").select("id, name"),
+    client.from("categories").select("id, name, default_featured_image"),
     client.from("modes").select("id, name"),
     client.from("formats").select("id, name"),
     client.from("centerings").select("id, name"),
   ]);
 
   const topicLookup = Object.fromEntries((topicsRes.data ?? []).map((t: any) => [t.name.toLowerCase(), t.id]));
+  const categoryImageLookup = Object.fromEntries((topicsRes.data ?? []).map((t: any) => [t.id, t.default_featured_image]));
   const whereLookup = Object.fromEntries((whereRes.data ?? []).map((w: any) => [w.name.toLowerCase(), w.id]));
   const howLookup = Object.fromEntries((howRes.data ?? []).map((w: any) => [w.name.toLowerCase(), w.id]));
   const whoLookup = Object.fromEntries((whoRes.data ?? []).map((w: any) => [w.name.toLowerCase(), w.id]));
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest) {
         description: row.description || null,
         engage: row.engage || null,
         content: row.content || null,
-        featured_image: row.featured_image || null,
+        featured_image: row.featured_image || (category_id ? categoryImageLookup[category_id] : null) || null,
         expiration_date: row.expiration_date || null,
         category_id,
         street_address: row.street_address || null,
@@ -85,6 +86,11 @@ export async function POST(req: NextRequest) {
         phone: row.phone || null,
         email: row.email || null,
         website: row.website || null,
+        source_url: row.source_url || row.website || null,
+        source_domain: row.source_domain || (row.website ? new URL(row.website).hostname.replace(/^www\./, "") : null),
+        scraped_at: row.scraped_at || new Date().toISOString(),
+        last_verified_at: new Date().toISOString(),
+        scrape_status: "active",
         created_by: row.created_by || caller.email || "",
         created_at: row.created_at || new Date().toISOString(),
         updated_at: row.updated_at || new Date().toISOString(),

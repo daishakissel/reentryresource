@@ -72,6 +72,7 @@ export async function GET(req: NextRequest) {
     "latitude", "longitude",
     "phone", "email", "website",
     "expiration_date",
+    "source_url", "source_domain",
     "created_by", "created_at", "updated_at",
   ];
 
@@ -91,6 +92,7 @@ export async function GET(req: NextRequest) {
     esc(r.latitude), esc(r.longitude),
     esc(r.phone), esc(r.email), esc(r.website),
     esc(r.expiration_date),
+    esc(r.source_url), esc(r.source_domain),
     esc(r.created_by), esc(r.created_at), esc(r.updated_at),
   ].join(","));
 

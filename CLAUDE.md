@@ -72,11 +72,11 @@ The database was renamed from the original WHY/WHAT/WHERE/HOW/WHO naming:
 
 ### Key Tables
 - `elements` — 6 rows
-- `categories` — 32 rows, each linked to elements via `categories_elements`
+- `categories` — 32 rows, each linked to elements via `categories_elements`, each has `default_featured_image` (SVG tarot-card URL in Supabase Storage at `resources/categories/`)
 - `modes` — 3 rows (In Person, Online, By Appointment Only)
 - `formats` — 4 rows
 - `centerings` — 19 rows
-- `resources` — main content table with slug, engage, expiration_date, category_id FK
+- `resources` — main content table with slug, engage, expiration_date, category_id FK, plus scrape tracking fields (source_url, source_domain, scraped_at, last_verified_at, scrape_status, content_hash)
 - `resources_modes`, `resources_formats`, `resources_centerings`, `resources_elements` — junction tables
 - `shelters` — with address, org name, phone, email, website, short_name
 - `shelter_pages` — with parent_id for tree structure
@@ -86,6 +86,7 @@ The database was renamed from the original WHY/WHAT/WHERE/HOW/WHO naming:
 - Elements are auto-populated via `categories_elements` junction when a resource is created/updated
 - The `when_times` and `resources_when_times` tables were DROPPED — "By Appointment Only" moved into `modes`
 - Import CSV uses semicolons (`;`) as separator, NOT commas (commas break "Classes, Workshops & Meetings")
+- CSV import auto-assigns the category's default featured image when no `featured_image` is provided
 - Resources without a format default to "Services" in the UI
 - Expired resources (past `expiration_date`) are hidden from public but visible in admin
 
@@ -123,7 +124,7 @@ The database was renamed from the original WHY/WHAT/WHERE/HOW/WHO naming:
 
 ## Development Notes
 - `next.config.js` has `ignoreBuildErrors: true` (temporary for deployment)
-- Supabase Storage buckets: `resources` (public), `shelters` (public)
+- Supabase Storage buckets: `resources` (public, includes `categories/` folder for default images), `shelters` (public)
 - `.env.local` needs: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
 - Kill old node processes: `kill $(lsof -t -i :3000)` before `npm run dev`
 - Load nvm: `export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"`

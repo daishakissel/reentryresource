@@ -42,7 +42,7 @@ These are **3 separate resources**, not one resource with multiple labels.
 Create a CSV file with these column headers (first row). Only `title` is mandatory.
 
 ```
-title,slug,organization_name,facility_name,description,engage,content,featured_image,category,modes,formats,centerings,street_address,city,state,zip,region,country,latitude,longitude,phone,email,website,expiration_date
+title,slug,organization_name,facility_name,description,engage,content,featured_image,category,modes,formats,centerings,street_address,city,state,zip,region,country,latitude,longitude,phone,email,website,expiration_date,source_url,source_domain
 ```
 
 ---
@@ -63,7 +63,7 @@ title,slug,organization_name,facility_name,description,engage,content,featured_i
 | description | Short summary for resource cards (~150 chars). Focus on what the service does, not the org. | `Free preschool for children birth to age 5 with health screenings and family support.` |
 | engage | Clear steps on how to access this resource. Be specific with phone numbers and processes. | `Call (503) 693-3262 or email HeadStart@caowash.org. Apply online or mail application.` |
 | content | Full details in HTML. Use headers, lists, and structure. Include eligibility, requirements, hours, and any specifics. | See examples below |
-| featured_image | URL to an image (copy from website or leave blank) | `https://example.com/logo.png` |
+| featured_image | URL to an image (leave blank to use the category's default tarot-card image; only fill if the resource has its own image) | `https://example.com/logo.png` |
 | expiration_date | YYYY-MM-DD if temporary. Leave empty for no expiration. | `2026-12-31` |
 
 ### Classification
@@ -86,8 +86,8 @@ title,slug,organization_name,facility_name,description,engage,content,featured_i
 | zip | ZIP code | `97123` |
 | region | County or region | `Washington County` |
 | country | Country | `United States` |
-| latitude | GPS latitude (leave blank — can be looked up later) | |
-| longitude | GPS longitude (leave blank — can be looked up later) | |
+| latitude | GPS latitude — look up from address (see Geocoding section below) | `45.5231` |
+| longitude | GPS longitude — look up from address (see Geocoding section below) | `-122.9896` |
 
 ### Contact
 | Column | Description | Example |
@@ -95,6 +95,14 @@ title,slug,organization_name,facility_name,description,engage,content,featured_i
 | phone | Program-specific phone if available, otherwise org main number | `503-693-3262` |
 | email | Program-specific email if available | `HeadStart@caowash.org` |
 | website | Direct link to the program's page, NOT the org homepage | `https://caowash.org/early-childhood-care-education/head-start` |
+
+### Scrape Tracking (auto-populated if blank)
+| Column | Description | Example |
+|---|---|---|
+| source_url | The page URL that was scraped (defaults to `website` if blank) | `https://caowash.org/early-childhood-care-education/head-start` |
+| source_domain | Root domain of the source (auto-derived from website if blank) | `caowash.org` |
+
+**Note:** `scraped_at`, `last_verified_at`, `scrape_status`, and `content_hash` are auto-populated during import — do NOT include them in the CSV.
 
 ---
 
@@ -139,6 +147,7 @@ Click into each program. If it has its own URL (e.g., `/housing-stability`, `/ut
 9. **Contact**: Use the program-specific phone/email if different from the org's main number
 10. **Website**: Link to the specific program page, not the homepage
 11. **Address**: Use the program-specific address if it has one
+12. **Latitude/Longitude**: Geocode the address (see Step 7)
 
 ### Step 4: Determine Modes
 
@@ -190,11 +199,34 @@ Use this template structure:
 </ul>
 ```
 
-### Step 7: Compile the CSV
+### Step 7: Geocode Addresses
+
+For every resource with a physical address, look up the latitude and longitude coordinates. This is required for the map to work.
+
+**Using Google Maps (easiest):**
+1. Go to [Google Maps](https://www.google.com/maps)
+2. Search for the full address (e.g., `1001 SW Baseline Street, Hillsboro, Oregon 97123`)
+3. Right-click on the pin → the coordinates appear at the top of the context menu (e.g., `45.5231, -122.9896`)
+4. Click the coordinates to copy them
+5. First number is latitude, second is longitude
+
+**Using Photon API (for bulk lookups):**
+```
+https://photon.komoot.io/api/?q=1001+SW+Baseline+Street+Hillsboro+Oregon+97123&limit=1
+```
+The result contains `coordinates: [longitude, latitude]` (note: longitude comes first in the API response).
+
+**Tips:**
+- If multiple resources share the same address, look it up once and reuse the coordinates
+- Online-only resources with no physical location can leave latitude/longitude blank
+- Always verify the pin lands on the correct building — some addresses geocode to nearby intersections
+- Use 4-6 decimal places for precision (e.g., `45.5231` not `45.5`)
+
+### Step 8: Compile the CSV
 
 Put one row per resource. Use semicolons (`;`) to separate multiple values in Modes, Formats, and Centerings.
 
-### Step 8: Import and Verify
+### Step 9: Import and Verify
 
 1. Log in to the admin panel
 2. Go to Resources → Import CSV
