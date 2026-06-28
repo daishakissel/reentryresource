@@ -32,18 +32,31 @@ export default function ViewToggle({ resources, hasMore, loadingMore, onLoadMore
   const [resourceFormatMap, setResourceFormatMap] = useState<Record<string, string[]>>({});
   const [modes, setModes] = useState<ModeItem[]>([]);
   const [resourceModeMap, setResourceModeMap] = useState<Record<string, string[]>>({});
+  const [resourceCategoryImages, setResourceCategoryImages] = useState<Record<string, { name: string; imageUrl: string }[]>>({});
   const [loaded, setLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
-    const [formatsRes, formatJunctionRes, modesRes, modeJunctionRes] = await Promise.all([
+    const [formatsRes, formatJunctionRes, modesRes, modeJunctionRes, catJunctionRes, categoriesRes] = await Promise.all([
       supabase.from("formats").select("id, name, sort_order").order("sort_order"),
       supabase.from("resources_formats").select("resource_id, format_id"),
       supabase.from("modes").select("id, name"),
       supabase.from("resources_modes").select("resource_id, mode_id"),
+      supabase.from("resources_categories").select("resource_id, category_id"),
+      supabase.from("categories").select("id, name, default_featured_image"),
     ]);
     setFormats(formatsRes.data ?? []);
     setModes(modesRes.data ?? []);
+
+    // Build category image map per resource
+    const catLookup = Object.fromEntries((categoriesRes.data ?? []).map((c: any) => [c.id, { name: c.name, imageUrl: c.default_featured_image }]));
+    const rcMap: Record<string, { name: string; imageUrl: string }[]> = {};
+    (catJunctionRes.data ?? []).forEach((row: any) => {
+      if (!rcMap[row.resource_id]) rcMap[row.resource_id] = [];
+      const cat = catLookup[row.category_id];
+      if (cat) rcMap[row.resource_id].push(cat);
+    });
+    setResourceCategoryImages(rcMap);
 
     const fMap: Record<string, string[]> = {};
     (formatJunctionRes.data ?? []).forEach((row: any) => {
@@ -170,6 +183,7 @@ export default function ViewToggle({ resources, hasMore, loadingMore, onLoadMore
             onLoadMore={onLoadMore}
             resourceModeMap={resourceModeMap}
             modeLookup={modeLookup}
+            resourceCategoryImages={resourceCategoryImages}
           />
         </div>
       )}

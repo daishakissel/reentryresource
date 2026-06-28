@@ -17,10 +17,10 @@ export async function GET(req: NextRequest) {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  // Fetch resources with topic name
+  // Fetch resources
   const { data: resources } = await client
     .from("resources")
-    .select("*, categories(name)")
+    .select("*")
     .order("title");
 
   if (!resources || resources.length === 0) {
@@ -28,19 +28,22 @@ export async function GET(req: NextRequest) {
   }
 
   // Fetch all junction data
-  const [whereRes, howRes, whoRes] = await Promise.all([
+  const [catRes, whereRes, howRes, whoRes] = await Promise.all([
+    client.from("resources_categories").select("resource_id, category_id"),
     client.from("resources_modes").select("resource_id, mode_id"),
     client.from("resources_formats").select("resource_id, format_id"),
     client.from("resources_centerings").select("resource_id, centering_id"),
   ]);
 
   // Fetch lookup tables
-  const [whereTypes, howFormats, whoCenterings] = await Promise.all([
+  const [catTypes, whereTypes, howFormats, whoCenterings] = await Promise.all([
+    client.from("categories").select("id, name"),
     client.from("modes").select("id, name"),
     client.from("formats").select("id, name"),
     client.from("centerings").select("id, name"),
   ]);
 
+  const catLookup = Object.fromEntries((catTypes.data ?? []).map((c: any) => [c.id, c.name]));
   const whereLookup = Object.fromEntries((whereTypes.data ?? []).map((w: any) => [w.id, w.name]));
   const howLookup = Object.fromEntries((howFormats.data ?? []).map((w: any) => [w.id, w.name]));
   const whoLookup = Object.fromEntries((whoCenterings.data ?? []).map((w: any) => [w.id, w.name]));
@@ -58,6 +61,7 @@ export async function GET(req: NextRequest) {
     return map;
   }
 
+  const catMap = buildMap(catRes.data ?? [], "category_id", catLookup);
   const whereMap = buildMap(whereRes.data ?? [], "mode_id", whereLookup);
   const howMap = buildMap(howRes.data ?? [], "format_id", howLookup);
   const whoMap = buildMap(whoRes.data ?? [], "centering_id", whoLookup);
@@ -84,7 +88,7 @@ export async function GET(req: NextRequest) {
   const rows = resources.map((r: any) => [
     esc(r.title), esc(r.slug), esc(r.organization_name), esc(r.facility_name),
     esc(r.description), esc(r.engage), esc(r.content), esc(r.featured_image),
-    esc(r.categories?.name ?? ""),
+    esc((catMap[r.id] ?? []).join("; ")),
     esc((whereMap[r.id] ?? []).join("; ")),
     esc((howMap[r.id] ?? []).join("; ")),
     esc((whoMap[r.id] ?? []).join("; ")),

@@ -25,9 +25,8 @@ interface ResourceDetail {
   phone: string | null;
   email: string | null;
   website: string | null;
-  category_id: string | null;
   created_at: string;
-  category_name: string | null;
+  category_names: string[];
   elements: string[];
   modes_list: string[];
   formats: string[];
@@ -55,7 +54,7 @@ async function fetchResource(slug: string): Promise<ResourceDetail | null> {
 
   const detail: ResourceDetail = {
     ...resource,
-    category_name: null,
+    category_names: [],
     elements: [],
     modes_list: [],
     formats: [],
@@ -66,7 +65,7 @@ async function fetchResource(slug: string): Promise<ResourceDetail | null> {
   const res = await fetch(`/api/resources/${resource.id}/tags`, { cache: "no-store" });
   if (res.ok) {
     const tags = await res.json();
-    detail.category_name = tags["Category"]?.[0] ?? null;
+    detail.category_names = tags["Category"] ?? [];
     detail.elements = tags["Element"] ?? [];
     detail.modes_list = tags["Mode"] ?? [];
     detail.formats = tags["Format"] ?? [];
@@ -100,7 +99,7 @@ export default function ResourceDetailPage({ params }: { params: { slug: string 
 
   const allLabels = [
     ...(resource.elements.length > 0 ? resource.elements : []),
-    ...(resource.category_name ? [resource.category_name] : []),
+    ...resource.category_names,
     ...resource.modes_list,
     ...resource.formats,
     ...resource.centerings,

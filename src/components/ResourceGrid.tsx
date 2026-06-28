@@ -2,6 +2,11 @@ import { useEffect, useRef } from "react";
 import type { Resource } from "@/types/database";
 import ResourceCard from "./ResourceCard";
 
+interface CategoryImage {
+  name: string;
+  imageUrl: string;
+}
+
 interface ResourceGridProps {
   resources: Resource[];
   hasMore?: boolean;
@@ -9,9 +14,10 @@ interface ResourceGridProps {
   onLoadMore?: () => void;
   resourceModeMap?: Record<string, string[]>;
   modeLookup?: Record<string, string>;
+  resourceCategoryImages?: Record<string, CategoryImage[]>;
 }
 
-export default function ResourceGrid({ resources, hasMore, loadingMore, onLoadMore, resourceModeMap, modeLookup }: ResourceGridProps) {
+export default function ResourceGrid({ resources, hasMore, loadingMore, onLoadMore, resourceModeMap, modeLookup, resourceCategoryImages }: ResourceGridProps) {
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -45,7 +51,8 @@ export default function ResourceGrid({ resources, hasMore, loadingMore, onLoadMo
           const modeNames = resourceModeMap && modeLookup
             ? (resourceModeMap[resource.id] ?? []).map((id) => modeLookup[id]).filter(Boolean)
             : [];
-          return <ResourceCard key={resource.id} resource={resource} modeLabels={modeNames} />;
+          const catImages = resourceCategoryImages?.[resource.id] ?? [];
+          return <ResourceCard key={resource.id} resource={resource} modeLabels={modeNames} categoryImages={catImages} />;
         })}
       </div>
       {hasMore && (

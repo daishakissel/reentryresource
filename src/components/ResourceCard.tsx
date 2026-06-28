@@ -4,12 +4,18 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import type { Resource } from "@/types/database";
 
+interface CategoryImage {
+  name: string;
+  imageUrl: string;
+}
+
 interface ResourceCardProps {
   resource: Resource;
   modeLabels?: string[];
+  categoryImages?: CategoryImage[];
 }
 
-export default function ResourceCard({ resource, modeLabels = [] }: ResourceCardProps) {
+export default function ResourceCard({ resource, modeLabels = [], categoryImages = [] }: ResourceCardProps) {
   const href = `/resource/${resource.slug || resource.id}`;
   const [expanded, setExpanded] = useState(false);
   const [isClamped, setIsClamped] = useState(false);
@@ -115,10 +121,14 @@ export default function ResourceCard({ resource, modeLabels = [] }: ResourceCard
             <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-2 text-sm">{resource.title}</h3>
           </div>
 
-          {/* Image: taller area, centered, no cropping */}
+          {/* Image area */}
           {resource.featured_image ? (
             <div className="h-52 bg-gray-100 dark:bg-ocean flex items-center justify-center flex-shrink-0 p-2">
               <img src={resource.featured_image} alt={resource.title} className="max-w-full max-h-full object-contain" />
+            </div>
+          ) : categoryImages.length > 0 ? (
+            <div className="h-52 bg-gray-100 dark:bg-ocean flex-shrink-0">
+              <CategoryIconGrid categories={categoryImages} />
             </div>
           ) : (
             <div className="h-52 bg-gray-100 dark:bg-ocean flex items-center justify-center flex-shrink-0">
@@ -136,11 +146,13 @@ export default function ResourceCard({ resource, modeLabels = [] }: ResourceCard
               </div>
             )}
             <div className="mt-auto flex items-end justify-between">
-              {resource.categories?.name ? (
+              {categoryImages.length > 0 ? (
                 <div className="flex flex-wrap gap-1">
-                  <span className="text-xs px-2 py-0.5 rounded bg-brand-gold-light text-brand-brown">
-                    {resource.categories.name}
-                  </span>
+                  {categoryImages.map((c) => (
+                    <span key={c.name} className="text-xs px-2 py-0.5 rounded bg-brand-gold-light text-brand-brown">
+                      {c.name}
+                    </span>
+                  ))}
                 </div>
               ) : (
                 <div />
@@ -173,6 +185,65 @@ export default function ResourceCard({ resource, modeLabels = [] }: ResourceCard
           </div>
         </div>
       </Link>
+    </div>
+  );
+}
+
+function CategoryIconGrid({ categories }: { categories: CategoryImage[] }) {
+  const count = categories.length;
+
+  if (count === 1) {
+    return (
+      <div className="w-full h-full flex items-center justify-center p-4">
+        <img src={categories[0].imageUrl} alt={categories[0].name} className="w-full h-full object-contain" />
+      </div>
+    );
+  }
+
+  if (count === 2) {
+    return (
+      <div className="w-full h-full flex items-center p-3">
+        <div className="flex-1 flex items-center justify-center h-full">
+          <img src={categories[0].imageUrl} alt={categories[0].name} className="max-w-full max-h-full object-contain" />
+        </div>
+        <div className="w-px h-3/4 bg-gray-300 dark:bg-gray-600" />
+        <div className="flex-1 flex items-center justify-center h-full">
+          <img src={categories[1].imageUrl} alt={categories[1].name} className="max-w-full max-h-full object-contain" />
+        </div>
+      </div>
+    );
+  }
+
+  if (count === 3) {
+    return (
+      <div className="w-full h-full flex flex-col p-3">
+        <div className="flex-1 flex items-center">
+          <div className="flex-1 flex items-center justify-center h-full">
+            <img src={categories[0].imageUrl} alt={categories[0].name} className="max-w-full max-h-full object-contain" />
+          </div>
+          <div className="w-px h-3/4 bg-gray-300 dark:bg-gray-600" />
+          <div className="flex-1 flex items-center justify-center h-full">
+            <img src={categories[1].imageUrl} alt={categories[1].name} className="max-w-full max-h-full object-contain" />
+          </div>
+        </div>
+        <div className="h-px w-3/4 mx-auto bg-gray-300 dark:bg-gray-600" />
+        <div className="flex-1 flex items-center justify-center">
+          <img src={categories[2].imageUrl} alt={categories[2].name} className="max-w-full max-h-full object-contain" />
+        </div>
+      </div>
+    );
+  }
+
+  // 4 categories: 2x2 grid
+  return (
+    <div className="w-full h-full grid grid-cols-2 grid-rows-2 p-3">
+      {categories.slice(0, 4).map((cat, i) => (
+        <div key={cat.name} className={`flex items-center justify-center ${
+          i % 2 === 0 ? "border-r border-gray-300 dark:border-gray-600" : ""
+        } ${i < 2 ? "border-b border-gray-300 dark:border-gray-600" : ""}`}>
+          <img src={cat.imageUrl} alt={cat.name} className="max-w-full max-h-full object-contain p-1" />
+        </div>
+      ))}
     </div>
   );
 }

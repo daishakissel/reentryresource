@@ -76,17 +76,18 @@ The database was renamed from the original WHY/WHAT/WHERE/HOW/WHO naming:
 - `modes` — 3 rows (In Person, Online, By Appointment Only)
 - `formats` — 4 rows
 - `centerings` — 19 rows
-- `resources` — main content table with slug, engage, expiration_date, category_id FK, plus scrape tracking fields (source_url, source_domain, scraped_at, last_verified_at, scrape_status, content_hash)
-- `resources_modes`, `resources_formats`, `resources_centerings`, `resources_elements` — junction tables
+- `resources` — main content table with slug, engage, expiration_date, plus scrape tracking fields (source_url, source_domain, scraped_at, last_verified_at, scrape_status, content_hash)
+- `resources_categories`, `resources_modes`, `resources_formats`, `resources_centerings`, `resources_elements` — junction tables
 - `shelters` — with address, org name, phone, email, website, short_name
 - `shelter_pages` — with parent_id for tree structure
 
 ### Important Notes
-- Resources have `category_id` (FK to `categories`), NOT `element_id`
-- Elements are auto-populated via `categories_elements` junction when a resource is created/updated
+- Resources link to categories via `resources_categories` junction table (many-to-many, max 4 categories per resource)
+- Elements are auto-populated as the union of all elements from all assigned categories
 - The `when_times` and `resources_when_times` tables were DROPPED — "By Appointment Only" moved into `modes`
 - Import CSV uses semicolons (`;`) as separator, NOT commas (commas break "Classes, Workshops & Meetings")
-- CSV import auto-assigns the category's default featured image when no `featured_image` is provided
+- Resource cards dynamically render category icon SVGs from Supabase Storage when no `featured_image` is set (1-4 icons in grid layout)
+- CSV category field supports semicolons for multiple categories (e.g., `Shelter; Food`)
 - Resources without a format default to "Services" in the UI
 - Expired resources (past `expiration_date`) are hidden from public but visible in admin
 

@@ -16,6 +16,7 @@ function getAdmin() {
 }
 
 const JUNCTION_TABLES: Record<string, { table: string; fk: string }> = {
+  category_ids: { table: "resources_categories", fk: "category_id" },
   mode_ids: { table: "resources_modes", fk: "mode_id" },
   format_ids: { table: "resources_formats", fk: "format_id" },
   centering_ids: { table: "resources_centerings", fk: "centering_id" },
@@ -31,7 +32,6 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     expiration_date,
     street_address, city, state, zip, region, country,
     latitude, longitude, phone, email, website,
-    category_id,
     ...junctionData
   } = body;
 
@@ -58,7 +58,6 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
       phone: phone || null,
       email: email || null,
       website: website || null,
-      category_id: category_id || null,
       updated_at: new Date().toISOString(),
     })
     .eq("id", params.id);
@@ -74,17 +73,19 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     }
   }
 
-  // Re-populate elementies from WHAT topic
+  // Re-populate elements from all assigned categories
   await client.from("resources_elements").delete().eq("resource_id", params.id);
-  if (category_id) {
+  const categoryIds: string[] = junctionData.category_ids ?? [];
+  if (categoryIds.length > 0) {
     const { data: whyLinks } = await client
       .from("categories_elements")
       .select("element_id")
-      .eq("category_id", category_id);
+      .in("category_id", categoryIds);
     if (whyLinks && whyLinks.length > 0) {
-      const whyRows = whyLinks.map((l: any) => ({
+      const uniqueElementIds = [...new Set(whyLinks.map((l: any) => l.element_id))];
+      const whyRows = uniqueElementIds.map((eid) => ({
         resource_id: params.id,
-        element_id: l.element_id,
+        element_id: eid,
       }));
       await client.from("resources_elements").insert(whyRows);
     }

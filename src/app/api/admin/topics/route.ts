@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
   const [topicsRes, mappingsRes, resourcesRes, whyRes] = await Promise.all([
     client.from("categories").select("id, name, slug, sort_order").order("sort_order"),
     client.from("categories_elements").select("category_id, element_id"),
-    client.from("resources").select("category_id"),
+    client.from("resources_categories").select("resource_id, category_id"),
     client.from("elements").select("id, name, slug").order("sort_order"),
   ]);
 
@@ -33,13 +33,14 @@ export async function GET(req: NextRequest) {
   const resources = resourcesRes.data ?? [];
   const elementCategories = whyRes.data ?? [];
 
-  // Count resources per topic
+  // Count resources per topic (via junction table)
   const resourceCounts: Record<string, number> = {};
   resources.forEach((r: any) => {
     if (r.category_id) {
       resourceCounts[r.category_id] = (resourceCounts[r.category_id] || 0) + 1;
     }
   });
+
 
   // Group elementies per topic
   const topicWhys: Record<string, string[]> = {};

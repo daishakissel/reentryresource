@@ -11,6 +11,7 @@ interface FilterOption { id: string; name: string }
 interface Filters { categories: FilterOption[]; modes: FilterOption[]; formats: FilterOption[]; centerings: FilterOption[] }
 
 const JUNCTION_LOAD: { key: string; table: string; fk: string }[] = [
+  { key: "category_ids", table: "resources_categories", fk: "category_id" },
   { key: "mode_ids", table: "resources_modes", fk: "mode_id" },
   { key: "format_ids", table: "resources_formats", fk: "format_id" },
   { key: "centering_ids", table: "resources_centerings", fk: "centering_id" },
@@ -44,7 +45,6 @@ export default function EditResourcePage({ params }: { params: { id: string } })
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [website, setWebsite] = useState("");
-  const [whatTopicId, setWhatTopicId] = useState("");
 
   const [selected, setSelected] = useState<Record<string, Set<string>>>(() => {
     const init: Record<string, Set<string>> = {};
@@ -73,7 +73,7 @@ export default function EditResourcePage({ params }: { params: { id: string } })
       setRegion(r.region ?? ""); setCountry(r.country ?? "");
       setLatitude(r.latitude?.toString() ?? ""); setLongitude(r.longitude?.toString() ?? "");
       setPhone(r.phone ?? ""); setEmail(r.email ?? ""); setWebsite(r.website ?? "");
-      setWhatTopicId(r.category_id ?? "");
+      // category loaded via junction in JUNCTION_LOAD
 
       const newSelected: Record<string, Set<string>> = {};
       await Promise.all(JUNCTION_LOAD.map(async (j) => {
@@ -108,7 +108,7 @@ export default function EditResourcePage({ params }: { params: { id: string } })
       title, slug, description, engage, content, featured_image: featuredImage,
       expiration_date: expirationDate || null,
       street_address: streetAddress, city, state, zip, region, country,
-      latitude, longitude, phone, email, website, category_id: whatTopicId || null,
+      latitude, longitude, phone, email, website,
     };
     for (const [key, ids] of Object.entries(selected)) { body[key] = Array.from(ids); }
 
@@ -125,6 +125,7 @@ export default function EditResourcePage({ params }: { params: { id: string } })
   if (!user) return null;
 
   const checkboxGroups = [
+    { label: "Category", key: "category_ids", filterKey: "categories" },
     { label: "Mode", key: "mode_ids", filterKey: "modes" },
     { label: "Format", key: "format_ids", filterKey: "formats" },
     { label: "Centering", key: "centering_ids", filterKey: "centerings" },
@@ -159,13 +160,6 @@ export default function EditResourcePage({ params }: { params: { id: string } })
                 <ContentImageInsert bucket="resources" folder="content" onInsert={(tag) => setContent((prev) => prev + "\n" + tag + "\n")} />
               </div>
               <textarea value={content} onChange={(e) => setContent(e.target.value)} rows={10} className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent font-mono text-sm" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
-              <select value={whatTopicId} onChange={(e) => setWhatTopicId(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent">
-                <option value="">Select a topic</option>
-                {(filters?.categories ?? []).map((t) => (<option key={t.id} value={t.id}>{t.name}</option>))}
-              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Expiration Date</label>

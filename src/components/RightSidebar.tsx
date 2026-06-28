@@ -354,7 +354,7 @@ export default function RightSidebar({ expanded, onClose }: RightSidebarProps) {
           {isLoggedIn ? (
             <nav className="space-y-1 px-2">
               <button
-                onClick={toggleTheme}
+                onClick={() => { toggleTheme(); onClose(); }}
                 title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
                 className="w-full flex items-center gap-3 px-2 py-2 rounded-md text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-ocean-light whitespace-nowrap transition-colors"
               >
@@ -391,7 +391,7 @@ export default function RightSidebar({ expanded, onClose }: RightSidebarProps) {
             </nav>
           ) : (
             <nav className="space-y-1 px-2">
-              <button onClick={toggleTheme} title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"} className="w-full flex items-center gap-3 px-2 py-2 rounded-md text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-ocean-light whitespace-nowrap transition-colors">
+              <button onClick={() => { toggleTheme(); onClose(); }} title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"} className="w-full flex items-center gap-3 px-2 py-2 rounded-md text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-ocean-light whitespace-nowrap transition-colors">
                 {theme === "light" ? (
                   <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
                 ) : (

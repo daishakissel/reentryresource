@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 export const dynamic = "force-dynamic";
 
 const TAG_JUNCTIONS = [
+  { label: "Category", table: "resources_categories", fk: "category_id", lookup: "categories" },
   { label: "Mode", table: "resources_modes", fk: "mode_id", lookup: "modes" },
   { label: "Format", table: "resources_formats", fk: "format_id", lookup: "formats" },
   { label: "Centering", table: "resources_centerings", fk: "centering_id", lookup: "centerings" },
@@ -17,23 +18,6 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
   );
 
   const result: Record<string, string[]> = {};
-
-  // Get WHAT topic and its elementies
-  const { data: resource } = await client
-    .from("resources")
-    .select("category_id")
-    .eq("id", params.id)
-    .single();
-
-  if (resource?.category_id) {
-    const { data: topic } = await client
-      .from("categories")
-      .select("name")
-      .eq("id", resource.category_id)
-      .single();
-    if (topic) result["Category"] = [topic.name];
-
-  }
 
   // Get WHY from direct junction table
   const { data: whyLinks } = await client

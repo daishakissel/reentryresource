@@ -30,34 +30,13 @@ export async function GET(req: NextRequest) {
 
     scopedResourceIds = new Set((whyLinks ?? []).map((l: any) => l.resource_id));
 
-    // Count WHAT topics within scope
-    if (scopedResourceIds.size > 0) {
-      const { data: resources } = await client
-        .from("resources")
-        .select("category_id")
-        .in("id", Array.from(scopedResourceIds));
-      if (resources) {
-        for (const r of resources) {
-          if (r.category_id) {
-            counts.categories[r.category_id] = (counts.categories[r.category_id] || 0) + 1;
-          }
-        }
-      }
-    }
-  } else {
-    // Count all resources per topic
-    const { data: resources } = await client.from("resources").select("category_id");
-    if (resources) {
-      for (const r of resources) {
-        if (r.category_id) {
-          counts.categories[r.category_id] = (counts.categories[r.category_id] || 0) + 1;
-        }
-      }
-    }
   }
+
+  // Categories are now counted via junction table like other dimensions
 
   // Junction table counts (scoped if elementId provided)
   const junctions: { key: string; table: string; fk: string }[] = [
+    { key: "categories", table: "resources_categories", fk: "category_id" },
     { key: "modes", table: "resources_modes", fk: "mode_id" },
     { key: "formats", table: "resources_formats", fk: "format_id" },
     { key: "centerings", table: "resources_centerings", fk: "centering_id" },

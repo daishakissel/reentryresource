@@ -10,6 +10,7 @@ import ViewToggle, { MapToggleButton, ModeToggleButtons } from "@/components/Vie
 import ResourceFilter from "@/components/ResourceFilter";
 
 const JUNCTION_MAP: Record<string, { table: string; fk: string }> = {
+  categories: { table: "resources_categories", fk: "category_id" },
   modes: { table: "resources_modes", fk: "mode_id" },
   formats: { table: "resources_formats", fk: "format_id" },
   centerings: { table: "resources_centerings", fk: "centering_id" },
@@ -58,7 +59,7 @@ function SearchPageInner() {
     setLoading(true);
 
     const [resourcesRes, ...junctionResults] = await Promise.all([
-      supabase.from("resources").select("*, categories(name)").or(`expiration_date.is.null,expiration_date.gte.${new Date().toISOString().split("T")[0]}`).order("title"),
+      supabase.from("resources").select("*").or(`expiration_date.is.null,expiration_date.gte.${new Date().toISOString().split("T")[0]}`).order("title"),
       ...Object.entries(JUNCTION_MAP).map(([, config]) =>
         supabase.from(config.table).select(`resource_id, ${config.fk}`)
       ),
@@ -96,9 +97,7 @@ function SearchPageInner() {
 
     const activeFilters = Object.entries(selected).filter(([, ids]) => ids.size > 0);
     for (const [filterKey, ids] of activeFilters) {
-      if (filterKey === "categories") {
-        results = results.filter((r) => r.category_id && ids.has(r.category_id));
-      } else if (junctionData[filterKey]) {
+      if (junctionData[filterKey]) {
         results = results.filter((r) => {
           const resourceFilterIds = junctionData[filterKey][r.id] ?? [];
           return resourceFilterIds.some((id) => ids.has(id));

@@ -45,9 +45,9 @@ export default function AddResourcePage() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [website, setWebsite] = useState("");
-  const [whatTopicId, setWhatTopicId] = useState("");
 
   const [selected, setSelected] = useState<Record<string, Set<string>>>({
+    category_ids: new Set(),
     mode_ids: new Set(),
     format_ids: new Set(),
     centering_ids: new Set(),
@@ -99,7 +99,6 @@ export default function AddResourcePage() {
       expiration_date: expirationDate || null,
       street_address: streetAddress, city, state, zip, region, country,
       latitude, longitude, phone, email, website,
-      category_id: whatTopicId || null,
     };
     for (const [key, ids] of Object.entries(selected)) {
       body[key] = Array.from(ids);
@@ -137,6 +136,7 @@ export default function AddResourcePage() {
   }
 
   const checkboxGroups = [
+    { label: "Category", key: "category_ids", filterKey: "categories" },
     { label: "Mode", key: "mode_ids", filterKey: "modes" },
     { label: "Format", key: "format_ids", filterKey: "formats" },
     { label: "Centering", key: "centering_ids", filterKey: "centerings" },
@@ -172,15 +172,6 @@ export default function AddResourcePage() {
                 <ContentImageInsert bucket="resources" folder="content" onInsert={(tag) => setContent((prev) => prev + "\n" + tag + "\n")} />
               </div>
               <textarea value={content} onChange={(e) => setContent(e.target.value)} rows={10} className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent font-mono text-sm" placeholder="Detailed content..." />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category <span className="text-red-500">*</span></label>
-              <select value={whatTopicId} onChange={(e) => setWhatTopicId(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent">
-                <option value="">Select a topic</option>
-                {(filters?.categories ?? []).map((t) => (
-                  <option key={t.id} value={t.id}>{t.name}</option>
-                ))}
-              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Expiration Date</label>

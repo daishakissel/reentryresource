@@ -9,7 +9,7 @@ import Link from "next/link";
 interface ResourceRow {
   id: string;
   title: string;
-  topic: string | null;
+  categories: string[];
   expiration_date: string | null;
   created_at: string;
 }
@@ -30,7 +30,7 @@ export default function AdminResourcesPage() {
   const fetchResources = useCallback(async () => {
     let query = supabase
       .from("resources")
-      .select("id, title, expiration_date, created_at, created_by, categories(name)")
+      .select("id, title, expiration_date, created_at, created_by")
       .order("created_at", { ascending: false });
 
     if (isAuthor && user) {
@@ -38,12 +38,26 @@ export default function AdminResourcesPage() {
     }
 
     const { data } = await query;
+    const resourceIds = (data ?? []).map((r: any) => r.id);
+
+    // Fetch categories via junction table
+    const [catJunctionRes, catRes] = await Promise.all([
+      supabase.from("resources_categories").select("resource_id, category_id").in("resource_id", resourceIds),
+      supabase.from("categories").select("id, name"),
+    ]);
+    const catLookup = Object.fromEntries((catRes.data ?? []).map((c: any) => [c.id, c.name]));
+    const catMap: Record<string, string[]> = {};
+    (catJunctionRes.data ?? []).forEach((row: any) => {
+      if (!catMap[row.resource_id]) catMap[row.resource_id] = [];
+      const name = catLookup[row.category_id];
+      if (name) catMap[row.resource_id].push(name);
+    });
 
     setResources(
       (data ?? []).map((r: any) => ({
         id: r.id,
         title: r.title,
-        topic: r.categories?.name ?? null,
+        categories: catMap[r.id] ?? [],
         expiration_date: r.expiration_date ?? null,
         created_at: r.created_at,
       }))
@@ -224,7 +238,7 @@ export default function AdminResourcesPage() {
             <thead className="bg-gray-50 dark:bg-ocean-dark">
               <tr>
                 <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Title</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Topic</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Categories</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Status</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Created</th>
                 <th className="px-4 py-3 w-20"></th>
@@ -234,7 +248,7 @@ export default function AdminResourcesPage() {
               {resources.map((r) => (
                 <tr key={r.id} className="border-t border-gray-100 dark:border-ocean-light hover:bg-gray-50 dark:hover:bg-ocean-light">
                   <td className="px-4 py-3 font-medium">{r.title}</td>
-                  <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{r.topic ?? "—"}</td>
+                  <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{r.categories.length > 0 ? r.categories.join(", ") : "—"}</td>
                   <td className="px-4 py-3">
                     {(() => {
                       const expired = r.expiration_date && new Date(r.expiration_date) < new Date();

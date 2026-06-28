@@ -28,14 +28,13 @@ export async function POST(req: NextRequest) {
 
   // Load lookup tables for name → ID matching
   const [topicsRes, whereRes, howRes, whoRes] = await Promise.all([
-    client.from("categories").select("id, name, default_featured_image"),
+    client.from("categories").select("id, name"),
     client.from("modes").select("id, name"),
     client.from("formats").select("id, name"),
     client.from("centerings").select("id, name"),
   ]);
 
   const topicLookup = Object.fromEntries((topicsRes.data ?? []).map((t: any) => [t.name.toLowerCase(), t.id]));
-  const categoryImageLookup = Object.fromEntries((topicsRes.data ?? []).map((t: any) => [t.id, t.default_featured_image]));
   const whereLookup = Object.fromEntries((whereRes.data ?? []).map((w: any) => [w.name.toLowerCase(), w.id]));
   const howLookup = Object.fromEntries((howRes.data ?? []).map((w: any) => [w.name.toLowerCase(), w.id]));
   const whoLookup = Object.fromEntries((whoRes.data ?? []).map((w: any) => [w.name.toLowerCase(), w.id]));
@@ -54,9 +53,8 @@ export async function POST(req: NextRequest) {
     const row = rows[i];
     if (!row.title) { skipped++; continue; }
 
-    // Match category by name
-    const topicName = (row.category || "").trim().toLowerCase();
-    const category_id = topicName ? (topicLookup[topicName] || null) : null;
+    // Match categories by name (semicolon-separated)
+    const categoryIds = matchIds(row.category || "", topicLookup);
 
     // Generate slug
     const slug = (row.slug || row.title).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
@@ -72,9 +70,8 @@ export async function POST(req: NextRequest) {
         description: row.description || null,
         engage: row.engage || null,
         content: row.content || null,
-        featured_image: row.featured_image || (category_id ? categoryImageLookup[category_id] : null) || null,
+        featured_image: row.featured_image || null,
         expiration_date: row.expiration_date || null,
-        category_id,
         street_address: row.street_address || null,
         city: row.city || null,
         state: row.state || null,
@@ -104,6 +101,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Insert junction table entries
+    if (categoryIds.length > 0) {
+      await client.from("resources_categories").insert(
+        categoryIds.map((id) => ({ resource_id: resource.id, category_id: id }))
+      );
+    }
+
     const whereIds = matchIds(row.modes || "", whereLookup);
     const howIds = matchIds(row.formats || "", howLookup);
     const whoIds = matchIds(row.centerings || "", whoLookup);
@@ -124,15 +127,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Auto-populate elementies from WHAT topic
-    if (category_id) {
+    // Auto-populate elements from all assigned categories
+    if (categoryIds.length > 0) {
       const { data: whyLinks } = await client
         .from("categories_elements")
         .select("element_id")
-        .eq("category_id", category_id);
+        .in("category_id", categoryIds);
       if (whyLinks && whyLinks.length > 0) {
+        const uniqueElementIds = [...new Set(whyLinks.map((l: any) => l.element_id))];
         await client.from("resources_elements").insert(
-          whyLinks.map((l: any) => ({ resource_id: resource.id, element_id: l.element_id }))
+          uniqueElementIds.map((eid) => ({ resource_id: resource.id, element_id: eid }))
         );
       }
     }
