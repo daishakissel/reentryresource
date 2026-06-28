@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import type { Resource } from "@/types/database";
 
@@ -12,7 +12,14 @@ interface ResourceCardProps {
 export default function ResourceCard({ resource, modeLabels = [] }: ResourceCardProps) {
   const href = `/resource/${resource.slug || resource.id}`;
   const [expanded, setExpanded] = useState(false);
-  const descriptionLong = (resource.description?.length ?? 0) > 100;
+  const [isClamped, setIsClamped] = useState(false);
+  const descRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    if (descRef.current) {
+      setIsClamped(descRef.current.scrollHeight > descRef.current.clientHeight);
+    }
+  }, [resource.description]);
 
   function handleToggle(e: React.MouseEvent) {
     e.preventDefault();
@@ -44,7 +51,7 @@ export default function ResourceCard({ resource, modeLabels = [] }: ResourceCard
           <div className="px-4 py-3 flex-1 flex flex-col border-t border-gray-100 dark:border-ocean">
             {resource.description && (
               <div className="mb-2">
-                <p className={`text-xs text-gray-600 dark:text-gray-300 ${expanded ? "" : "line-clamp-3"}`}>
+                <p ref={descRef} className={`text-xs text-gray-600 dark:text-gray-300 ${expanded ? "" : "line-clamp-3"}`}>
                   {resource.description}
                 </p>
               </div>
@@ -59,7 +66,7 @@ export default function ResourceCard({ resource, modeLabels = [] }: ResourceCard
               ) : (
                 <div />
               )}
-              {descriptionLong && (
+              {isClamped && (
                 <button
                   onClick={handleToggle}
                   className={`w-7 h-7 flex items-center justify-center rounded-full border-2 transition-all flex-shrink-0 ml-2 ${

@@ -33,6 +33,7 @@ export default function ViewToggle({ resources, hasMore, loadingMore, onLoadMore
   const [modes, setModes] = useState<ModeItem[]>([]);
   const [resourceModeMap, setResourceModeMap] = useState<Record<string, string[]>>({});
   const [loaded, setLoaded] = useState(false);
+  const [activeTab, setActiveTab] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     const [formatsRes, formatJunctionRes, modesRes, modeJunctionRes] = await Promise.all([
@@ -65,14 +66,13 @@ export default function ViewToggle({ resources, hasMore, loadingMore, onLoadMore
   // Build mode name lookup
   const modeLookup = Object.fromEntries(modes.map((m) => [m.id, m.name]));
 
-  // Get mode names for a resource
   function getResourceModeNames(resourceId: string): string[] {
     const modeIds = resourceModeMap[resourceId] ?? [];
     return modeIds.map((id) => modeLookup[id]).filter(Boolean);
   }
 
   // Filter resources by active mode toggles
-  const filteredResources = loaded ? resources.filter((r) => {
+  const modeFiltered = loaded ? resources.filter((r) => {
     const modeNames = getResourceModeNames(r.id);
     const isInPerson = modeNames.includes("In Person");
     const isOnline = modeNames.includes("Online");
@@ -85,28 +85,49 @@ export default function ViewToggle({ resources, hasMore, loadingMore, onLoadMore
     return true;
   }) : resources;
 
-  const mappable = filteredResources.filter((r) => r.latitude && r.longitude);
-
-  // Group by format
-  const grouped: { format: FormatItem; resources: Resource[] }[] = [];
-  const ungrouped: Resource[] = [];
+  // Group by format tabs
+  const formatTabs: { format: FormatItem; count: number }[] = [];
+  const formatResourceMap: Record<string, Resource[]> = {};
+  const assignedIds = new Set<string>();
 
   if (loaded) {
-    const assigned = new Set<string>();
+    // Find the Services format ID to use as default for unassigned
+    const servicesFormat = formats.find((f) => f.name === "Services");
+
     for (const format of formats) {
-      const matching = filteredResources.filter((r) => {
+      const matching = modeFiltered.filter((r) => {
         const fIds = resourceFormatMap[r.id] ?? [];
         return fIds.includes(format.id);
       });
       if (matching.length > 0) {
-        grouped.push({ format, resources: matching });
-        matching.forEach((r) => assigned.add(r.id));
+        formatTabs.push({ format, count: matching.length });
+        formatResourceMap[format.id] = matching;
+        matching.forEach((r) => assignedIds.add(r.id));
       }
     }
-    filteredResources.forEach((r) => {
-      if (!assigned.has(r.id)) ungrouped.push(r);
-    });
+
+    // Unassigned resources go into Services
+    const unassigned = modeFiltered.filter((r) => !assignedIds.has(r.id));
+    if (unassigned.length > 0 && servicesFormat) {
+      if (!formatResourceMap[servicesFormat.id]) {
+        formatResourceMap[servicesFormat.id] = [];
+        formatTabs.unshift({ format: servicesFormat, count: 0 });
+      }
+      formatResourceMap[servicesFormat.id] = [...(formatResourceMap[servicesFormat.id] ?? []), ...unassigned];
+      const tab = formatTabs.find((t) => t.format.id === servicesFormat.id);
+      if (tab) tab.count = formatResourceMap[servicesFormat.id].length;
+    }
   }
+
+  // Set default active tab
+  useEffect(() => {
+    if (loaded && activeTab === null && formatTabs.length > 0) {
+      setActiveTab(formatTabs[0].format.id);
+    }
+  }, [loaded, formatTabs.length]);
+
+  const activeResources = activeTab ? (formatResourceMap[activeTab] ?? []) : modeFiltered;
+  const mappable = modeFiltered.filter((r) => r.latitude && r.longitude);
 
   return (
     <div>
@@ -116,28 +137,40 @@ export default function ViewToggle({ resources, hasMore, loadingMore, onLoadMore
         </div>
       )}
 
-      {!loaded || filteredResources.length === 0 ? (
-        filteredResources.length === 0 && loaded ? (
-          <p className="text-gray-500 dark:text-gray-400">No resources found.</p>
-        ) : (
-          <ResourceGrid resources={filteredResources} hasMore={hasMore} loadingMore={loadingMore} onLoadMore={onLoadMore} resourceModeMap={resourceModeMap} modeLookup={modeLookup} />
-        )
+      {!loaded ? (
+        <p className="text-gray-500">Loading...</p>
+      ) : modeFiltered.length === 0 ? (
+        <p className="text-gray-500 dark:text-gray-400">No resources found.</p>
       ) : (
         <div>
-          {grouped.map(({ format, resources: groupResources }) => (
-            <div key={format.id} className="mb-8">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">{format.name}</h2>
-              <ResourceGrid resources={groupResources} resourceModeMap={resourceModeMap} modeLookup={modeLookup} />
-            </div>
-          ))}
-          {ungrouped.length > 0 && (
-            <div className="mb-8">
-              {grouped.length > 0 && (
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Other</h2>
-              )}
-              <ResourceGrid resources={ungrouped} hasMore={hasMore} loadingMore={loadingMore} onLoadMore={onLoadMore} resourceModeMap={resourceModeMap} modeLookup={modeLookup} />
+          {/* Format tabs */}
+          {formatTabs.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-6 border-b border-gray-200 dark:border-ocean-light">
+              {formatTabs.map(({ format, count }) => (
+                <button
+                  key={format.id}
+                  onClick={() => setActiveTab(format.id)}
+                  className={`px-4 py-2 text-sm font-medium transition-colors border-b-2 -mb-px ${
+                    activeTab === format.id
+                      ? "border-brand-gold text-brand-gold"
+                      : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                  }`}
+                >
+                  {format.name} <span className="text-xs opacity-60">({count})</span>
+                </button>
+              ))}
             </div>
           )}
+
+          {/* Resources for active tab */}
+          <ResourceGrid
+            resources={activeResources}
+            hasMore={hasMore}
+            loadingMore={loadingMore}
+            onLoadMore={onLoadMore}
+            resourceModeMap={resourceModeMap}
+            modeLookup={modeLookup}
+          />
         </div>
       )}
     </div>

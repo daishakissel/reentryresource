@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 
   function matchIds(value: string, lookup: Record<string, string>): string[] {
     if (!value) return [];
-    return value.split(/[;,]/).map((v) => v.trim().toLowerCase()).filter(Boolean)
+    return value.split(";").map((v) => v.trim().toLowerCase()).filter(Boolean)
       .map((v) => lookup[v]).filter(Boolean);
   }
 
