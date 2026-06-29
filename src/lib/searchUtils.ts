@@ -15,7 +15,7 @@ const fuseOptions: Fuse.IFuseOptions<SearchableResource> = {
     { name: "city", weight: 0.05 },
     { name: "street_address", weight: 0.05 },
   ],
-  threshold: 0.4,
+  threshold: 0.15,
   ignoreLocation: true,
   minMatchCharLength: 2,
 };

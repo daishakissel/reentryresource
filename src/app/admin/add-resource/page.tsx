@@ -6,6 +6,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import ImageUpload from "@/components/ImageUpload";
 import ContentImageInsert from "@/components/ContentImageInsert";
+import RichTextEditor from "@/components/RichTextEditor";
 
 interface FilterOption { id: string; name: string }
 
@@ -160,18 +161,18 @@ export default function AddResourcePage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Short Description</label>
-              <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent" placeholder="Brief summary shown on resource cards" />
+              <RichTextEditor value={description} onChange={setDescription} placeholder="Brief summary shown on resource cards" minHeight="80px" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">How to Engage</label>
-              <textarea value={engage} onChange={(e) => setEngage(e.target.value)} rows={3} className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent" placeholder="Steps to access or engage with this resource..." />
+              <RichTextEditor value={engage} onChange={setEngage} placeholder="Steps to access or engage with this resource..." minHeight="80px" />
             </div>
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Content</label>
                 <ContentImageInsert bucket="resources" folder="content" onInsert={(tag) => setContent((prev) => prev + "\n" + tag + "\n")} />
               </div>
-              <textarea value={content} onChange={(e) => setContent(e.target.value)} rows={10} className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent font-mono text-sm" placeholder="Detailed content..." />
+              <RichTextEditor value={content} onChange={setContent} placeholder="Detailed content..." minHeight="200px" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Expiration Date</label>

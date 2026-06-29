@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { supabase } from "@/lib/supabase";
 
 interface FilterOption {
   id: string;
@@ -16,39 +17,125 @@ interface Filters {
 }
 
 const FILTER_SECTIONS = [
-  { label: "Categories", filterKey: "categories" },
-  { label: "Formats", filterKey: "formats" },
-  { label: "Centerings", filterKey: "centerings" },
+  { label: "Categories", filterKey: "categories", table: "resources_categories", fk: "category_id" },
+  { label: "Formats", filterKey: "formats", table: "resources_formats", fk: "format_id" },
+  { label: "Centerings", filterKey: "centerings", table: "resources_centerings", fk: "centering_id" },
 ];
 
 interface ResourceFilterProps {
   selected: Record<string, Set<string>>;
   onSelectionChange: (selected: Record<string, Set<string>>) => void;
   elementId?: string;
+  resourceIds?: string[];
 }
 
-export default function ResourceFilter({ selected, onSelectionChange, elementId }: ResourceFilterProps) {
+export default function ResourceFilter({ selected, onSelectionChange, elementId, resourceIds }: ResourceFilterProps) {
   const [open, setOpen] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
   const [filters, setFilters] = useState<Filters | null>(null);
-  const [counts, setCounts] = useState<Record<string, Record<string, number>>>({});
   const [loaded, setLoaded] = useState(false);
+  // Junction data: { filterKey: { resourceId: Set<filterId> } }
+  const [junctionData, setJunctionData] = useState<Record<string, Record<string, Set<string>>>>({});
+  // All valid resource IDs (non-expired, optionally scoped to element)
+  const [allResourceIds, setAllResourceIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    fetch("/api/filters", { cache: "no-store" }).then(async (res) => {
-      if (res.ok) setFilters(await res.json());
+    async function loadData() {
+      const [filtersRes, ...junctionResults] = await Promise.all([
+        fetch("/api/filters", { cache: "no-store" }),
+        ...FILTER_SECTIONS.map((s) =>
+          supabase.from(s.table).select(`resource_id, ${s.fk}`)
+        ),
+      ]);
+
+      if (filtersRes.ok) setFilters(await filtersRes.json());
+
+      const jd: Record<string, Record<string, Set<string>>> = {};
+      FILTER_SECTIONS.forEach((section, idx) => {
+        const map: Record<string, Set<string>> = {};
+        ((junctionResults[idx] as any)?.data ?? []).forEach((row: any) => {
+          if (!map[row.resource_id]) map[row.resource_id] = new Set();
+          map[row.resource_id].add(row[section.fk]);
+        });
+        jd[section.filterKey] = map;
+      });
+      setJunctionData(jd);
+
+      // Only fetch baseline resource IDs if not externally scoped
+      if (!resourceIds) {
+        const today = new Date().toISOString().split("T")[0];
+        const { data: resources } = await supabase
+          .from("resources")
+          .select("id")
+          .or(`expiration_date.is.null,expiration_date.gte.${today}`);
+        let ids = new Set((resources ?? []).map((r: any) => r.id));
+
+        if (elementId) {
+          const { data: whyLinks } = await supabase
+            .from("resources_elements")
+            .select("resource_id")
+            .eq("element_id", elementId);
+          const whyIds = new Set((whyLinks ?? []).map((l: any) => l.resource_id));
+          ids = new Set([...ids].filter((id) => whyIds.has(id)));
+        }
+
+        setAllResourceIds(ids);
+      }
+
       setLoaded(true);
-    });
-  }, []);
+    }
+    loadData();
+  }, [elementId, resourceIds]);
 
+  // Keep allResourceIds in sync with resourceIds prop
   useEffect(() => {
-    const countsUrl = elementId
-      ? `/api/filters/counts?elementId=${elementId}`
-      : "/api/filters/counts";
-    fetch(countsUrl, { cache: "no-store" }).then(async (res) => {
-      if (res.ok) setCounts(await res.json());
-    });
-  }, [elementId]);
+    if (resourceIds) {
+      setAllResourceIds(new Set(resourceIds));
+    }
+  }, [resourceIds]);
+
+  // Compute faceted counts: for each dimension, apply all OTHER filters, then count
+  const counts = useMemo(() => {
+    const result: Record<string, Record<string, number>> = {};
+
+    for (const section of FILTER_SECTIONS) {
+      // Get resources that pass ALL other dimension filters
+      let pool = allResourceIds;
+
+      for (const otherSection of FILTER_SECTIONS) {
+        if (otherSection.filterKey === section.filterKey) continue;
+        const selectedIds = selected[otherSection.filterKey];
+        if (!selectedIds || selectedIds.size === 0) continue;
+
+        // Only keep resources that have at least one of the selected values in this other dimension
+        const otherJunction = junctionData[otherSection.filterKey] ?? {};
+        pool = new Set(
+          [...pool].filter((rid) => {
+            const resourceValues = otherJunction[rid];
+            if (!resourceValues) return false;
+            return [...selectedIds].some((sid) => resourceValues.has(sid));
+          })
+        );
+      }
+
+      // Now count how many resources in the pool have each option in this dimension
+      const sectionJunction = junctionData[section.filterKey] ?? {};
+      const sectionCounts: Record<string, number> = {};
+
+      for (const rid of pool) {
+        const values = sectionJunction[rid];
+        if (values) {
+          for (const v of values) {
+            sectionCounts[v] = (sectionCounts[v] || 0) + 1;
+          }
+        }
+      }
+
+      result[section.filterKey] = sectionCounts;
+    }
+
+    return result;
+  }, [selected, junctionData, allResourceIds]);
 
   function toggleSection(key: string) {
     setExpandedSections((prev) => {
@@ -94,7 +181,7 @@ export default function ResourceFilter({ selected, onSelectionChange, elementId 
             FILTER_SECTIONS.map((section) => {
               let options: FilterOption[] = (filters as any)[section.filterKey] ?? [];
 
-              // Filter WHAT topics by element when on a specific WHY page
+              // Filter categories by element when on a specific WHY page
               if (section.filterKey === "categories" && elementId && filters.categories_elements) {
                 const validTopicIds = new Set(
                   filters.categories_elements
@@ -130,7 +217,7 @@ export default function ResourceFilter({ selected, onSelectionChange, elementId 
                   {isExpanded && (
                     <div className="px-4 pb-3 flex flex-wrap gap-x-6 gap-y-2">
                       {options.map((opt) => {
-                        const count = section.filterKey === "categories" ? (counts[section.filterKey]?.[opt.id] ?? 0) : null;
+                        const count = counts[section.filterKey]?.[opt.id] ?? 0;
                         return (
                           <label key={opt.id} className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                             <input
@@ -140,7 +227,7 @@ export default function ResourceFilter({ selected, onSelectionChange, elementId 
                               className="h-4 w-4 rounded border-gray-300 text-brand-gold focus:ring-brand-gold"
                             />
                             {opt.name}
-                            {count !== null && <span className="text-xs text-gray-400">({count})</span>}
+                            <span className="text-xs text-gray-400">({count})</span>
                           </label>
                         );
                       })}

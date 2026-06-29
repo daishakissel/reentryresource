@@ -20,6 +20,7 @@ export default function ResourceCard({ resource, modeLabels = [], categoryImages
   const [expanded, setExpanded] = useState(false);
   const [isClamped, setIsClamped] = useState(false);
   const [showPhonePopup, setShowPhonePopup] = useState(false);
+  const [engageOpen, setEngageOpen] = useState(false);
   const descRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
@@ -183,6 +184,26 @@ export default function ResourceCard({ resource, modeLabels = [], categoryImages
               </div>
             )}
           </div>
+
+          {/* Engage footer */}
+          {resource.engage && (
+            <div className="bg-gray-100 dark:bg-ocean flex-shrink-0 border-t border-gray-200 dark:border-ocean-light">
+              <button
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setEngageOpen((v) => !v); }}
+                className="w-full flex items-center justify-between px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-brand-gold transition-colors"
+              >
+                <span>Engage</span>
+                <svg className={`w-4 h-4 transition-transform ${engageOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {engageOpen && (
+                <div className="px-4 pb-3" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
+                  <p className="text-xs text-gray-600 dark:text-gray-300">{resource.engage}</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </Link>
     </div>

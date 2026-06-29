@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
 
 interface ManagedUser {
@@ -12,26 +12,34 @@ interface ManagedUser {
   created_at: string;
 }
 
+const ALL_COLUMNS: { key: string; label: string; defaultVisible: boolean }[] = [
+  { key: "email", label: "Email", defaultVisible: true },
+  { key: "role", label: "Role", defaultVisible: true },
+  { key: "created_at", label: "Created", defaultVisible: true },
+];
+
 export default function UserManagementPage() {
   const { user, loading, canAccessAdminPages } = useAuth();
   const router = useRouter();
 
   const [users, setUsers] = useState<ManagedUser[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(true);
+  const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
+    () => new Set(ALL_COLUMNS.filter((c) => c.defaultVisible).map((c) => c.key))
+  );
+  const [columnFilters, setColumnFilters] = useState<Record<string, string>>({});
+  const [showColumnPicker, setShowColumnPicker] = useState(false);
 
-  // New user form
   const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newRole, setNewRole] = useState("author");
   const [createError, setCreateError] = useState<string | null>(null);
   const [createSuccess, setCreateSuccess] = useState<string | null>(null);
 
-  // Invite user
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [inviteSuccess, setInviteSuccess] = useState<string | null>(null);
 
-  // Change own password
   const [ownPassword, setOwnPassword] = useState("");
   const [ownPasswordConfirm, setOwnPasswordConfirm] = useState("");
   const [passwordError, setPasswordError] = useState<string | null>(null);
@@ -62,6 +70,22 @@ export default function UserManagementPage() {
   useEffect(() => {
     if (user) fetchUsers();
   }, [user, fetchUsers]);
+
+  function getCellValue(u: ManagedUser, key: string): string {
+    if (key === "created_at") return new Date(u.created_at).toLocaleDateString();
+    return (u as any)[key] ?? "—";
+  }
+
+  const filteredUsers = useMemo(() => {
+    return users.filter((u) => {
+      for (const [key, filter] of Object.entries(columnFilters)) {
+        if (!filter.trim()) continue;
+        const val = getCellValue(u, key);
+        if (!val.toLowerCase().includes(filter.toLowerCase())) return false;
+      }
+      return true;
+    });
+  }, [users, columnFilters]);
 
   async function handleCreateUser(e: React.FormEvent) {
     e.preventDefault();
@@ -148,15 +172,17 @@ export default function UserManagementPage() {
   if (loading) return <p className="text-gray-500">Loading...</p>;
   if (!user) return null;
 
+  const activeColumns = ALL_COLUMNS.filter((c) => visibleColumns.has(c.key));
+
   return (
     <div className="max-w-2xl space-y-10">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">User Management</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">User Management</h1>
 
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Create New User</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-3">Create New User</h2>
         <form onSubmit={handleCreateUser} className="space-y-3">
           <div>
-            <label htmlFor="new-email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label htmlFor="new-email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
             <input
               id="new-email"
               type="email"
@@ -168,7 +194,7 @@ export default function UserManagementPage() {
             />
           </div>
           <div>
-            <label htmlFor="new-password" className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+            <label htmlFor="new-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
             <input
               id="new-password"
               type="password"
@@ -205,11 +231,11 @@ export default function UserManagementPage() {
       </div>
 
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Invite User</h2>
-        <p className="text-sm text-gray-500 mb-3">Send an email invitation so the user can set their own password.</p>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-3">Invite User</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">Send an email invitation so the user can set their own password.</p>
         <form onSubmit={handleInviteUser} className="space-y-3">
           <div>
-            <label htmlFor="invite-email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label htmlFor="invite-email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
             <input
               id="invite-email"
               type="email"
@@ -232,30 +258,86 @@ export default function UserManagementPage() {
       </div>
 
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Existing Users</h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200">Existing Users</h2>
+          <div className="relative">
+            <button
+              onClick={() => setShowColumnPicker((v) => !v)}
+              className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-ocean-light hover:bg-gray-200 dark:hover:bg-ocean transition-colors flex items-center gap-1.5"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+              </svg>
+              Columns
+            </button>
+            {showColumnPicker && (
+              <>
+                <div className="fixed inset-0 z-30" onClick={() => setShowColumnPicker(false)} />
+                <div className="absolute right-0 top-full mt-1 z-40 bg-white dark:bg-ocean-dark border border-gray-200 dark:border-ocean-light rounded-lg shadow-lg p-3 w-48">
+                  {ALL_COLUMNS.map((col) => (
+                    <label key={col.key} className="flex items-center gap-2 py-1 text-sm text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-50 dark:hover:bg-ocean-light px-1 rounded">
+                      <input
+                        type="checkbox"
+                        checked={visibleColumns.has(col.key)}
+                        onChange={() => {
+                          setVisibleColumns((prev) => {
+                            const next = new Set(prev);
+                            if (next.has(col.key)) next.delete(col.key);
+                            else next.add(col.key);
+                            return next;
+                          });
+                        }}
+                        className="h-4 w-4 rounded border-gray-300 text-brand-gold focus:ring-brand-gold"
+                      />
+                      {col.label}
+                    </label>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+          {filteredUsers.length} of {users.length} users
+        </p>
         {loadingUsers ? (
           <p className="text-gray-500">Loading users...</p>
         ) : users.length === 0 ? (
           <p className="text-gray-500">No users found.</p>
         ) : (
-          <div className="border border-gray-200 rounded-lg overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50">
+          <div className="border border-gray-200 dark:border-ocean-light rounded-lg overflow-x-auto">
+            <table className="w-full text-sm whitespace-nowrap">
+              <thead className="bg-gray-50 dark:bg-ocean-dark">
                 <tr>
-                  <th className="text-left px-4 py-2 font-medium text-gray-700">Email</th>
-                  <th className="text-left px-4 py-2 font-medium text-gray-700">Role</th>
-                  <th className="text-left px-4 py-2 font-medium text-gray-700">Created</th>
+                  {activeColumns.map((col) => (
+                    <th key={col.key} className="text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-300">
+                      <div className="flex flex-col gap-1">
+                        <span>{col.label}</span>
+                        <input
+                          type="text"
+                          placeholder="Filter..."
+                          value={columnFilters[col.key] ?? ""}
+                          onChange={(e) => setColumnFilters((prev) => ({ ...prev, [col.key]: e.target.value }))}
+                          className="w-full px-2 py-1 text-xs rounded border border-gray-300 dark:border-ocean-light bg-white dark:bg-ocean-deeper text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-1 focus:ring-brand-gold"
+                        />
+                      </div>
+                    </th>
+                  ))}
                   <th className="px-4 py-2 w-10"></th>
                 </tr>
               </thead>
               <tbody>
-                {users.map((u) => (
-                  <tr key={u.id} className="border-t border-gray-100">
-                    <td className="px-4 py-2 text-gray-900">{u.email}</td>
-                    <td className="px-4 py-2 text-gray-600 capitalize">{u.role}</td>
-                    <td className="px-4 py-2 text-gray-500">
-                      {new Date(u.created_at).toLocaleDateString()}
-                    </td>
+                {filteredUsers.map((u) => (
+                  <tr key={u.id} className="border-t border-gray-100 dark:border-ocean-light hover:bg-gray-50 dark:hover:bg-ocean-light">
+                    {activeColumns.map((col) => (
+                      <td key={col.key} className="px-4 py-2 text-gray-300 dark:text-gray-300">
+                        {col.key === "role" ? (
+                          <span className="capitalize">{u.role}</span>
+                        ) : (
+                          getCellValue(u, col.key)
+                        )}
+                      </td>
+                    ))}
                     <td className="px-4 py-2">
                       <button
                         onClick={() => handleDeleteUser(u.id, u.email)}
@@ -276,10 +358,14 @@ export default function UserManagementPage() {
       </div>
 
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Change Your Password</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-1">Change Your Password</h2>
+        <div className="mb-3">
+          <p className="text-xs text-gray-500 dark:text-gray-400">Logged in as:</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email ?? "Guest"}</p>
+        </div>
         <form onSubmit={handleChangePassword} className="space-y-3">
           <div>
-            <label htmlFor="own-password" className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+            <label htmlFor="own-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Password</label>
             <input
               id="own-password"
               type="password"
@@ -291,7 +377,7 @@ export default function UserManagementPage() {
             />
           </div>
           <div>
-            <label htmlFor="own-password-confirm" className="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+            <label htmlFor="own-password-confirm" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm New Password</label>
             <input
               id="own-password-confirm"
               type="password"

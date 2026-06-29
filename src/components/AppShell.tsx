@@ -13,9 +13,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const mainRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    setSidebarExpanded(window.innerWidth >= 768);
-  }, []);
+  // Both sidebars start closed
 
   // Listen for custom event to open right sidebar (from map pin click)
   useEffect(() => {

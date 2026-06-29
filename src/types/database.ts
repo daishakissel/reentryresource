@@ -2,6 +2,8 @@ export type Resource = {
   id: string;
   title: string;
   slug: string;
+  organization_name: string | null;
+  facility_name: string | null;
   description: string | null;
   content: string | null;
   featured_image: string | null;

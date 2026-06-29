@@ -91,9 +91,16 @@ function SearchPageInner() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  // Apply fuzzy search and filters
+  // Search-only results (before filters) — used to scope filter counts
+  const searchMatchedResults = useMemo(() => {
+    return query.trim() ? searchResources(allResources, query) : allResources;
+  }, [allResources, query]);
+
+  const searchMatchedIds = useMemo(() => searchMatchedResults.map((r) => r.id), [searchMatchedResults]);
+
+  // Apply filters on top of search results
   const searchResults = useMemo(() => {
-    let results = query.trim() ? searchResources(allResources, query) : allResources;
+    let results = searchMatchedResults;
 
     const activeFilters = Object.entries(selected).filter(([, ids]) => ids.size > 0);
     for (const [filterKey, ids] of activeFilters) {
@@ -106,7 +113,7 @@ function SearchPageInner() {
     }
 
     return results;
-  }, [allResources, query, selected, junctionData]);
+  }, [searchMatchedResults, selected, junctionData]);
 
   if (!loaded) return <p className="text-gray-500">Loading...</p>;
 
@@ -121,8 +128,8 @@ function SearchPageInner() {
         )}
       </p>
 
-      <ResourceFilter selected={selected} onSelectionChange={handleSelectionChange} />
-      <div className="mb-4">
+      <ResourceFilter selected={selected} onSelectionChange={handleSelectionChange} resourceIds={searchMatchedIds} />
+      <div className="flex flex-wrap gap-2 mb-4">
         <MapToggleButton showMap={showMap} onToggle={() => setShowMap((v) => !v)} />
         <ModeToggleButtons showInPerson={showInPerson} showOnline={showOnline} onToggleInPerson={() => setShowInPerson((v) => !v)} onToggleOnline={() => setShowOnline((v) => !v)} />
       </div>

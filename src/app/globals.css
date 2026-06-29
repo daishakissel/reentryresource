@@ -39,3 +39,29 @@
     border-color: #234E63;
   }
 }
+
+/* Leaflet MarkerCluster styles */
+.marker-cluster-small,
+.marker-cluster-medium,
+.marker-cluster-large {
+  background-color: rgba(200, 169, 81, 0.4);
+  border-radius: 50%;
+}
+.marker-cluster-small div,
+.marker-cluster-medium div,
+.marker-cluster-large div {
+  background-color: rgba(200, 169, 81, 0.8);
+  color: white;
+  font-weight: bold;
+  font-size: 13px;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  margin-left: 5px;
+  margin-top: 5px;
+  text-align: center;
+  line-height: 30px;
+}
+.marker-cluster {
+  background-clip: padding-box;
+}

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import ContentImageInsert from "@/components/ContentImageInsert";
+import RichTextEditor from "@/components/RichTextEditor";
 
 export default function EditShelterPage({ params }: { params: { id: string; pageId: string } }) {
   const { user, loading: authLoading } = useAuth();
@@ -114,7 +115,7 @@ export default function EditShelterPage({ params }: { params: { id: string; page
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Content</label>
             <ContentImageInsert bucket="shelters" folder="pages" onInsert={(tag) => setContent((prev) => prev + "\n" + tag + "\n")} />
           </div>
-          <textarea value={content} onChange={(e) => setContent(e.target.value)} rows={12} className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent" />
+          <RichTextEditor value={content} onChange={setContent} minHeight="200px" />
         </div>
 
         {error && <p className="text-sm text-red-600">{error}</p>}

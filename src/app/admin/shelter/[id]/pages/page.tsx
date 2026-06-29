@@ -6,6 +6,7 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import ContentImageInsert from "@/components/ContentImageInsert";
+import RichTextEditor from "@/components/RichTextEditor";
 
 interface ShelterPage {
   id: string;
@@ -153,13 +154,7 @@ export default function ShelterPagesAdmin({ params }: { params: { id: string } }
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Content</label>
               <ContentImageInsert bucket="shelters" folder="pages" onInsert={(tag) => setNewContent((prev) => prev + "\n" + tag + "\n")} />
             </div>
-            <textarea
-              value={newContent}
-              onChange={(e) => setNewContent(e.target.value)}
-              rows={8}
-              className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent"
-              placeholder="Page content (HTML or plain text)..."
-            />
+            <RichTextEditor value={newContent} onChange={setNewContent} placeholder="Page content..." minHeight="160px" />
           </div>
           {createError && <p className="text-sm text-red-600">{createError}</p>}
           {createSuccess && <p className="text-sm text-green-600">{createSuccess}</p>}

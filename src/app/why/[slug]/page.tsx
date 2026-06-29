@@ -90,6 +90,8 @@ export default function WhyPage({ params }: WhyPageProps) {
       </div>
       {loading || resolving ? (
         <p className="text-gray-500">Loading resources...</p>
+      ) : resources.length === 0 ? (
+        <p className="text-gray-500 dark:text-gray-400">No resources match your filters.</p>
       ) : (
         <ViewToggle
           resources={resources}
