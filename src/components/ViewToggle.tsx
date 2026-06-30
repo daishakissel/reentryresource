@@ -5,6 +5,7 @@ import type { Resource } from "@/types/database";
 import ResourceGrid from "./ResourceGrid";
 import ResourceMap from "./ResourceMap";
 import { supabase } from "@/lib/supabase";
+import InfoTooltip from "./InfoTooltip";
 
 interface FormatItem {
   id: string;
@@ -236,5 +237,25 @@ export function ModeToggleButtons({ showInPerson, showOnline, onToggleInPerson, 
         {showOnline ? "Hide Online" : "Show Online"}
       </button>
     </>
+  );
+}
+
+export function ViewControlsInfo() {
+  return (
+    <InfoTooltip
+      text={
+        <div className="space-y-3">
+          <div>
+            <p className="font-semibold text-gray-900 dark:text-white mb-1">Show Map:</p>
+            <p>Show resources on a map (will not show Online Resources).</p>
+            <p>Resources at the same address are grouped into one pin with a number, tap it to see the list.</p>
+          </div>
+          <div>
+            <p className="font-semibold text-gray-900 dark:text-white mb-1">Show In Person / Show Online:</p>
+            <p>Show or hide resources based on how you can access them: In Person at a physical location, or Online (website, phone, app).</p>
+          </div>
+        </div>
+      }
+    />
   );
 }

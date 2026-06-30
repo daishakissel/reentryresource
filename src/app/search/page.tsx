@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { searchResources } from "@/lib/searchUtils";
 import type { SearchableResource } from "@/lib/searchUtils";
 import { loadFilters, saveFilters, saveLastWhy } from "@/lib/filterStorage";
-import ViewToggle, { MapToggleButton, ModeToggleButtons } from "@/components/ViewToggle";
+import ViewToggle, { MapToggleButton, ModeToggleButtons, ViewControlsInfo } from "@/components/ViewToggle";
 import ResourceFilter from "@/components/ResourceFilter";
 
 const JUNCTION_MAP: Record<string, { table: string; fk: string }> = {
@@ -130,6 +130,7 @@ function SearchPageInner() {
 
       <ResourceFilter selected={selected} onSelectionChange={handleSelectionChange} resourceIds={searchMatchedIds} />
       <div className="flex flex-wrap gap-2 mb-4">
+        <ViewControlsInfo />
         <MapToggleButton showMap={showMap} onToggle={() => setShowMap((v) => !v)} />
         <ModeToggleButtons showInPerson={showInPerson} showOnline={showOnline} onToggleInPerson={() => setShowInPerson((v) => !v)} onToggleOnline={() => setShowOnline((v) => !v)} />
       </div>

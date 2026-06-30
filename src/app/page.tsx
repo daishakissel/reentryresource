@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ViewToggle, { MapToggleButton, ModeToggleButtons } from "@/components/ViewToggle";
+import ViewToggle, { MapToggleButton, ModeToggleButtons, ViewControlsInfo } from "@/components/ViewToggle";
 import ResourceFilter from "@/components/ResourceFilter";
 import { useInfiniteResources } from "@/lib/useInfiniteResources";
 import { loadFilters, saveFilters, saveLastWhy } from "@/lib/filterStorage";
@@ -38,6 +38,7 @@ export default function HomePage() {
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">All Resources</h1>
       <ResourceFilter selected={selected} onSelectionChange={handleSelectionChange} />
       <div className="flex flex-wrap gap-2 mb-4">
+        <ViewControlsInfo />
         <MapToggleButton showMap={showMap} onToggle={() => setShowMap((v) => !v)} />
         <ModeToggleButtons showInPerson={showInPerson} showOnline={showOnline} onToggleInPerson={() => setShowInPerson((v) => !v)} onToggleOnline={() => setShowOnline((v) => !v)} />
       </div>

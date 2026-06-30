@@ -23,7 +23,7 @@ const ALL_COLUMNS: { key: string; label: string; defaultVisible: boolean }[] = [
   { key: "email", label: "Email", defaultVisible: false },
   { key: "website", label: "Website", defaultVisible: false },
   { key: "source_url", label: "Source URL", defaultVisible: false },
-  { key: "source_domain", label: "Source Domain", defaultVisible: false },
+  { key: "scraped_url", label: "Scraped From", defaultVisible: false },
   { key: "scrape_status", label: "Scrape Status", defaultVisible: false },
   { key: "expiration_date", label: "Expiration", defaultVisible: false },
   { key: "created_at", label: "Created", defaultVisible: true },
@@ -341,7 +341,7 @@ export default function AdminResourcesPage() {
                         }`}>
                           {r.status}
                         </span>
-                      ) : col.key === "website" || col.key === "source_url" ? (
+                      ) : col.key === "website" || col.key === "source_url" || col.key === "scraped_url" ? (
                         r[col.key] ? (
                           <a href={r[col.key]} target="_blank" rel="noopener noreferrer" className="text-brand-gold hover:underline">
                             {r[col.key].replace(/^https?:\/\/(www\.)?/, "").slice(0, 40)}

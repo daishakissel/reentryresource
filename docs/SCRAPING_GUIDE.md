@@ -42,7 +42,7 @@ These are **3 separate resources**, not one resource with multiple labels.
 Create a CSV file with these column headers (first row). Only `title` is mandatory.
 
 ```
-title,slug,organization_name,facility_name,description,engage,content,featured_image,category,modes,formats,centerings,street_address,city,state,zip,region,country,latitude,longitude,phone,email,website,expiration_date,source_url,source_domain
+title,slug,organization_name,facility_name,description,engage,content,featured_image,category,modes,formats,centerings,street_address,city,state,zip,region,country,latitude,longitude,phone,email,website,expiration_date,source_url,scraped_url
 ```
 
 ---
@@ -96,13 +96,23 @@ title,slug,organization_name,facility_name,description,engage,content,featured_i
 | email | Program-specific email if available | `HeadStart@caowash.org` |
 | website | Direct link to the program's page, NOT the org homepage | `https://caowash.org/early-childhood-care-education/head-start` |
 
-### Scrape Tracking (auto-populated if blank)
+### Scrape Tracking
 | Column | Description | Example |
 |---|---|---|
-| source_url | The page URL that was scraped (defaults to `website` if blank) | `https://caowash.org/early-childhood-care-education/head-start` |
-| source_domain | Root domain of the source (auto-derived from website if blank) | `caowash.org` |
+| source_url | The specific page URL for THIS resource (defaults to `website` if blank) | `https://caowash.org/early-childhood-care-education/head-start` |
+| scraped_url | The root/starting URL you were given to scrape (same for every resource from one scraping session) — also add this URL to `docs/SCRAPED_SOURCES.md` | `https://caowash.org` |
 
 **Note:** `scraped_at`, `last_verified_at`, `scrape_status`, and `content_hash` are auto-populated during import — do NOT include them in the CSV.
+
+---
+
+## Starting a Scraping Session
+
+Before scraping anything, Claude must ask:
+
+**"How many URLs from `docs/SCRAPE_QUEUE.md` do you want me to scrape in this session?"**
+
+This lets the user start one at a time and scale up to bulk scraping later. Only pull that many URLs from the top of the queue for this session.
 
 ---
 
@@ -123,6 +133,20 @@ Visit the organization's website. Look for:
 Click into each program. If it has its own URL (e.g., `/housing-stability`, `/utility-assistance`), it's a separate resource. If sub-programs within that page ALSO have their own URLs (e.g., `/housing-stability/renter-support`), those are separate resources too.
 
 **Go as deep as the site structure goes.** A page like "Housing Stability" might link to 3 sub-programs, each with their own page — that's 3 resources, not 1.
+
+### Step 2.5: Check for Duplicates
+
+Before treating a discovered page as a new resource, check whether it might already exist in the database:
+
+- Compare the page URL against existing `source_url` and `website` values
+- Compare the program name and organization against existing resource titles
+- If the same organization was scraped before (check `docs/SCRAPED_SOURCES.md`), pay extra attention — the org may have updated, renamed, or restructured a program that's already in the database
+
+**If a potential duplicate is found, do not silently add or silently skip it.** Stop and ask the user:
+
+> "This looks like it might be a duplicate of [existing resource title] ([existing source_url]). Do you want me to (a) skip it, (b) update the existing resource, or (c) add it as a new separate resource?"
+
+Wait for the user's answer before proceeding with that resource.
 
 ### Step 3: For Each Program Page, Extract
 
@@ -171,6 +195,22 @@ Only mark centerings if the program **explicitly targets** a specific population
 - "Open to all Washington County residents" → leave blank (no centering)
 
 **If a resource has no centerings marked, the site treats it as available to everyone.** Don't guess — only mark what the website explicitly states.
+
+### When Classification Is Unclear: Ask, Don't Guess
+
+If at any point — Category, Modes, Formats, or Centerings — the right classification is genuinely ambiguous, or an existing classification in the list doesn't quite fit what the website describes, **stop and interview the user rather than guessing.** Lean toward caution.
+
+Examples of when to ask:
+- A resource seems to span two Categories about equally (e.g., is it `Housing` or `Shelter`?) and picking one feels arbitrary
+- The website describes a population that doesn't map cleanly to any existing Centering
+- It's unclear whether something counts as `By Appointment Only` vs `In Person` based on vague wording
+- A new type of service doesn't fit any existing Category at all
+
+When this happens, present the resource, the ambiguity, and the options, then ask the user to decide. Example:
+
+> "CAO's 'Community Connect' page offers both housing navigation and basic case management — I'm unsure whether to classify it as `Housing` or `Case Management`, or use both. Which would you prefer, or should I add a new Category?"
+
+This keeps the taxonomy clean and avoids silently forcing resources into categories that don't really fit.
 
 ### Step 6: Write Good Content HTML
 
@@ -233,6 +273,26 @@ Put one row per resource. Use semicolons (`;`) to separate multiple values in Mo
 3. Check the import results
 4. Browse the site and click into each resource to verify
 5. Edit any resources that need corrections
+
+### Step 10: Taxonomy Review Pass
+
+At the end of every scraping session, do a quick review of the Categories and Centerings lists based on what was just scraped:
+
+- Were any Categories used so rarely or awkwardly that they should be merged, renamed, or split?
+- Did any resources almost fit a Category but not quite — suggesting a gap in the list?
+- Were any Centerings never applicable across multiple organizations, suggesting they're too narrow or rare to keep?
+- Did the same ambiguity (see "When Classification Is Unclear" above) come up more than once, suggesting a structural fix rather than a one-off decision?
+
+Summarize any findings and present them to the user as suggestions, e.g.:
+
+> "This session scraped 3 organizations. Two of them had programs that didn't cleanly fit `Case Management` or `Benefits` — both were really about helping someone navigate multiple services at once. Should we add a `Navigation` category, or is one of the existing ones meant to cover this?"
+
+If nothing stood out, say so briefly rather than forcing a suggestion. The goal is for the taxonomy to converge over time — as more organizations are scraped, these review passes should become shorter and eventually unnecessary.
+
+### Step 11: Update the Queue and Sources List
+
+1. Remove the scraped URL(s) from `docs/SCRAPE_QUEUE.md`
+2. Add an entry to `docs/SCRAPED_SOURCES.md` with the date and resource count
 
 ---
 

@@ -124,40 +124,30 @@ export default function ResourceCard({ resource, modeLabels = [], categoryImages
 
           {/* Image area */}
           {resource.featured_image ? (
-            <div className="h-52 bg-gray-100 dark:bg-ocean flex items-center justify-center flex-shrink-0 p-2">
+            <div className="h-60 bg-gray-100 dark:bg-ocean flex items-center justify-center flex-shrink-0 p-2">
               <img src={resource.featured_image} alt={resource.title} className="max-w-full max-h-full object-contain" />
             </div>
           ) : categoryImages.length > 0 ? (
-            <div className="h-52 bg-gray-100 dark:bg-ocean flex-shrink-0">
+            <div className="h-60 bg-gray-100 dark:bg-ocean flex-shrink-0">
               <CategoryIconGrid categories={categoryImages} />
             </div>
           ) : (
-            <div className="h-52 bg-gray-100 dark:bg-ocean flex items-center justify-center flex-shrink-0">
+            <div className="h-60 bg-gray-100 dark:bg-ocean flex items-center justify-center flex-shrink-0">
               <span className="text-gray-400 text-sm">No image</span>
             </div>
           )}
 
-          {/* Bottom: Description + Topics */}
+          {/* Bottom: Description */}
           <div className="px-4 py-3 flex-1 flex flex-col border-t border-gray-100 dark:border-ocean">
             {resource.description && (
               <div className="mb-2">
+                <p className="text-xs font-semibold text-gray-900 dark:text-white mb-1">Description</p>
                 <p ref={descRef} className={`text-xs text-gray-600 dark:text-gray-300 ${expanded ? "" : "line-clamp-3"}`}>
                   {resource.description}
                 </p>
               </div>
             )}
-            <div className="mt-auto flex items-end justify-between">
-              {categoryImages.length > 0 ? (
-                <div className="flex flex-wrap gap-1">
-                  {categoryImages.map((c) => (
-                    <span key={c.name} className="text-xs px-2 py-0.5 rounded bg-brand-gold-light text-brand-brown">
-                      {c.name}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <div />
-              )}
+            <div className="mt-auto flex items-end justify-end">
               {isClamped && (
                 <button
                   onClick={handleToggle}
@@ -177,8 +167,8 @@ export default function ResourceCard({ resource, modeLabels = [], categoryImages
             {modeLabels.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-2">
                 {modeLabels.map((label) => (
-                  <span key={label} className="text-xs px-1.5 py-0.5 rounded bg-gray-100 dark:bg-ocean text-gray-600 dark:text-gray-400">
-                    {label}
+                  <span key={label} className="text-xs px-2 py-0.5 rounded bg-brand-gold-light text-brand-brown">
+                    {label === "By Appointment Only" ? "By Appointment" : label}
                   </span>
                 ))}
               </div>
@@ -237,18 +227,18 @@ function CategoryIconGrid({ categories }: { categories: CategoryImage[] }) {
 
   if (count === 3) {
     return (
-      <div className="w-full h-full flex flex-col p-3">
-        <div className="flex-1 flex items-center">
-          <div className="flex-1 flex items-center justify-center h-full">
+      <div className="w-full h-full flex flex-col p-3 min-h-0">
+        <div className="flex-1 flex items-center min-h-0">
+          <div className="flex-1 flex items-center justify-center h-full min-h-0 min-w-0">
             <img src={categories[0].imageUrl} alt={categories[0].name} className="max-w-full max-h-full object-contain" />
           </div>
           <div className="w-px h-3/4 bg-gray-300 dark:bg-gray-600" />
-          <div className="flex-1 flex items-center justify-center h-full">
+          <div className="flex-1 flex items-center justify-center h-full min-h-0 min-w-0">
             <img src={categories[1].imageUrl} alt={categories[1].name} className="max-w-full max-h-full object-contain" />
           </div>
         </div>
         <div className="h-px w-3/4 mx-auto bg-gray-300 dark:bg-gray-600" />
-        <div className="flex-1 flex items-center justify-center">
+        <div className="flex-1 flex items-center justify-center min-h-0">
           <img src={categories[2].imageUrl} alt={categories[2].name} className="max-w-full max-h-full object-contain" />
         </div>
       </div>

@@ -9,6 +9,7 @@ Master list of all URLs provided for scraping. Each URL was explored to discover
 | # | URL | Organization | Date Scraped | Resources Found |
 |---|---|---|---|---|
 | 1 | https://caowash.org | Community Action of Washington County | 2026-06-27 | 12 |
+| 2 | https://4drecovery.org/ | 4D Recovery | 2026-06-30 | 4 |
 
 ---
 

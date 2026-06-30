@@ -6,6 +6,7 @@ import SearchBar from "./SearchBar";
 import Sidebar from "./Sidebar";
 import RightSidebar from "./RightSidebar";
 import Footer from "./Footer";
+import WelcomeModal from "./WelcomeModal";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
@@ -36,6 +37,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="relative flex flex-col h-screen overflow-hidden">
+      <WelcomeModal />
+
       {/* Dark overlay — covers entire screen including header */}
       <div
         className={`fixed inset-0 z-[1000] bg-black transition-opacity duration-500 ${

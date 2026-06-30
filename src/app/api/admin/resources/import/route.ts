@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
         email: row.email || null,
         website: row.website || null,
         source_url: row.source_url || row.website || null,
-        source_domain: row.source_domain || (row.website ? new URL(row.website).hostname.replace(/^www\./, "") : null),
+        scraped_url: row.scraped_url || null,
         scraped_at: row.scraped_at || new Date().toISOString(),
         last_verified_at: new Date().toISOString(),
         scrape_status: "active",

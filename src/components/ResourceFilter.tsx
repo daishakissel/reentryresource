@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
+import InfoTooltip from "./InfoTooltip";
 
 interface FilterOption {
   id: string;
@@ -21,6 +22,28 @@ const FILTER_SECTIONS = [
   { label: "Formats", filterKey: "formats", table: "resources_formats", fk: "format_id" },
   { label: "Centerings", filterKey: "centerings", table: "resources_centerings", fk: "centering_id" },
 ];
+
+const RESOURCE_FILTER_INFO = (
+  <div className="space-y-3">
+    <div>
+      <p className="font-semibold text-gray-900 dark:text-white mb-1">Resource Filter:</p>
+      <p>Select the Categories, Formats, and Centerings to find the resources you are looking for.</p>
+      <p className="mt-1">Leaving a classification unmarked will show all.</p>
+    </div>
+    <div>
+      <p className="font-semibold text-gray-900 dark:text-white mb-1">Categories:</p>
+      <p>What kind of resource you're looking for, like Food, Housing, or Medical care.</p>
+    </div>
+    <div>
+      <p className="font-semibold text-gray-900 dark:text-white mb-1">Formats:</p>
+      <p>How the resource can be accessed: an offered Service, a Class, Workshop or Meeting, an Online Guidebook to read, or a Volunteering opportunity.</p>
+    </div>
+    <div>
+      <p className="font-semibold text-gray-900 dark:text-white mb-1">Centerings:</p>
+      <p>Who the resource centers around or is specifically designed for like Veterans, Women, or Youth & Children.</p>
+    </div>
+  </div>
+);
 
 interface ResourceFilterProps {
   selected: Record<string, Set<string>>;
@@ -157,21 +180,24 @@ export default function ResourceFilter({ selected, onSelectionChange, elementId,
 
   return (
     <div className="mb-2">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-ocean-light hover:bg-gray-200 dark:hover:bg-ocean-dark text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors"
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-        </svg>
-        <span>Resource Filter</span>
-        {totalSelected > 0 && (
-          <span className="px-1.5 py-0.5 text-xs rounded-full bg-brand-gold text-white">{totalSelected}</span>
-        )}
-        <svg className={`w-4 h-4 transition-transform ${open ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
+      <div className="flex items-center gap-1.5">
+        <InfoTooltip text={RESOURCE_FILTER_INFO} />
+        <button
+          onClick={() => setOpen((v) => !v)}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 dark:bg-ocean-light hover:bg-gray-200 dark:hover:bg-ocean-dark text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          </svg>
+          <span>Resource Filter</span>
+          {totalSelected > 0 && (
+            <span className="px-1.5 py-0.5 text-xs rounded-full bg-brand-gold text-white">{totalSelected}</span>
+          )}
+          <svg className={`w-4 h-4 transition-transform ${open ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
 
       {open && (
         <div className="mt-2 rounded-lg border border-gray-200 dark:border-ocean-light bg-white dark:bg-ocean-dark overflow-hidden">

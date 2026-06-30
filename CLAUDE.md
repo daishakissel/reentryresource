@@ -76,7 +76,7 @@ The database was renamed from the original WHY/WHAT/WHERE/HOW/WHO naming:
 - `modes` — 3 rows (In Person, Online, By Appointment Only)
 - `formats` — 4 rows
 - `centerings` — 19 rows
-- `resources` — main content table with slug, engage, expiration_date, plus scrape tracking fields (source_url, source_domain, scraped_at, last_verified_at, scrape_status, content_hash)
+- `resources` — main content table with slug, engage, expiration_date, plus scrape tracking fields (source_url = this resource's specific page, scraped_url = the root URL given to start scraping, scraped_at, last_verified_at, scrape_status, content_hash)
 - `resources_categories`, `resources_modes`, `resources_formats`, `resources_centerings`, `resources_elements` — junction tables
 - `shelters` — with address, org name, phone, email, website, short_name
 - `shelter_pages` — with parent_id for tree structure

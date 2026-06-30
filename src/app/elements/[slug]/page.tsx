@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { notFound } from "next/navigation";
-import ViewToggle, { MapToggleButton, ModeToggleButtons } from "@/components/ViewToggle";
+import ViewToggle, { MapToggleButton, ModeToggleButtons, ViewControlsInfo } from "@/components/ViewToggle";
 import ResourceFilter from "@/components/ResourceFilter";
 import { supabase } from "@/lib/supabase";
 import { ELEMENTS } from "@/lib/constants";
@@ -85,6 +85,7 @@ export default function WhyPage({ params }: WhyPageProps) {
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{category.label} Resources</h1>
       <ResourceFilter selected={selected} onSelectionChange={handleSelectionChange} elementId={elementId} />
       <div className="flex flex-wrap gap-2 mb-4">
+        <ViewControlsInfo />
         <MapToggleButton showMap={showMap} onToggle={() => setShowMap((v) => !v)} />
         <ModeToggleButtons showInPerson={showInPerson} showOnline={showOnline} onToggleInPerson={() => setShowInPerson((v) => !v)} onToggleOnline={() => setShowOnline((v) => !v)} />
       </div>
