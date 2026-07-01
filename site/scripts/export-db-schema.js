@@ -169,13 +169,7 @@ async function main() {
   wheres.forEach((w, i) => lines.push(`| ${i + 1} | ${w.name} | ${w.definition || "—"} |`));
   lines.push("");
 
-  // WHEN
-  lines.push(`## WHEN Times (${whens.length})`);
-  lines.push("");
-  lines.push("| # | Name | Definition |");
-  lines.push("|---|---|---|");
-  whens.forEach((w, i) => lines.push(`| ${i + 1} | ${w.name} | ${w.definition || "—"} |`));
-  lines.push("");
+  // WHEN — when_times table was dropped; "By Appointment Only" moved into modes
 
   // HOW
   const hows = await fetchTable("formats", "id,name,definition,sort_order");
@@ -259,7 +253,7 @@ async function main() {
   fs.writeFileSync(outPath, lines.join("\n") + "\n");
 
   console.log(`\nDone! Output: docs/DATABASE_SCHEMA_CURRENT.md`);
-  console.log(`Total dimension values: ${whys.length + whats.length + wheres.length + whens.length + hows.length + whos.length}`);
+  console.log(`Total dimension values: ${whys.length + whats.length + wheres.length + hows.length + whos.length}`);
 }
 
 main().catch((err) => {

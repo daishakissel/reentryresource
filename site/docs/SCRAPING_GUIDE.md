@@ -345,8 +345,23 @@ If nothing stood out, say so briefly rather than forcing a suggestion. The goal 
 
 - **Services** — Direct help (counseling, food distribution, housing placement, etc.)
 - **Classes, Workshops & Meetings** — Structured learning, training, or group sessions
-- **Guidebooks** — Information resources (how-to guides, videos, blog posts, infographics)
+- **Guidebooks** — Standalone instructional content (a PDF, article, video, or infographic) that exists independent of a specific program
 - **Volunteering** — Volunteer opportunities
+
+### Guidebooks vs. Services — How to Decide
+
+The test is: **is there an actionable next step (apply, call, attend, sign up), or is the page/document purely something you read or watch?**
+
+- **If a page explains something AND lets you act on it** (e.g., a benefits page with eligibility info plus an "Apply" button), classify it as **Services only** — even though it contains informational content. Guidebook is not for mixed pages.
+- **An organization's own descriptive page about itself or a program is never a Guidebook**, even if it reads as informational. A hotline's "About our crisis line" page is a `Service` (the hotline itself is the service) — not a `Guidebook`, because the page is the access point.
+- **Guidebook applies only to standalone instructional content** that exists independent of any specific program: a downloadable PDF ("How to Apply for SNAP"), a how-to article, an educational video, an infographic. If you'd link directly to a document or article rather than a program page, it's a Guidebook.
+- An organization can have both: e.g., a legal aid org might have `CAO - Tenant Rights Hotline` (Service) and `CAO - Know Your Rights Guide` (Guidebook) as two separate resources, if the guide is a standalone document distinct from the hotline.
+
+**Examples:**
+- "Call 211 for housing referrals" → Service (actionable, even though it's informational over the phone)
+- A PDF titled "Renter's Rights in Oregon" linked from a legal aid site → Guidebook (standalone document, no direct action)
+- A benefits eligibility page with an "Apply Now" button → Service only (mixed page, has an actionable step)
+- An org's "About Us" or "Our Programs" page describing what they do → Service for whatever program it describes, not Guidebook
 
 ---
 

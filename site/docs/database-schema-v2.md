@@ -1,4 +1,8 @@
-# Reentry Resource — Database Schema v2
+# ⚠️ DEPRECATED — Reentry Resource — Database Schema v2
+
+> This file describes the OLD schema (WHY/WHAT/WHERE/WHEN/HOW/WHO naming) before the June 2026 rename.
+> It is kept for historical reference only. **Do not use this as a reference for the current schema.**
+> See `docs/DATABASE_SCHEMA_CURRENT.md` for the live schema.
 
 ## Overview
 

@@ -1,9 +1,9 @@
 # Reentry Resource — Live Database Schema
 
-> Auto-generated on 2026-06-22 07:40:43 UTC
+> Auto-generated on 2026-07-01 05:09:02 UTC
 > Run `npm run export-db-schema` to regenerate
 
-## WHY Categories (6)
+## Elements (6)
 
 | # | Name | Slug | Definition |
 |---|---|---|---|
@@ -14,7 +14,7 @@
 | 5 | Daily Essentials | daily-essentials | I want this resource to access material necessities (food, clothing, transport, comms) |
 | 6 | My Team | my-team | I want this resource to build my support network (peer support, relationships, community) |
 
-## WHAT Topics (32)
+## Categories (32)
 
 | # | Name | Slug |
 |---|---|---|
@@ -51,9 +51,9 @@
 | 31 | Utilities | utilities |
 | 32 | Health Insurance | health-insurance |
 
-## WHAT → WHY Mappings (33)
+## Category → Element Mappings (33)
 
-| WHAT Topic | WHY Category |
+| Category | Element |
 |---|---|
 | Food | Daily Essentials |
 | Children Support | Health |
@@ -89,39 +89,24 @@
 | Nature | Health |
 | Case Management | My Team |
 
-## WHERE Location Types (4)
+## Modes (3)
 
 | # | Name | Definition |
 |---|---|---|
-| 1 | Building | Physical brick-and-mortar location where you go in person |
-| 2 | Online | Digital resource accessible via website/app/email |
-| 3 | Phone | Resource accessed by calling a phone number |
-| 4 | Event | Temporary physical location (fair, pop-up, mobile clinic, one-time event, etc.) |
+| 1 | In Person | Physical location you visit in person |
+| 2 | Online | Digital resource accessible via website, app, phone, or email |
+| 3 | By Appointment Only | Requires scheduling or booking in advance |
 
-## WHEN Times (4)
-
-| # | Name | Definition |
-|---|---|---|
-| 1 | Anytime | Available 24/7 or whenever you need (open access) |
-| 2 | Daytime | Available during typical daytime hours |
-| 3 | Walk In | Open for walk-in access (no appointment needed) |
-| 4 | By Appointment | Requires scheduling/booking in advance |
-
-## HOW Formats (9)
+## Formats (4)
 
 | # | Name | Definition |
 |---|---|---|
-| 1 | Classes & Workshops | Structured learning or training sessions |
-| 2 | Volunteering | Opportunity to volunteer time/skills |
-| 3 | Article | Written content (blog, guide, resource) |
-| 4 | Infographic | Visual/graphical content (diagrams, charts, visual guides) |
-| 5 | Service | Direct service or appointment-based help (counseling, medical, etc.) |
-| 6 | Podcast | Audio content (series or episode) |
-| 7 | Video | Video content (tutorial, educational, story) |
-| 8 | Book | Physical or digital book |
-| 9 | Meetings | Structured group meetings (AA meetings, support groups, community meetings, etc.) |
+| 1 | Services | Direct service or appointment-based help (counseling, medical, food distribution, etc.) |
+| 2 | Classes, Workshops & Meetings | Structured learning, training sessions, or group meetings (AA, support groups, etc.) |
+| 3 | Guidebooks | Online information resources — how-to guides, videos, podcasts, blog posts, infographics, step-by-step instructions |
+| 4 | Volunteering | Opportunity to volunteer time or skills |
 
-## WHO Centerings (19)
+## Centerings (19)
 
 | # | Name | Definition |
 |---|---|---|
@@ -149,18 +134,12 @@
 
 | Table | Rows |
 |---|---|
-| resources | 115 |
-| why_categories | 6 |
-| what_topics | 32 |
-| where_location_types | 4 |
-| when_times | 4 |
-| how_formats | 9 |
-| who_centerings | 19 |
-| what_topics_why_categories | ? |
-| resources_where_location_types | ? |
-| resources_when_times | ? |
-| resources_how_formats | ? |
-| resources_who_centerings | ? |
+| resources | 16 |
+| elements | 6 |
+| categories | 32 |
+| modes | 3 |
+| resources_formats | ? |
+| resources_centerings | ? |
 | shelters | 1 |
 | shelter_pages | 2 |
 
@@ -192,7 +171,7 @@
 | phone | Phone number |
 | email | Email address |
 | website | URL |
-| what_topic_id | FK to what_topics |
+| category_id | FK to categories |
 | created_by | Admin email who created |
 | created_at | Auto timestamp |
 | updated_at | Auto timestamp |
