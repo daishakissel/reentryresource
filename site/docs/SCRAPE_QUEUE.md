@@ -11,6 +11,7 @@ Ordered crawl → walk → run: single-resource orgs first, then orgs with 2-3 k
 | # | URL | Organization (if known) | Notes | Added |
 |---|---|---|---|---|
 | 28 | https://justmeninrecovery.com/ | Just Men in Recovery | | 2026-06-30 |
+| 28b | https://www.familyshelter.org/ | My Father's House (Gresham) | Discovered while scraping Family Promise — NOT a Family Promise affiliate; independent Christ-centered family transitional housing in Gresham (food pantry, clothing, case management, children's center). 5003 W Powell Blvd, 503-492-3046 | 2026-07-01 |
 | 29 | https://www.miraclesclub.org/ | Miracles Club | | 2026-06-30 |
 | 30 | https://www.namimultnomah.org/peer-delivered-services | National Alliance on Mental Illness (NAMI) Multnomah | | 2026-06-30 |
 | 31 | https://newnarrativepdx.org/ | New Narrative | | 2026-06-30 |

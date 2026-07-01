@@ -30,7 +30,7 @@ Master list of all URLs provided for scraping. Each URL was explored to discover
 | 20 | https://cvision.org/ | Community Vision | 2026-07-01 | 4 |
 | 21 | https://dignityvillage.org/ | Dignity Village | 2026-07-01 | 1 |
 | 22 | https://dpistaffing.com/for-job-seekers/jobs/ | DPI Staffing Solutions | 2026-07-01 | 1 |
-| 23 | https://familypromise.org/ | Family Promise (Metro East affiliate) | 2026-07-01 | 1 |
+| 23 | https://familypromise.org/ | Family Promise — OR affiliates: Metro East, Greater Washington County, Tualatin Valley | 2026-07-01 | 3 |
 | 24 | https://forahealth.org/ | Fora Health | 2026-07-01 | 6 |
 | 25 | https://www.fpcwc.org/ | Family Peace Center | 2026-07-01 | 1 |
 | 26 | https://gncnw.org/ | Good Neighbor Center | 2026-07-01 | 1 |
