@@ -10,16 +10,6 @@ Ordered crawl → walk → run: single-resource orgs first, then orgs with 2-3 k
 
 | # | URL | Organization (if known) | Notes | Added |
 |---|---|---|---|---|
-| 1 | https://dignityvillage.org/ | Dignity Village Shelter & Tiny Houses | | 2026-06-30 |
-| 19 | https://dpistaffing.com/for-job-seekers/jobs/ | DPI Staffing Solutions | | 2026-06-30 |
-| 20 | https://familypromise.org/ | Family Promise | | 2026-06-30 |
-| 21 | https://forahealth.org/ | Fora Health | | 2026-06-30 |
-| 22 | https://www.fpcwc.org/ | Family Peace Center | | 2026-06-30 |
-| 23 | https://gncnw.org/ | Good Neighbor Center | | 2026-06-30 |
-| 24 | https://helpinghandsreentry.org/bybee-lakes-hope-center | Helping Hands Reentry (Bybee Lakes Hope Center) | | 2026-06-30 |
-| 25 | https://www.irontribenetwork.org/ | Iron Tribe | | 2026-06-30 |
-| 26 | https://janusyouth.org/ | Janus Youth Programs | | 2026-06-30 |
-| 27 | https://juntosnw.com/ | Juntos NW | | 2026-06-30 |
 | 28 | https://justmeninrecovery.com/ | Just Men in Recovery | | 2026-06-30 |
 | 29 | https://www.miraclesclub.org/ | Miracles Club | | 2026-06-30 |
 | 30 | https://www.namimultnomah.org/peer-delivered-services | National Alliance on Mental Illness (NAMI) Multnomah | | 2026-06-30 |
