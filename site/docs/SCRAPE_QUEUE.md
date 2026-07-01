@@ -10,9 +10,7 @@ Ordered crawl → walk → run: single-resource orgs first, then orgs with 2-3 k
 
 | # | URL | Organization (if known) | Notes | Added |
 |---|---|---|---|---|
-| 1 | https://www.au-some-kids.org/ | Au-some Kids | | 2026-06-30 |
-| 3 | https://www.atlastreatmentcenter.com/ | Atlas Addiction Treatment Center of Oregon | | 2026-06-30 |
-| 4 | https://www.b4hpdx.org/ | Bikes for Humanity PDX | | 2026-06-30 |
+| 1 | https://www.boulder.care/ | Boulder Care | | 2026-06-30 |
 | 5 | https://www.boulder.care/ | Boulder Care | | 2026-06-30 |
 | 6 | https://bridgeofhope-otc.com/ | Bridge of Hope | | 2026-06-30 |
 | 7 | https://www.bridgestochange.com/ | Bridges to Change | | 2026-06-30 |
@@ -86,6 +84,14 @@ Ordered crawl → walk → run: single-resource orgs first, then orgs with 2-3 k
 | 75 | https://www.dogoodmultnomah.org/refer | Do Good Multnomah | Wife found 3 pages: /refer (used for 7 listings: Arbor Lodge, Downtown Shelter, Kiggins Village, Roseway, St. Johns Village, Stark Street, Veteran's Village), /shelter (NE 82nd Ave Motel), /alternative-shelter (St. Johns Village, Kiggins Village) — explore all 3 starting points, likely several separate shelter-program resources | 2026-06-30 |
 | 76 | https://www.oregon.gov/odhs/benefits/Pages/default.aspx | Oregon Dept. of Human Services (ODHS) | State government site. Wife found 8 distinct program pages under oregon.gov covering SNAP, OHP, TANF, TANF-JOBS, ERDC, WIC, Family Support and Connections — likely 8 separate resources, scope each tightly | 2026-06-30 |
 | 77 | https://www.tprojects.org/shelters | Transition Projects (TPI) | Wife found 3 pages: /shelters (covers Laurelwood, River District Navigation Center, Walnut Park, Willamette Center, Clark Center, Doreen's Place, Jean's Place, Banfield Shelter Motel), /housing (Home and Family Reunification), / (general org page) — explore all 3, likely many separate shelter-program resources | 2026-06-30 |
+
+---
+
+## Dead Links (URL no longer resolves)
+
+| URL | Organization | Notes |
+|---|---|---|
+| https://www.au-some-kids.org/ | Au-some Kids | Domain does not resolve as of 2026-07-01. No trace of org online. Skip. |
 
 ---
 
