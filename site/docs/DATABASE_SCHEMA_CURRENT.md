@@ -1,6 +1,6 @@
 # Reentry Resource — Live Database Schema
 
-> Auto-generated on 2026-07-01 13:12:15 UTC
+> Auto-generated on 2026-07-01 13:21:06 UTC
 > Run `npm run export-db-schema` to regenerate
 
 ## Elements (6)
@@ -14,7 +14,7 @@
 | 5 | Daily Essentials | daily-essentials | I want this resource to access material necessities (food, clothing, transport, comms) |
 | 6 | My Team | my-team | I want this resource to build my support network (peer support, relationships, community) |
 
-## Categories (33)
+## Categories (32)
 
 | # | Name | Slug |
 |---|---|---|
@@ -42,17 +42,16 @@
 | 22 | Medical | medical |
 | 23 | Mental & Behavioral Health | mental-behavioral-health |
 | 24 | Peer Support | peer-support |
-| 25 | Phone | phone |
-| 26 | Email | email |
-| 27 | Rental Assistance | rental-assistance |
-| 28 | Shelter | shelter |
-| 29 | Toiletries | toiletries |
-| 30 | Transport | transport |
-| 31 | Utilities | utilities |
-| 32 | Health Insurance | health-insurance |
-| 33 | Day Center | day-center |
+| 25 | Phone & Internet | phone-internet |
+| 26 | Rental Assistance | rental-assistance |
+| 27 | Shelter | shelter |
+| 28 | Toiletries | toiletries |
+| 29 | Transport | transport |
+| 30 | Utilities | utilities |
+| 31 | Health Insurance | health-insurance |
+| 32 | Day Center | day-center |
 
-## Category → Element Mappings (34)
+## Category → Element Mappings (33)
 
 | Category | Element |
 |---|---|
@@ -63,8 +62,7 @@
 | Utilities | Housing |
 | Health Insurance | Health |
 | Health Insurance | Admin |
-| Phone | Daily Essentials |
-| Email | Daily Essentials |
+| Phone & Internet | Daily Essentials |
 | Rental Assistance | Housing |
 | Parenting | Health |
 | Detox | Health |
@@ -140,7 +138,7 @@
 |---|---|
 | resources | 66 |
 | elements | 6 |
-| categories | 33 |
+| categories | 32 |
 | modes | 3 |
 | resources_formats | ? |
 | resources_centerings | ? |

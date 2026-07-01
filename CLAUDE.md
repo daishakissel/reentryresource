@@ -145,7 +145,7 @@ The database was renamed from the original WHY/WHAT/WHERE/HOW/WHO naming:
 | Table | Rows | Notes |
 |---|---|---|
 | `elements` | 6 | Health, Housing, Admin, Income, Daily Essentials, My Team |
-| `categories` | 33 | Service types — see full list in SCRAPING_GUIDE.md |
+| `categories` | 32 | Service types — see full list in SCRAPING_GUIDE.md |
 | `modes` | 3 | In Person, Online, By Appointment Only |
 | `formats` | 4 | Services; Classes, Workshops & Meetings; Guidebooks; Volunteering |
 | `centerings` | 21 | Populations served — see full list in SCRAPING_GUIDE.md |

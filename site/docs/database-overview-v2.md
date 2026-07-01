@@ -34,7 +34,7 @@ Every resource is defined by 6 angles:
 
 **Income (5):** Benefits, Education, Skill Building, Employment & Career, Financial
 
-**Daily Essentials (7):** Clothing, Food, Phone, Email, Toiletries, Transport, Day Center
+**Daily Essentials (6):** Clothing, Food, Phone & Internet, Toiletries, Transport, Day Center
 
 **My Team (3):** Crisis Hotlines, Peer Support, Case Management
 

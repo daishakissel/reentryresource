@@ -133,7 +133,7 @@
 
 ### Categories (32)
 Use these exact names in CSV imports and the admin form:
-Animal Support, Benefits, Case Management, Children Support, Clothing, Crisis Hotlines, Day Center, Dental, Detox, Education, Email, Employment & Career, Farm Life, Financial, Food, Health Insurance, Housing, ID & Documents, Legal, Medical, Mental & Behavioral Health, Movement, Nature, Parenting, Peer Support, Phone, Recovery, Rental Assistance, Shelter, Skill Building, Toiletries, Transport, Utilities
+Animal Support, Benefits, Case Management, Children Support, Clothing, Crisis Hotlines, Day Center, Dental, Detox, Education, Employment & Career, Farm Life, Financial, Food, Health Insurance, Housing, ID & Documents, Legal, Medical, Mental & Behavioral Health, Movement, Nature, Parenting, Peer Support, Phone & Internet, Recovery, Rental Assistance, Shelter, Skill Building, Toiletries, Transport, Utilities
 
 ### Modes (3)
 - **In Person** — physical location you visit

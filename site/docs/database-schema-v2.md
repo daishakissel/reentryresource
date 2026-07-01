@@ -41,7 +41,7 @@ Values: Health, Housing, Admin, Income, Daily Essentials, My Team
 | sort_order | int | NOT NULL, DEFAULT 0 |
 | created_at | timestamptz | DEFAULT now() |
 
-Values: Animal Support, Farm Life, Nature, Benefits, Case Management, Children Support, Parenting, Clothing, Crisis Hotlines, Day Center, Dental, Detox, Recovery, Education, Skill Building, Employment & Career, Financial, Movement, Food, Housing, ID & Documents, Legal, Medical, Mental & Behavioral Health, Peer Support, Phone, Email, Rental Assistance, Shelter, Toiletries, Transport, Utilities, Health Insurance
+Values: Animal Support, Farm Life, Nature, Benefits, Case Management, Children Support, Parenting, Clothing, Crisis Hotlines, Day Center, Dental, Detox, Recovery, Education, Skill Building, Employment & Career, Financial, Movement, Food, Housing, ID & Documents, Legal, Medical, Mental & Behavioral Health, Peer Support, Phone & Internet, Rental Assistance, Shelter, Toiletries, Transport, Utilities, Health Insurance
 
 ### where_location_types (4 rows)
 

@@ -320,7 +320,6 @@ If nothing stood out, say so briefly rather than forcing a suggestion. The goal 
 - Dental
 - Detox
 - Education
-- Email
 - Employment & Career
 - Farm Life
 - Financial
@@ -335,7 +334,7 @@ If nothing stood out, say so briefly rather than forcing a suggestion. The goal 
 - Nature
 - Parenting
 - Peer Support
-- Phone
+- Phone & Internet
 - Recovery
 - Rental Assistance
 - Shelter
