@@ -377,10 +377,10 @@ The test is: **is there an actionable next step (apply, call, attend, sign up), 
 
 ## Centerings (match exactly — leave blank if general population)
 
-- ASL or Language Support
-- BIPOC
 - Clean & Sober
+- BIPOC
 - Couples
+- Deaf & Hard of Hearing
 - Domestic Violence (DV) Survivors
 - Families
 - Immigrants, Refugees, Asylum Seekers
@@ -392,6 +392,7 @@ The test is: **is there an actionable next step (apply, call, attend, sign up), 
 - People with Disabilities
 - People with Pets/Animals
 - Seniors
+- Spanish Speakers
 - Survivors of Human Trafficking
 - Veterans
 - Women

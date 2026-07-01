@@ -134,7 +134,7 @@ The database was renamed from the original WHY/WHAT/WHERE/HOW/WHO naming:
 - **Categories** (was WHAT Topics) — 32 service types
 - **Modes** (was WHERE + WHEN merged) — 3 access methods (In Person, Online, By Appointment Only)
 - **Formats** (was HOW) — 4 delivery types
-- **Centerings** (was WHO) — 19 populations served
+- **Centerings** (was WHO) — 20 populations served
 
 #### Tables (Live DB — verified July 2026)
 
@@ -144,7 +144,7 @@ The database was renamed from the original WHY/WHAT/WHERE/HOW/WHO naming:
 | `categories` | 32 | Service types — see full list in SCRAPING_GUIDE.md |
 | `modes` | 3 | In Person, Online, By Appointment Only |
 | `formats` | 4 | Services; Classes, Workshops & Meetings; Guidebooks; Volunteering |
-| `centerings` | 19 | Populations served — see full list in SCRAPING_GUIDE.md |
+| `centerings` | 20 | Populations served — see full list in SCRAPING_GUIDE.md |
 | `resources` | 16 | Main content table (12 CAO + 4 4D Recovery) |
 | `categories_elements` | 33 | Junction: which categories map to which elements |
 | `resources_categories` | varies | Junction: which categories each resource belongs to |
