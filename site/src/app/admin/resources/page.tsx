@@ -218,8 +218,11 @@ export default function AdminResourcesPage() {
       let msg = `Imported ${data.imported} resource${data.imported !== 1 ? "s" : ""}.`;
       if (data.skipped > 0) msg += ` Skipped ${data.skipped} (no title).`;
       if (data.errors?.length > 0) msg += ` ${data.errors.length} error(s).`;
+      if (data.errors?.length > 0) {
+        msg += " Errors: " + data.errors.join(" | ");
+        setImportRowErrors(data.errors);
+      }
       setImportSuccess(msg);
-      if (data.errors?.length > 0) setImportRowErrors(data.errors);
     } else {
       setImportError(data.error || "Import failed");
     }
