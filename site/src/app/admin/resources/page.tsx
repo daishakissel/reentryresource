@@ -25,6 +25,7 @@ const ALL_COLUMNS: { key: string; label: string; defaultVisible: boolean }[] = [
   { key: "source_url", label: "Source URL", defaultVisible: false },
   { key: "scraped_url", label: "Scraped From", defaultVisible: false },
   { key: "scrape_status", label: "Scrape Status", defaultVisible: false },
+  { key: "content_hash", label: "Content Hash", defaultVisible: false },
   { key: "expiration_date", label: "Expiration", defaultVisible: false },
   { key: "created_at", label: "Created", defaultVisible: true },
   { key: "created_by", label: "Created By", defaultVisible: false },
