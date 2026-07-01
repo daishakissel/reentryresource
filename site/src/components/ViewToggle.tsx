@@ -36,6 +36,7 @@ export default function ViewToggle({ resources, hasMore, loadingMore, onLoadMore
   const [resourceCategoryImages, setResourceCategoryImages] = useState<Record<string, { name: string; imageUrl: string }[]>>({});
   const [loaded, setLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>(null);
+  const [dbFormatCounts, setDbFormatCounts] = useState<Record<string, number>>({});
 
   const fetchData = useCallback(async () => {
     const [formatsRes, formatJunctionRes, modesRes, modeJunctionRes, catJunctionRes, categoriesRes] = await Promise.all([
@@ -48,6 +49,12 @@ export default function ViewToggle({ resources, hasMore, loadingMore, onLoadMore
     ]);
     setFormats(formatsRes.data ?? []);
     setModes(modesRes.data ?? []);
+
+    const countsRes = await fetch("/api/filters/counts", { cache: "no-store" });
+    if (countsRes.ok) {
+      const data = await countsRes.json();
+      setDbFormatCounts(data.formats ?? {});
+    }
 
     // Build category image map per resource
     const catLookup = Object.fromEntries((categoriesRes.data ?? []).map((c: any) => [c.id, { name: c.name, imageUrl: c.default_featured_image }]));
@@ -114,7 +121,7 @@ export default function ViewToggle({ resources, hasMore, loadingMore, onLoadMore
         return fIds.includes(format.id);
       });
       if (matching.length > 0) {
-        formatTabs.push({ format, count: matching.length });
+        formatTabs.push({ format, count: dbFormatCounts[format.id] ?? matching.length });
         formatResourceMap[format.id] = matching;
         matching.forEach((r) => assignedIds.add(r.id));
       }
@@ -129,7 +136,7 @@ export default function ViewToggle({ resources, hasMore, loadingMore, onLoadMore
       }
       formatResourceMap[servicesFormat.id] = [...(formatResourceMap[servicesFormat.id] ?? []), ...unassigned];
       const tab = formatTabs.find((t) => t.format.id === servicesFormat.id);
-      if (tab) tab.count = formatResourceMap[servicesFormat.id].length;
+      if (tab) tab.count = dbFormatCounts[servicesFormat.id] ?? formatResourceMap[servicesFormat.id].length;
     }
   }
 
