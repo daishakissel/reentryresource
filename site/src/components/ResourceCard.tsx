@@ -121,7 +121,7 @@ export default function ResourceCard({ resource, modeLabels = [], categoryImages
       <Link href={href}>
         <div
           className={`bg-white dark:bg-ocean-light rounded-lg border border-gray-200 dark:border-ocean-light hover:shadow-md transition-shadow cursor-pointer flex flex-col ${expanded ? "" : "overflow-hidden"}`}
-          style={{ height: expanded ? "auto" : "460px", minHeight: "460px" }}
+          style={{ height: expanded ? "auto" : "500px", minHeight: "500px" }}
         >
           {/* Top: Title + organization */}
           <div className="px-4 py-2 border-b border-gray-100 dark:border-ocean flex-shrink-0 h-[64px] flex flex-col justify-center">
