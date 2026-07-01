@@ -2,12 +2,17 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET() {
   const client = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
+    {
+      auth: { autoRefreshToken: false, persistSession: false },
+      // Bypass Next.js fetch caching so filters always reflect the live DB
+      global: { fetch: (input: any, init?: any) => fetch(input, { ...init, cache: "no-store" }) },
+    }
   );
 
   const [whyRes, whatRes, whereRes, howRes, whoRes, whatWhyRes] = await Promise.all([

@@ -2,12 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function GET(req: NextRequest) {
   const client = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
+    {
+      auth: { autoRefreshToken: false, persistSession: false },
+      // Bypass Next.js fetch caching so counts always reflect the live DB
+      global: { fetch: (input: any, init?: any) => fetch(input, { ...init, cache: "no-store" }) },
+    }
   );
 
   const elementId = req.nextUrl.searchParams.get("elementId");
