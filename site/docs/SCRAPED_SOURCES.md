@@ -20,6 +20,9 @@ Master list of all URLs provided for scraping. Each URL was explored to discover
 | 10 | https://www.bridgestochange.com/ | Bridges to Change | 2026-07-01 | 4 |
 | 11 | https://calltosafety.org/ | Call to Safety | 2026-07-01 | 5 |
 | 12 | https://www.capnw.org/ | Cascade AIDS Project | 2026-07-01 | 9 |
+| 13 | https://cascadiahealth.org/ | Cascadia Health | 2026-07-01 | 4 |
+| 14 | https://www.catholiccharitiesoregon.org/ | Catholic Charities Immigration Legal Services | 2026-07-01 | 1 |
+| 15 | https://cellphonesforsoldiers.com/ | Cell Phones For Soldiers | 2026-07-01 | 3 |
 
 ---
 

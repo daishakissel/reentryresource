@@ -10,10 +10,7 @@ Ordered crawl → walk → run: single-resource orgs first, then orgs with 2-3 k
 
 | # | URL | Organization (if known) | Notes | Added |
 |---|---|---|---|---|
-| 1 | https://cascadiahealth.org/ | Cascadia Health | | 2026-06-30 |
-| 11 | https://www.catholiccharitiesoregon.org/ | Catholic Charities Immigration Legal Services | | 2026-06-30 |
-| 12 | https://cellphonesforsoldiers.com/ | Cell Phones For Soldiers | | 2026-06-30 |
-| 13 | https://www.cityteam.org/ | Cityteam Portland | | 2026-06-30 |
+| 1 | https://www.cityteam.org/ | Cityteam Portland | | 2026-06-30 |
 | 14 | https://clear-clinic.org/ | Clear Clinic | | 2026-06-30 |
 | 15 | https://codainc.org/ | Coda | | 2026-06-30 |
 | 16 | https://www.communitywarehouse.org/get-furniture/ | Community Warehouse Furniture | | 2026-06-30 |
