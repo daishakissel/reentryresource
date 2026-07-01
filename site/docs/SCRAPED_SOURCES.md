@@ -17,6 +17,9 @@ Master list of all URLs provided for scraping. Each URL was explored to discover
 | 7 | https://www.b4hpdx.org/ | Bikes for Humanity PDX | 2026-07-01 | 2 |
 | 8 | https://www.boulder.care/ | Boulder Care | 2026-07-01 | 1 |
 | 9 | https://bridgeofhope-otc.com/ | Bridge of Hope | 2026-07-01 | 10 |
+| 10 | https://www.bridgestochange.com/ | Bridges to Change | 2026-07-01 | 4 |
+| 11 | https://calltosafety.org/ | Call to Safety | 2026-07-01 | 5 |
+| 12 | https://www.capnw.org/ | Cascade AIDS Project | 2026-07-01 | 9 |
 
 ---
 

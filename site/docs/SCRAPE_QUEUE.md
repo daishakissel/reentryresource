@@ -10,10 +10,7 @@ Ordered crawl → walk → run: single-resource orgs first, then orgs with 2-3 k
 
 | # | URL | Organization (if known) | Notes | Added |
 |---|---|---|---|---|
-| 1 | https://www.bridgestochange.com/ | Bridges to Change | | 2026-06-30 |
-| 8 | https://calltosafety.org/ | Call to Safety | | 2026-06-30 |
-| 9 | https://www.capnw.org/ | Cascade AIDS Project | | 2026-06-30 |
-| 10 | https://cascadiahealth.org/ | Cascadia Health | | 2026-06-30 |
+| 1 | https://cascadiahealth.org/ | Cascadia Health | | 2026-06-30 |
 | 11 | https://www.catholiccharitiesoregon.org/ | Catholic Charities Immigration Legal Services | | 2026-06-30 |
 | 12 | https://cellphonesforsoldiers.com/ | Cell Phones For Soldiers | | 2026-06-30 |
 | 13 | https://www.cityteam.org/ | Cityteam Portland | | 2026-06-30 |
