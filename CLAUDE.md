@@ -80,7 +80,7 @@ site/
 │   │   ├── AppShell.tsx            # Main layout with header, sidebars, footer
 │   │   ├── Sidebar.tsx             # RIGHT sidebar — elements navigation
 │   │   ├── RightSidebar.tsx        # LEFT sidebar — user/shelter/my-location (legacy name)
-│   │   ├── ResourceCard.tsx        # Resource card with expandable description
+│   │   ├── ResourceCard.tsx        # Resource card; image flips (bottom-left button) to show all mode/category/format/centering labels
 │   │   ├── ResourceGrid.tsx        # Grid of resource cards with infinite scroll
 │   │   ├── ResourceFilter.tsx      # Dropdown filter (Categories, Formats, Centerings)
 │   │   ├── ResourceMap.tsx         # Leaflet map wrapper (dynamic import)

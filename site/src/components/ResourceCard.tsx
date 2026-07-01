@@ -13,14 +13,17 @@ interface ResourceCardProps {
   resource: Resource;
   modeLabels?: string[];
   categoryImages?: CategoryImage[];
+  formatLabels?: string[];
+  centeringLabels?: string[];
 }
 
-export default function ResourceCard({ resource, modeLabels = [], categoryImages = [] }: ResourceCardProps) {
+export default function ResourceCard({ resource, modeLabels = [], categoryImages = [], formatLabels = [], centeringLabels = [] }: ResourceCardProps) {
   const href = `/resource/${resource.slug || resource.id}`;
   const [expanded, setExpanded] = useState(false);
   const [isClamped, setIsClamped] = useState(false);
   const [showPhonePopup, setShowPhonePopup] = useState(false);
   const [engageOpen, setEngageOpen] = useState(false);
+  const [flipped, setFlipped] = useState(false);
   const descRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
@@ -128,20 +131,57 @@ export default function ResourceCard({ resource, modeLabels = [], categoryImages
             )}
           </div>
 
-          {/* Image area */}
-          {resource.featured_image ? (
-            <div className="h-60 bg-gray-100 dark:bg-ocean flex items-center justify-center flex-shrink-0 p-2">
-              <img src={resource.featured_image} alt={resource.title} className="max-w-full max-h-full object-contain" />
+          {/* Image area — flips to show all labels */}
+          <div className="h-60 flex-shrink-0 relative" style={{ perspective: "1000px" }}>
+            <div
+              className="relative w-full h-full transition-transform duration-500"
+              style={{ transformStyle: "preserve-3d", transform: flipped ? "rotateY(180deg)" : "rotateY(0deg)" }}
+            >
+              {/* Front: image / category icons */}
+              <div className="absolute inset-0 bg-gray-100 dark:bg-ocean overflow-hidden" style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden" }}>
+                {resource.featured_image ? (
+                  <div className="w-full h-full flex items-center justify-center p-2">
+                    <img src={resource.featured_image} alt={resource.title} className="max-w-full max-h-full object-contain" />
+                  </div>
+                ) : categoryImages.length > 0 ? (
+                  <CategoryIconGrid categories={categoryImages} />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <span className="text-gray-400 text-sm">No image</span>
+                  </div>
+                )}
+              </div>
+              {/* Back: all labels */}
+              <div
+                className="absolute inset-0 bg-gray-100 dark:bg-ocean overflow-y-auto px-3 py-2 text-left"
+                style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}
+              >
+                {modeLabels.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {modeLabels.map((label) => (
+                      <span key={label} className="text-[10px] px-2 py-0.5 rounded bg-brand-gold-light text-brand-brown">
+                        {label === "By Appointment Only" ? "By Appointment" : label}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <LabelGroup title="Categories" items={categoryImages.map((c) => c.name)} />
+                <LabelGroup title="Formats" items={formatLabels} />
+                <LabelGroup title="Centerings" items={centeringLabels} />
+              </div>
             </div>
-          ) : categoryImages.length > 0 ? (
-            <div className="h-60 bg-gray-100 dark:bg-ocean flex-shrink-0">
-              <CategoryIconGrid categories={categoryImages} />
-            </div>
-          ) : (
-            <div className="h-60 bg-gray-100 dark:bg-ocean flex items-center justify-center flex-shrink-0">
-              <span className="text-gray-400 text-sm">No image</span>
-            </div>
-          )}
+            {/* Flip button (bottom-left, mirrors the top-right contact buttons) */}
+            <button
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setFlipped((v) => !v); }}
+              className="absolute bottom-2 left-2 z-20 w-8 h-8 rounded-full bg-brand-gold text-white flex items-center justify-center hover:bg-brand-gold/80 transition-colors shadow-md"
+              aria-label={flipped ? "Show image" : "Show all labels"}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+          </div>
 
           {/* Bottom: Description */}
           <div className="px-4 py-3 flex-1 flex flex-col border-t border-gray-100 dark:border-ocean">
@@ -170,15 +210,6 @@ export default function ResourceCard({ resource, modeLabels = [], categoryImages
                 </button>
               )}
             </div>
-            {modeLabels.length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-2">
-                {modeLabels.map((label) => (
-                  <span key={label} className="text-xs px-2 py-0.5 rounded bg-brand-gold-light text-brand-brown">
-                    {label === "By Appointment Only" ? "By Appointment" : label}
-                  </span>
-                ))}
-              </div>
-            )}
           </div>
 
           {/* Engage footer */}
@@ -202,6 +233,22 @@ export default function ResourceCard({ resource, modeLabels = [], categoryImages
           )}
         </div>
       </Link>
+    </div>
+  );
+}
+
+function LabelGroup({ title, items }: { title: string; items: string[] }) {
+  if (!items || items.length === 0) return null;
+  return (
+    <div className="mb-2">
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">{title}</p>
+      <div className="flex flex-wrap gap-1">
+        {items.map((it) => (
+          <span key={it} className="text-[10px] px-2 py-0.5 rounded bg-white dark:bg-ocean-light text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-ocean">
+            {it}
+          </span>
+        ))}
+      </div>
     </div>
   );
 }

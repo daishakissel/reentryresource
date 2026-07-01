@@ -35,20 +35,44 @@ export default function ViewToggle({ resources, loading: resourcesLoading, hasMo
   const [modes, setModes] = useState<ModeItem[]>([]);
   const [resourceModeMap, setResourceModeMap] = useState<Record<string, string[]>>({});
   const [resourceCategoryImages, setResourceCategoryImages] = useState<Record<string, { name: string; imageUrl: string }[]>>({});
+  const [resourceFormatLabels, setResourceFormatLabels] = useState<Record<string, string[]>>({});
+  const [resourceCenteringLabels, setResourceCenteringLabels] = useState<Record<string, string[]>>({});
   const [loaded, setLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [dbFormatCounts, setDbFormatCounts] = useState<Record<string, number>>({});
 
   const fetchData = useCallback(async () => {
-    const [formatsRes, modesRes, modeJunctionRes, catJunctionRes, categoriesRes] = await Promise.all([
+    const [formatsRes, modesRes, modeJunctionRes, catJunctionRes, categoriesRes, formatJunctionRes, centeringsRes, centeringJunctionRes] = await Promise.all([
       supabase.from("formats").select("id, name, sort_order").order("sort_order"),
       supabase.from("modes").select("id, name"),
       supabase.from("resources_modes").select("resource_id, mode_id"),
       supabase.from("resources_categories").select("resource_id, category_id"),
       supabase.from("categories").select("id, name, default_featured_image"),
+      supabase.from("resources_formats").select("resource_id, format_id"),
+      supabase.from("centerings").select("id, name"),
+      supabase.from("resources_centerings").select("resource_id, centering_id"),
     ]);
     setFormats(formatsRes.data ?? []);
     setModes(modesRes.data ?? []);
+
+    // Per-resource format and centering name labels (for the card flip side)
+    const formatLookup = Object.fromEntries((formatsRes.data ?? []).map((f: any) => [f.id, f.name]));
+    const rfMap: Record<string, string[]> = {};
+    (formatJunctionRes.data ?? []).forEach((row: any) => {
+      const name = formatLookup[row.format_id];
+      if (!name) return;
+      (rfMap[row.resource_id] ??= []).push(name);
+    });
+    setResourceFormatLabels(rfMap);
+
+    const centeringLookup = Object.fromEntries((centeringsRes.data ?? []).map((c: any) => [c.id, c.name]));
+    const rcentMap: Record<string, string[]> = {};
+    (centeringJunctionRes.data ?? []).forEach((row: any) => {
+      const name = centeringLookup[row.centering_id];
+      if (!name) return;
+      (rcentMap[row.resource_id] ??= []).push(name);
+    });
+    setResourceCenteringLabels(rcentMap);
 
     const countsRes = await fetch("/api/filters/counts", { cache: "no-store" });
     if (countsRes.ok) {
@@ -158,6 +182,8 @@ export default function ViewToggle({ resources, loading: resourcesLoading, hasMo
               resourceModeMap={resourceModeMap}
               modeLookup={modeLookup}
               resourceCategoryImages={resourceCategoryImages}
+              resourceFormatLabels={resourceFormatLabels}
+              resourceCenteringLabels={resourceCenteringLabels}
             />
           )}
         </div>

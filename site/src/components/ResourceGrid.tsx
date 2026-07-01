@@ -15,9 +15,11 @@ interface ResourceGridProps {
   resourceModeMap?: Record<string, string[]>;
   modeLookup?: Record<string, string>;
   resourceCategoryImages?: Record<string, CategoryImage[]>;
+  resourceFormatLabels?: Record<string, string[]>;
+  resourceCenteringLabels?: Record<string, string[]>;
 }
 
-export default function ResourceGrid({ resources, hasMore, loadingMore, onLoadMore, resourceModeMap, modeLookup, resourceCategoryImages }: ResourceGridProps) {
+export default function ResourceGrid({ resources, hasMore, loadingMore, onLoadMore, resourceModeMap, modeLookup, resourceCategoryImages, resourceFormatLabels, resourceCenteringLabels }: ResourceGridProps) {
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -52,7 +54,9 @@ export default function ResourceGrid({ resources, hasMore, loadingMore, onLoadMo
             ? (resourceModeMap[resource.id] ?? []).map((id) => modeLookup[id]).filter(Boolean)
             : [];
           const catImages = resourceCategoryImages?.[resource.id] ?? [];
-          return <ResourceCard key={resource.id} resource={resource} modeLabels={modeNames} categoryImages={catImages} />;
+          const formatLabels = resourceFormatLabels?.[resource.id] ?? [];
+          const centeringLabels = resourceCenteringLabels?.[resource.id] ?? [];
+          return <ResourceCard key={resource.id} resource={resource} modeLabels={modeNames} categoryImages={catImages} formatLabels={formatLabels} centeringLabels={centeringLabels} />;
         })}
       </div>
       {hasMore && (
