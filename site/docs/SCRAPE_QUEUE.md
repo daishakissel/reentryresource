@@ -11,16 +11,7 @@ Ordered crawl → walk → run: single-resource orgs first, then orgs with 2-3 k
 | # | URL | Organization (if known) | Notes | Added |
 |---|---|---|---|---|
 | 28b | https://www.familyshelter.org/ | My Father's House (Gresham) | Discovered while scraping Family Promise — NOT a Family Promise affiliate; independent Christ-centered family transitional housing in Gresham (food pantry, clothing, case management, children's center). 5003 W Powell Blvd, 503-492-3046 | 2026-07-01 |
-| 48 | https://serenitylane.org/ | Serenity Lane | | 2026-06-30 |
-| 49 | https://www.shelterbridge.org/ | Shelter Bridge | | 2026-06-30 |
-| 50 | https://www.soberhousingoregonllc.com/ | Sober Housing Oregon | | 2026-06-30 |
-| 51 | https://stjohnsfoodshare.org/ | St. Johns Food Share | | 2026-06-30 |
-| 52 | https://www.strongeroregon.com/ | Stronger Oregon | | 2026-06-30 |
-| 53 | https://www.thepathfindernetwork.org/ | The Pathfinder Network | | 2026-06-30 |
-| 54 | https://thepeercompany.org/ | The Peer Company | | 2026-06-30 |
-| 55 | https://www.therecoverygym.org/ | The Recovery Gym | | 2026-06-30 |
-| 56 | https://www.truecolorsrecovery.org/ | True Colors | | 2026-06-30 |
-| 57 | https://www.williamtemple.org/ | William Temple House | | 2026-06-30 |
+| 50 | https://www.soberhousingoregonllc.com/ | Sober Housing Oregon | DEFERRED — site returned no indexable content (empty) on 2026-07-01; retry later or contact directly | 2026-06-30 |
 | 58 | https://worksourceoregon.org/contact | WorkSource Oregon | | 2026-06-30 |
 | 59 | https://app.smartsheet.com/b/form/6a61de9da2ed4e83b651a90f9ce65e09 | HMIT Referral for Services | Smartsheet form, not a normal site — verify it's still active before scraping | 2026-06-30 |
 | 60 | https://paulsusi.wordpress.com/pdx-id-assistance/ | Paul Susi (PDX ID Assistance) | Personal/independent site, not an org — verify it's still active | 2026-06-30 |
@@ -61,6 +52,7 @@ These came up in the wife's CSV but are not being added to the scrape queue as i
 | https://www.211info.org/ | General referral/directory aggregator, not a single organization — useful as a taxonomy reference, not a scrape target |
 | https://www.findhelp.org/ | Same as above — directory aggregator, not a scrape target |
 | https://poisedproperties.com/ | Reviewed 2026-07-01 — for-profit property management company (Section 8/LIHTC landlord), not a direct-service org. Excluded. |
+| https://www.shelterbridge.org/ | Reviewed 2026-07-01 — a homeless-resource finder app/directory (real-time shelter beds, meals, legal aid), not a direct-service org. Excluded like 211/findhelp. Useful tool; can add on request. |
 | https://www.indeed.com/ | Generic job board, not a service organization — if wanted, add directly as a single "Job Search" resource (Employment & Career category) rather than scraping it as a site |
 
 ## How to use this file

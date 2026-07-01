@@ -57,6 +57,14 @@ Master list of all URLs provided for scraping. Each URL was explored to discover
 | 47 | https://recoverynetworkoforegon.org/ | Recovery Network of Oregon | 2026-07-01 | 1 |
 | 48 | https://www.recoveryworksnw.com/ | Recovery Works NW | 2026-07-01 | 3 |
 | 49 | https://www.rosecitydetox.com/ | Rose City Detox | 2026-07-01 | 1 |
+| 50 | https://serenitylane.org/ | Serenity Lane | 2026-07-01 | 5 |
+| 51 | https://stjohnsfoodshare.org/ | St. Johns Food Share | 2026-07-01 | 1 |
+| 52 | https://www.strongeroregon.com/ | Stronger Oregon | 2026-07-01 | 2 |
+| 53 | https://www.thepathfindernetwork.org/ | The Pathfinder Network | 2026-07-01 | 2 |
+| 54 | https://thepeercompany.org/ | The Peer Company (formerly MHAAO) | 2026-07-01 | 1 |
+| 55 | https://www.therecoverygym.org/ | The Recovery Gym | 2026-07-01 | 1 |
+| 56 | https://www.truecolorsrecovery.org/ | True Colors | 2026-07-01 | 1 |
+| 57 | https://www.williamtemple.org/ | William Temple House | 2026-07-01 | 4 |
 
 ---
 
