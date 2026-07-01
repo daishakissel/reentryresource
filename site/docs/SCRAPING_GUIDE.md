@@ -266,7 +266,15 @@ The result contains `coordinates: [longitude, latitude]` (note: longitude comes 
 
 Put one row per resource. Use semicolons (`;`) to separate multiple values in Modes, Formats, and Centerings.
 
-**Column count tip — online-only resources with no address:** The columns between `formats` and `phone` are: `centerings, street_address, city, state, zip, region, country, latitude, longitude` — 9 empty fields. Because each field needs its own separator comma, you need **10 commas** between `Services` and the phone number: `Services,,,,,,,,,,1-888-000-0000`. A common mistake is writing only 9, which shifts phone into the longitude slot and the website URL into expiration_date.
+**Column count reference — empty location/contact fields:** The columns in order are `centerings, street_address, city, state, zip, region, country, latitude, longitude, phone, email, website`. Count the commas needed to reach the first non-empty contact field:
+
+| First non-empty field after formats/centerings | Commas needed after that field's value |
+|---|---|
+| `phone` (no address) | 10 commas between `formats` and phone |
+| `email` (no address, no phone) | 10 commas between `centerings` and email, OR 11 between `formats` and email |
+| `website` (no address, no phone, no email) | 11 commas between `centerings` and website |
+
+The pattern: each empty field between you and the target costs one comma. `street_address` through `phone` = 9 fields = 9 commas, plus 1 for the separator before the value = **10 commas minimum from centerings to email**. Always verify with `python3 -c "import csv; [print(r['phone'], r['email'], r['website']) for r in csv.DictReader(open('file.csv'))]"` before importing.
 
 ### Step 9: Import and Verify
 
