@@ -89,7 +89,7 @@ Values: Classes & Workshops, Volunteering, Article, Infographic, Service, Podcas
 | sort_order | int | NOT NULL, DEFAULT 0 |
 | created_at | timestamptz | DEFAULT now() |
 
-Values: ASL or Language Support, BIPOC, Clean & Sober, Couples, Domestic Violence (DV) Survivors, Families, Immigrants Refugees and Asylum Seekers, Justice Impacted, LGBTQIA2S+, Low Barrier, Men, People in Recovery, People with Disabilities, People with Pets/Animals, Seniors, Survivors of Human Trafficking, Veterans, Women, Youth & Children
+Values: ASL Support, BIPOC, Clean & Sober, Couples, Domestic Violence (DV) Survivors, Families, Immigrants Refugees and Asylum Seekers, Justice Impacted, LGBTQIA2S+, Low Barrier, Men, People in Recovery, People with Disabilities, People with Pets/Animals, Seniors, Spanish Speakers, Survivors of Human Trafficking, Veterans, Women, Youth & Children
 
 ---
 

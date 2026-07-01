@@ -1,6 +1,6 @@
 # Reentry Resource — Live Database Schema
 
-> Auto-generated on 2026-07-01 05:09:02 UTC
+> Auto-generated on 2026-07-01 12:11:33 UTC
 > Run `npm run export-db-schema` to regenerate
 
 ## Elements (6)
@@ -106,12 +106,12 @@
 | 3 | Guidebooks | Online information resources — how-to guides, videos, podcasts, blog posts, infographics, step-by-step instructions |
 | 4 | Volunteering | Opportunity to volunteer time or skills |
 
-## Centerings (19)
+## Centerings (20)
 
 | # | Name | Definition |
 |---|---|---|
 | 1 | Clean & Sober | — |
-| 2 | ASL or Language Support | Offers interpretation or accessibility for deaf/hard of hearing or non-English speakers |
+| 2 | ASL Support | Offers American Sign Language (ASL) interpretation or accessibility for the Deaf and hard of hearing |
 | 3 | BIPOC | Centers on Black, Indigenous, People of Color |
 | 4 | Couples | Designed for couples (relationship counseling, couples housing, etc.) |
 | 5 | Domestic Violence (DV) Survivors | Centers on survivors of domestic/intimate partner violence |
@@ -125,16 +125,17 @@
 | 13 | People with Disabilities | Accessible and serving people with disabilities |
 | 14 | People with Pets/Animals | Welcomes or accommodates pets/animals |
 | 15 | Seniors | Serves older adults (55+, 60+, etc.) |
-| 16 | Survivors of Human Trafficking | Centers on trafficking survivors |
-| 17 | Veterans | Serves military veterans |
-| 18 | Women | Specifically serves women |
-| 19 | Youth & Children | Serves young people and children |
+| 16 | Spanish Speakers | Offers services in Spanish or centers on the Spanish-speaking community |
+| 17 | Survivors of Human Trafficking | Centers on trafficking survivors |
+| 18 | Veterans | Serves military veterans |
+| 19 | Women | Specifically serves women |
+| 20 | Youth & Children | Serves young people and children |
 
 ## Table Row Counts
 
 | Table | Rows |
 |---|---|
-| resources | 16 |
+| resources | 37 |
 | elements | 6 |
 | categories | 32 |
 | modes | 3 |

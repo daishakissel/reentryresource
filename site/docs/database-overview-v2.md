@@ -74,7 +74,7 @@ Every resource is defined by 6 angles:
 
 ## WHO — Centerings (19)
 
-1. ASL or Language Support
+1. ASL Support
 2. BIPOC
 3. Clean & Sober
 4. Couples
@@ -89,10 +89,11 @@ Every resource is defined by 6 angles:
 13. People with Disabilities
 14. People with Pets/Animals
 15. Seniors
-16. Survivors of Human Trafficking
-17. Veterans
-18. Women
-19. Youth & Children
+16. Spanish Speakers
+17. Survivors of Human Trafficking
+18. Veterans
+19. Women
+20. Youth & Children
 
 ---
 

@@ -148,7 +148,7 @@ Animal Support, Benefits, Case Management, Children Support, Clothing, Crisis Ho
 
 ### Centerings (19)
 Leave blank if open to everyone. Use these exact names:
-ASL or Language Support, BIPOC, Clean & Sober, Couples, Domestic Violence (DV) Survivors, Families, Immigrants Refugees and Asylum Seekers, Justice Impacted, LGBTQIA2S+, Low Barrier, Men, People in Recovery, People with Disabilities, People with Pets/Animals, Seniors, Survivors of Human Trafficking, Veterans, Women, Youth & Children
+ASL Support, BIPOC, Clean & Sober, Couples, Domestic Violence (DV) Survivors, Families, Immigrants Refugees and Asylum Seekers, Justice Impacted, LGBTQIA2S+, Low Barrier, Men, People in Recovery, People with Disabilities, People with Pets/Animals, Seniors, Spanish Speakers, Survivors of Human Trafficking, Veterans, Women, Youth & Children
 
 ---
 

@@ -378,9 +378,9 @@ The test is: **is there an actionable next step (apply, call, attend, sign up), 
 ## Centerings (match exactly — leave blank if general population)
 
 - Clean & Sober
+- ASL Support
 - BIPOC
 - Couples
-- Deaf & Hard of Hearing
 - Domestic Violence (DV) Survivors
 - Families
 - Immigrants, Refugees, Asylum Seekers
