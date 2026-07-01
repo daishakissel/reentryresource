@@ -39,7 +39,7 @@ export default function ResourceCard({ resource, modeLabels = [], categoryImages
     <div className="relative">
       {/* Contact icon buttons - top right, stacked vertically */}
       {(resource.website || resource.email || resource.phone) && (
-        <div className="absolute top-14 right-2 z-10 flex flex-col gap-1.5">
+        <div className="absolute top-[72px] right-2 z-10 flex flex-col gap-1.5">
           {resource.website && (
             <a
               href={resource.website}
@@ -116,10 +116,16 @@ export default function ResourceCard({ resource, modeLabels = [], categoryImages
       )}
 
       <Link href={href}>
-        <div className="bg-white dark:bg-ocean-light rounded-lg border border-gray-200 dark:border-ocean-light overflow-hidden hover:shadow-md transition-shadow cursor-pointer flex flex-col" style={{ minHeight: "380px" }}>
-          {/* Top: Title */}
-          <div className="px-4 py-3 border-b border-gray-100 dark:border-ocean flex-shrink-0">
-            <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-2 text-sm">{resource.title}</h3>
+        <div
+          className={`bg-white dark:bg-ocean-light rounded-lg border border-gray-200 dark:border-ocean-light hover:shadow-md transition-shadow cursor-pointer flex flex-col ${expanded ? "" : "overflow-hidden"}`}
+          style={{ height: expanded ? "auto" : "460px", minHeight: "460px" }}
+        >
+          {/* Top: Title + organization */}
+          <div className="px-4 py-2 border-b border-gray-100 dark:border-ocean flex-shrink-0 h-[64px] flex flex-col justify-center">
+            <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-2 text-sm leading-tight">{resource.title}</h3>
+            {resource.organization_name && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1 mt-0.5">{resource.organization_name}</p>
+            )}
           </div>
 
           {/* Image area */}

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { resourceSlug as buildResourceSlug } from "@/lib/slug";
 
 async function verifyAuth(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
@@ -28,7 +29,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
   const body = await req.json();
   const {
-    title, slug, description, engage, content, featured_image,
+    title, slug, organization_name, facility_name, description, engage, content, featured_image,
     expiration_date,
     street_address, city, state, zip, region, country,
     latitude, longitude, phone, email, website,
@@ -41,7 +42,9 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     .from("resources")
     .update({
       title,
-      slug: slug || title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
+      slug: slug || buildResourceSlug(organization_name, title),
+      organization_name: organization_name || null,
+      facility_name: facility_name || null,
       description: description || null,
       engage: engage || null,
       content: content || null,

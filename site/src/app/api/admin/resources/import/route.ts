@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createHash } from "crypto";
+import { resourceSlug } from "@/lib/slug";
 
 function md5(str: string): string {
   return createHash("md5").update(str).digest("hex");
@@ -50,6 +51,21 @@ export async function POST(req: NextRequest) {
       .map((v) => lookup[v]).filter(Boolean);
   }
 
+  // Load existing slugs so we can guarantee uniqueness across imports
+  const { data: existingSlugRows } = await client.from("resources").select("slug");
+  const usedSlugs = new Set<string>((existingSlugRows ?? []).map((r: any) => r.slug).filter(Boolean));
+
+  function uniqueSlug(base: string): string {
+    let candidate = base || "resource";
+    let n = 2;
+    while (usedSlugs.has(candidate)) {
+      candidate = `${base}-${n}`;
+      n++;
+    }
+    usedSlugs.add(candidate);
+    return candidate;
+  }
+
   let imported = 0;
   let skipped = 0;
   const errors: string[] = [];
@@ -61,8 +77,8 @@ export async function POST(req: NextRequest) {
     // Match categories by name (semicolon-separated)
     const categoryIds = matchIds(row.category || "", topicLookup);
 
-    // Generate slug
-    const slug = (row.slug || row.title).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    // Slug: full organization name first, then title (unique across the DB)
+    const slug = uniqueSlug(row.slug ? row.slug : resourceSlug(row.organization_name, row.title));
 
     // Hash the scraped content so we can detect changes on re-scrape
     const contentToHash = [row.title, row.description, row.content, row.engage].filter(Boolean).join("\n");
@@ -73,7 +89,7 @@ export async function POST(req: NextRequest) {
       .from("resources")
       .insert({
         title: row.title,
-        slug: slug + "-" + Date.now().toString(36).slice(-4),
+        slug: slug,
         organization_name: row.organization_name || null,
         facility_name: row.facility_name || null,
         description: row.description || null,

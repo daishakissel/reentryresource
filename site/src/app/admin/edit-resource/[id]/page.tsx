@@ -29,6 +29,7 @@ export default function EditResourcePage({ params }: { params: { id: string } })
   const [geocoding, setGeocoding] = useState(false);
 
   const [title, setTitle] = useState("");
+  const [organizationName, setOrganizationName] = useState("");
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
   const [engage, setEngage] = useState("");
@@ -68,7 +69,7 @@ export default function EditResourcePage({ params }: { params: { id: string } })
       return;
     }
     if (r) {
-      setTitle(r.title); setSlug(r.slug ?? ""); setDescription(r.description ?? ""); setEngage(r.engage ?? ""); setContent(r.content ?? ""); setExpirationDate(r.expiration_date ?? "");
+      setTitle(r.title); setOrganizationName(r.organization_name ?? ""); setSlug(r.slug ?? ""); setDescription(r.description ?? ""); setEngage(r.engage ?? ""); setContent(r.content ?? ""); setExpirationDate(r.expiration_date ?? "");
       setFeaturedImage(r.featured_image ?? ""); setStreetAddress(r.street_address ?? "");
       setCity(r.city ?? ""); setState(r.state ?? ""); setZip(r.zip ?? "");
       setRegion(r.region ?? ""); setCountry(r.country ?? "");
@@ -106,7 +107,7 @@ export default function EditResourcePage({ params }: { params: { id: string } })
     const { data } = await supabase.auth.getSession();
     const token = data.session?.access_token;
     const body: Record<string, unknown> = {
-      title, slug, description, engage, content, featured_image: featuredImage,
+      title, organization_name: organizationName, slug, description, engage, content, featured_image: featuredImage,
       expiration_date: expirationDate || null,
       street_address: streetAddress, city, state, zip, region, country,
       latitude, longitude, phone, email, website,
@@ -140,8 +141,12 @@ export default function EditResourcePage({ params }: { params: { id: string } })
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-4">Basic Information</h2>
           <div className="space-y-4">
             <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Organization Name</label>
+              <input type="text" value={organizationName} onChange={(e) => setOrganizationName(e.target.value)} className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent" placeholder="Full organization name (shown under the title on cards)" />
+            </div>
+            <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title <span className="text-red-500">*</span></label>
-              <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent" />
+              <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent" placeholder="Service name only — no organization prefix" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Slug</label>

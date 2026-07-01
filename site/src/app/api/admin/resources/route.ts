@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { resourceSlug as buildResourceSlug } from "@/lib/slug";
 
 async function verifyAuth(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json();
   const {
-    title, slug, description, engage, content, featured_image,
+    title, slug, organization_name, facility_name, description, engage, content, featured_image,
     expiration_date,
     street_address, city, state, zip, region, country,
     latitude, longitude, phone, email, website,
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
   } = body;
 
   if (!title) return NextResponse.json({ error: "Title is required" }, { status: 400 });
-  const resourceSlug = slug || title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  const finalSlug = slug || buildResourceSlug(organization_name, title);
 
   const client = getAdmin();
 
@@ -44,7 +45,9 @@ export async function POST(req: NextRequest) {
     .from("resources")
     .insert({
       title,
-      slug: resourceSlug,
+      slug: finalSlug,
+      organization_name: organization_name || null,
+      facility_name: facility_name || null,
       description: description || null,
       engage: engage || null,
       content: content || null,

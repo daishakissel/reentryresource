@@ -16,7 +16,7 @@ The import process automatically:
 - Matches the Category by name to the database
 - Auto-assigns Elements based on the Category relationship
 - Creates all junction table entries (Modes, Formats, Centerings)
-- Generates a URL-friendly slug from the title
+- Generates a URL-friendly slug as `organization-name-title` (and de-duplicates it if needed)
 
 ---
 
@@ -33,7 +33,7 @@ These are **3 separate resources**, not one resource with multiple labels.
 
 **If programs are listed on a single page without separate URLs**, treat it as one resource with the most appropriate single Category and note the sub-programs in the content field.
 
-**Naming convention:** Use a short prefix for the organization followed by the program name. Example: `CAO - Head Start Early Childhood Education` where "CAO" is the abbreviation for "Community Action of Washington County."
+**Naming convention:** The `title` is the **program/service name only — no organization prefix or abbreviation.** The full organization goes in the `organization_name` column. Example: title `Head Start Early Childhood Education`, organization_name `Community Action of Washington County`. On the cards the title shows on top with the organization name in smaller text below. The URL slug is generated automatically as `organization-name-title` (full org name first, then title, hyphenated) — leave the `slug` column blank.
 
 ---
 
@@ -57,8 +57,8 @@ title,slug,organization_name,facility_name,description,engage,content,featured_i
 ### Identity & Content
 | Column | Description | Example |
 |---|---|---|
-| slug | URL-friendly name (auto-generated from title if blank) | `cao-head-start` |
-| organization_name | Full parent organization name | `Community Action of Washington County` |
+| slug | URL-friendly name — leave blank; auto-generated as `organization-name-title` | `community-action-of-washington-county-head-start-early-childhood-education` |
+| organization_name | Full parent organization name (shown under the title on cards) | `Community Action of Washington County` |
 | facility_name | Specific facility/location name (if different from org) | `Hillsboro Multi-Service Center` |
 | description | Short summary for resource cards (~150 chars). Focus on what the service does, not the org. | `Free preschool for children birth to age 5 with health screenings and family support.` |
 | engage | Clear steps on how to access this resource. Be specific with phone numbers and processes. | `Call (503) 693-3262 or email HeadStart@caowash.org. Apply online or mail application.` |
@@ -150,7 +150,7 @@ Wait for the user's answer before proceeding with that resource.
 
 ### Step 3: For Each Program Page, Extract
 
-1. **Title**: Program name (prefix with org abbreviation)
+1. **Title**: Program/service name only — no organization prefix (the org goes in `organization_name`)
 2. **Description**: Write a 1-2 sentence summary (~150 chars) of what the program DOES. Don't describe the organization — describe the service.
 3. **Engage**: How does someone actually access this? Be specific:
    - "Call [number]" — include the actual number

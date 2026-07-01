@@ -140,7 +140,10 @@ export default function ResourceDetailPage({ params }: { params: { slug: string 
       <button onClick={() => window.history.back()} className="text-sm text-brand-gold hover:underline mb-6 inline-block">&larr; Back to {lastWhy.label} resources</button>
 
       {/* Title */}
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{resource.title}</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{resource.title}</h1>
+      {resource.organization_name && (
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">{resource.organization_name}</p>
+      )}
 
       {/* Labels */}
       {allLabels.length > 0 && (

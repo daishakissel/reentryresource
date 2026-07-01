@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import ImageUpload from "@/components/ImageUpload";
 import ContentImageInsert from "@/components/ContentImageInsert";
 import RichTextEditor from "@/components/RichTextEditor";
+import { resourceSlug } from "@/lib/slug";
 
 interface FilterOption { id: string; name: string }
 
@@ -29,6 +30,7 @@ export default function AddResourcePage() {
   const [geocoding, setGeocoding] = useState(false);
 
   const [title, setTitle] = useState("");
+  const [organizationName, setOrganizationName] = useState("");
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
   const [engage, setEngage] = useState("");
@@ -96,7 +98,7 @@ export default function AddResourcePage() {
     const token = data.session?.access_token;
 
     const body: Record<string, unknown> = {
-      title, slug, description, engage, content, featured_image: featuredImage,
+      title, organization_name: organizationName, slug, description, engage, content, featured_image: featuredImage,
       expiration_date: expirationDate || null,
       street_address: streetAddress, city, state, zip, region, country,
       latitude, longitude, phone, email, website,
@@ -129,7 +131,7 @@ export default function AddResourcePage() {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Resource Created</h1>
         <p className="text-gray-600 dark:text-gray-300 mb-6">The resource has been added successfully.</p>
         <div className="flex justify-center gap-4">
-          <button onClick={() => { setSuccess(false); setTitle(""); setSlug(""); setDescription(""); setEngage(""); setContent(""); setExpirationDate(""); setFeaturedImage(""); setStreetAddress(""); setCity(""); setState(""); setZip(""); setRegion(""); setCountry(""); setLatitude(""); setLongitude(""); setPhone(""); setEmail(""); setWebsite(""); setWhatTopicId(""); setSelected({ mode_ids: new Set(), format_ids: new Set(), centering_ids: new Set() }); }} className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-brand-gold hover:bg-brand-gold/90 transition-colors">Add Another</button>
+          <button onClick={() => { setSuccess(false); setTitle(""); setOrganizationName(""); setSlug(""); setDescription(""); setEngage(""); setContent(""); setExpirationDate(""); setFeaturedImage(""); setStreetAddress(""); setCity(""); setState(""); setZip(""); setRegion(""); setCountry(""); setLatitude(""); setLongitude(""); setPhone(""); setEmail(""); setWebsite(""); setWhatTopicId(""); setSelected({ mode_ids: new Set(), format_ids: new Set(), centering_ids: new Set() }); }} className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-brand-gold hover:bg-brand-gold/90 transition-colors">Add Another</button>
           <button onClick={() => router.push("/")} className="px-4 py-2 rounded-lg text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors">Go to Resources</button>
         </div>
       </div>
@@ -152,12 +154,16 @@ export default function AddResourcePage() {
           <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-200 mb-4">Basic Information</h2>
           <div className="space-y-4">
             <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Organization Name</label>
+              <input type="text" value={organizationName} onChange={(e) => { setOrganizationName(e.target.value); setSlug(resourceSlug(e.target.value, title)); }} className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent" placeholder="Full organization name (shown under the title on cards)" />
+            </div>
+            <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Title <span className="text-red-500">*</span></label>
-              <input type="text" value={title} onChange={(e) => { setTitle(e.target.value); if (!slug || slug === title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")) setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")); }} required className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent" />
+              <input type="text" value={title} onChange={(e) => { setTitle(e.target.value); setSlug(resourceSlug(organizationName, e.target.value)); }} required className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent" placeholder="Service name only — no organization prefix" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Slug</label>
-              <input type="text" value={slug} onChange={(e) => setSlug(e.target.value)} required className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent" placeholder="auto-generated-from-title" />
+              <input type="text" value={slug} onChange={(e) => setSlug(e.target.value)} required className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent" placeholder="auto-generated-from-organization-and-title" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Short Description</label>
