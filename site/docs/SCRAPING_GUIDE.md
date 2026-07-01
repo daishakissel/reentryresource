@@ -266,7 +266,7 @@ The result contains `coordinates: [longitude, latitude]` (note: longitude comes 
 
 Put one row per resource. Use semicolons (`;`) to separate multiple values in Modes, Formats, and Centerings.
 
-**Column count tip — online-only resources with no address:** The columns between `formats` and `phone` are: `centerings, street_address, city, state, zip, region, country, latitude, longitude` — that is **9 fields**. When all are empty you need exactly 9 consecutive commas before the phone number: `Services,,,,,,,,,1-888-000-0000`. A common mistake is writing only 8, which shifts phone into the longitude slot and the website URL into expiration_date.
+**Column count tip — online-only resources with no address:** The columns between `formats` and `phone` are: `centerings, street_address, city, state, zip, region, country, latitude, longitude` — 9 empty fields. Because each field needs its own separator comma, you need **10 commas** between `Services` and the phone number: `Services,,,,,,,,,,1-888-000-0000`. A common mistake is writing only 9, which shifts phone into the longitude slot and the website URL into expiration_date.
 
 ### Step 9: Import and Verify
 
