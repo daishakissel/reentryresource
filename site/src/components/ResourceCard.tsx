@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import type { Resource } from "@/types/database";
 
@@ -19,24 +19,10 @@ interface ResourceCardProps {
 
 export default function ResourceCard({ resource, modeLabels = [], categoryImages = [], formatLabels = [], centeringLabels = [] }: ResourceCardProps) {
   const href = `/resource/${resource.slug || resource.id}`;
-  const [expanded, setExpanded] = useState(false);
-  const [isClamped, setIsClamped] = useState(false);
   const [showPhonePopup, setShowPhonePopup] = useState(false);
+  const [descOpen, setDescOpen] = useState(false);
   const [engageOpen, setEngageOpen] = useState(false);
   const [flipped, setFlipped] = useState(false);
-  const descRef = useRef<HTMLParagraphElement>(null);
-
-  useEffect(() => {
-    if (descRef.current) {
-      setIsClamped(descRef.current.scrollHeight > descRef.current.clientHeight);
-    }
-  }, [resource.description]);
-
-  function handleToggle(e: React.MouseEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    setExpanded((v) => !v);
-  }
 
   return (
     <div className="relative">
@@ -120,8 +106,8 @@ export default function ResourceCard({ resource, modeLabels = [], categoryImages
 
       <Link href={href}>
         <div
-          className={`bg-white dark:bg-ocean-light rounded-lg border border-gray-200 dark:border-ocean-light hover:shadow-md transition-shadow cursor-pointer flex flex-col ${expanded ? "" : "overflow-hidden"}`}
-          style={{ height: expanded ? "auto" : "500px", minHeight: "500px" }}
+          className="bg-white dark:bg-ocean-light rounded-lg border border-gray-200 dark:border-ocean-light overflow-hidden hover:shadow-md transition-shadow cursor-pointer flex flex-col"
+          style={{ minHeight: "440px" }}
         >
           {/* Top: Title + organization */}
           <div className="px-4 py-2 border-b border-gray-100 dark:border-ocean flex-shrink-0 h-[64px] flex flex-col justify-center">
@@ -183,33 +169,26 @@ export default function ResourceCard({ resource, modeLabels = [], categoryImages
             </button>
           </div>
 
-          {/* Bottom: Description */}
-          <div className="px-4 py-3 flex-1 flex flex-col border-t border-gray-100 dark:border-ocean">
+          {/* Description dropdown (flex-1 fills the baseline height; keeps Engage pinned to the bottom) */}
+          <div className="flex-1 min-h-0 border-t border-gray-100 dark:border-ocean">
             {resource.description && (
-              <div className="mb-2">
-                <p className="text-xs font-semibold text-gray-900 dark:text-white mb-1">Description</p>
-                <p ref={descRef} className={`text-xs text-gray-600 dark:text-gray-300 ${expanded ? "" : "line-clamp-3"}`}>
-                  {resource.description}
-                </p>
-              </div>
-            )}
-            <div className="mt-auto flex items-end justify-end">
-              {isClamped && (
+              <>
                 <button
-                  onClick={handleToggle}
-                  className={`w-7 h-7 flex items-center justify-center rounded-full border-2 transition-all flex-shrink-0 ml-2 ${
-                    expanded
-                      ? "bg-brand-gold border-brand-gold text-white hover:bg-brand-gold/80"
-                      : "border-gray-300 dark:border-gray-500 text-gray-400 hover:border-brand-gold hover:text-brand-gold hover:bg-brand-gold-light"
-                  }`}
-                  aria-label={expanded ? "Collapse description" : "Expand description"}
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setDescOpen((v) => !v); }}
+                  className="w-full flex items-center justify-between px-4 py-2 text-xs font-semibold text-gray-900 dark:text-white hover:text-brand-gold transition-colors"
                 >
-                  <svg className={`w-3.5 h-3.5 transition-transform ${expanded ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                  <span>Description</span>
+                  <svg className={`w-4 h-4 transition-transform ${descOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
-              )}
-            </div>
+                {descOpen && (
+                  <div className="px-4 pb-3" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
+                    <p className="text-xs text-gray-600 dark:text-gray-300">{resource.description}</p>
+                  </div>
+                )}
+              </>
+            )}
           </div>
 
           {/* Engage footer */}
