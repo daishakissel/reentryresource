@@ -13,6 +13,7 @@ Master list of all URLs provided for scraping. Each URL was explored to discover
 | 3 | https://www.accesswireless.com/ | Access Wireless | 2026-06-30 | 1 |
 | 4 | https://anotherchancerehab.com/ | Another Chance Drug & Alcohol Treatment Center | 2026-06-30 | 9 |
 | 5 | https://www.arrayanimalrescue.org/ | Array Animal Rescue | 2026-06-30 | 2 |
+| 6 | https://www.atlastreatmentcenter.com/ | Atlas Addiction Treatment Center of Oregon | 2026-06-30 | 7 |
 
 ---
 
