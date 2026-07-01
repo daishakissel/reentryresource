@@ -10,12 +10,7 @@ Ordered crawl → walk → run: single-resource orgs first, then orgs with 2-3 k
 
 | # | URL | Organization (if known) | Notes | Added |
 |---|---|---|---|---|
-| 1 | https://www.cityteam.org/ | Cityteam Portland | | 2026-06-30 |
-| 14 | https://clear-clinic.org/ | Clear Clinic | | 2026-06-30 |
-| 15 | https://codainc.org/ | Coda | | 2026-06-30 |
-| 16 | https://www.communitywarehouse.org/get-furniture/ | Community Warehouse Furniture | | 2026-06-30 |
-| 17 | https://cvision.org/ | Community Vision | | 2026-06-30 |
-| 18 | https://dignityvillage.org/ | Dignity Village Shelter & Tiny Houses | | 2026-06-30 |
+| 1 | https://dignityvillage.org/ | Dignity Village Shelter & Tiny Houses | | 2026-06-30 |
 | 19 | https://dpistaffing.com/for-job-seekers/jobs/ | DPI Staffing Solutions | | 2026-06-30 |
 | 20 | https://familypromise.org/ | Family Promise | | 2026-06-30 |
 | 21 | https://forahealth.org/ | Fora Health | | 2026-06-30 |

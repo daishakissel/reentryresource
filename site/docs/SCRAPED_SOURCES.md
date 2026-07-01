@@ -23,6 +23,11 @@ Master list of all URLs provided for scraping. Each URL was explored to discover
 | 13 | https://cascadiahealth.org/ | Cascadia Health | 2026-07-01 | 4 |
 | 14 | https://www.catholiccharitiesoregon.org/ | Catholic Charities Immigration Legal Services | 2026-07-01 | 1 |
 | 15 | https://cellphonesforsoldiers.com/ | Cell Phones For Soldiers | 2026-07-01 | 3 |
+| 16 | https://www.cityteam.org/ | Cityteam Portland | 2026-07-01 | 4 |
+| 17 | https://clear-clinic.org/ | Clear Clinic | 2026-07-01 | 4 |
+| 18 | https://codainc.org/ | Coda | 2026-07-01 | 5 |
+| 19 | https://www.communitywarehouse.org/get-furniture/ | Community Warehouse Furniture | 2026-07-01 | 1 |
+| 20 | https://cvision.org/ | Community Vision | 2026-07-01 | 4 |
 
 ---
 
