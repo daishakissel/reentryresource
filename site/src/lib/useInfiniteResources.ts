@@ -23,6 +23,7 @@ export function useInfiniteResources({ topicIds, elementId, filters, formatId }:
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  // Saved matched IDs from last reset — used by loadMore to avoid re-fetching filters
   const matchedIdsRef = useRef<string[] | null>(null);
 
   const fetchPage = useCallback(async (offset: number, reset: boolean) => {
@@ -33,63 +34,79 @@ export function useInfiniteResources({ topicIds, elementId, filters, formatId }:
       setLoadingMore(true);
     }
 
-    const activeFilters = Object.entries(filters).filter(([, ids]) => ids.size > 0);
+    // On reset, compute matched IDs fresh using LOCAL variables (not the shared ref)
+    // so concurrent calls don't corrupt each other's results.
+    let localMatchedIds: string[] | null = null;
 
-    // If filters active, resolve matching resource IDs first (only on reset)
-    if (reset && activeFilters.length > 0) {
-      let matchingIds: Set<string> | null = null;
+    if (reset) {
+      const activeFilters = Object.entries(filters).filter(([, ids]) => ids.size > 0);
 
-      // Junction filters: only narrow results for resources that HAVE entries
-      for (const [filterKey, ids] of activeFilters) {
-        const junction = JUNCTION_MAP[filterKey];
-        if (!junction) continue;
-        const { data: links } = await supabase
-          .from(junction.table)
+      if (activeFilters.length > 0) {
+        let matchingIds: Set<string> | null = null;
+        for (const [filterKey, ids] of activeFilters) {
+          const junction = JUNCTION_MAP[filterKey];
+          if (!junction) continue;
+          const { data: links } = await supabase
+            .from(junction.table)
+            .select("resource_id")
+            .in(junction.fk, Array.from(ids));
+          const resourceIds = new Set((links ?? []).map((l: any) => l.resource_id));
+          if (matchingIds === null) {
+            matchingIds = resourceIds;
+          } else {
+            matchingIds = new Set([...matchingIds].filter((id) => resourceIds.has(id)));
+          }
+        }
+        localMatchedIds = matchingIds ? Array.from(matchingIds) : [];
+      }
+
+      if (elementId) {
+        const { data: whyLinks } = await supabase
+          .from("resources_elements")
           .select("resource_id")
-          .in(junction.fk, Array.from(ids));
-        const resourceIds = new Set((links ?? []).map((l: any) => l.resource_id));
-        if (matchingIds === null) {
-          matchingIds = resourceIds;
+          .eq("element_id", elementId);
+        const whyIds = new Set((whyLinks ?? []).map((l: any) => l.resource_id));
+        if (localMatchedIds === null) {
+          localMatchedIds = Array.from(whyIds);
         } else {
-          matchingIds = new Set([...matchingIds].filter((id) => resourceIds.has(id)));
+          localMatchedIds = localMatchedIds.filter((id) => whyIds.has(id));
         }
       }
 
-      matchedIdsRef.current = matchingIds ? Array.from(matchingIds) : [];
-    } else if (reset) {
-      matchedIdsRef.current = null;
-    }
-
-    // If scoped to a element, intersect with resources in that category
-    if (reset && elementId) {
-      const { data: whyLinks } = await supabase
-        .from("resources_elements")
-        .select("resource_id")
-        .eq("element_id", elementId);
-      const whyResourceIds = new Set((whyLinks ?? []).map((l: any) => l.resource_id));
-      if (matchedIdsRef.current === null) {
-        matchedIdsRef.current = Array.from(whyResourceIds);
-      } else {
-        matchedIdsRef.current = matchedIdsRef.current.filter((id) => whyResourceIds.has(id));
+      if (formatId) {
+        const { data: formatLinks } = await supabase
+          .from("resources_formats")
+          .select("resource_id")
+          .eq("format_id", formatId);
+        const formatIds = new Set((formatLinks ?? []).map((l: any) => l.resource_id));
+        if (localMatchedIds === null) {
+          localMatchedIds = Array.from(formatIds);
+        } else {
+          localMatchedIds = localMatchedIds.filter((id) => formatIds.has(id));
+        }
       }
-    }
 
-    // If scoped to a format tab, intersect with resources in that format
-    if (reset && formatId) {
-      const { data: formatLinks } = await supabase
-        .from("resources_formats")
-        .select("resource_id")
-        .eq("format_id", formatId);
-      const formatResourceIds = new Set((formatLinks ?? []).map((l: any) => l.resource_id));
-      if (matchedIdsRef.current === null) {
-        matchedIdsRef.current = Array.from(formatResourceIds);
-      } else {
-        matchedIdsRef.current = matchedIdsRef.current.filter((id) => formatResourceIds.has(id));
+      if (topicIds && topicIds.length > 0) {
+        const { data: catLinks } = await supabase
+          .from("resources_categories")
+          .select("resource_id")
+          .in("category_id", topicIds);
+        const catIds = new Set((catLinks ?? []).map((l: any) => l.resource_id));
+        if (localMatchedIds === null) {
+          localMatchedIds = Array.from(catIds);
+        } else {
+          localMatchedIds = localMatchedIds.filter((id) => catIds.has(id));
+        }
       }
+
+      // Save for subsequent loadMore calls
+      matchedIdsRef.current = localMatchedIds;
+    } else {
+      // loadMore: reuse IDs from the last reset
+      localMatchedIds = matchedIdsRef.current;
     }
 
-    // If filters resulted in no matches
-    if (matchedIdsRef.current !== null && matchedIdsRef.current.length === 0) {
+    if (localMatchedIds !== null && localMatchedIds.length === 0) {
       if (reset) setResources([]);
       setHasMore(false);
       setLoading(false);
@@ -97,7 +114,6 @@ export function useInfiniteResources({ topicIds, elementId, filters, formatId }:
       return;
     }
 
-    // Build query — exclude expired resources
     const today = new Date().toISOString().split("T")[0];
     let query = supabase
       .from("resources")
@@ -106,22 +122,8 @@ export function useInfiniteResources({ topicIds, elementId, filters, formatId }:
       .order("created_at", { ascending: false })
       .range(offset, offset + PAGE_SIZE - 1);
 
-    if (topicIds && topicIds.length > 0) {
-      // Filter by category via junction table — intersect with matchedIdsRef
-      const { data: catLinks } = await supabase
-        .from("resources_categories")
-        .select("resource_id")
-        .in("category_id", topicIds);
-      const catResourceIds = new Set((catLinks ?? []).map((l: any) => l.resource_id));
-      if (matchedIdsRef.current === null) {
-        matchedIdsRef.current = Array.from(catResourceIds);
-      } else {
-        matchedIdsRef.current = matchedIdsRef.current.filter((id) => catResourceIds.has(id));
-      }
-    }
-
-    if (matchedIdsRef.current !== null) {
-      query = query.in("id", matchedIdsRef.current);
+    if (localMatchedIds !== null) {
+      query = query.in("id", localMatchedIds);
     }
 
     const { data } = await query;
