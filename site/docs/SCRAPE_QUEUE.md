@@ -10,10 +10,7 @@ Ordered crawl → walk → run: single-resource orgs first, then orgs with 2-3 k
 
 | # | URL | Organization (if known) | Notes | Added |
 |---|---|---|---|---|
-| 1 | https://www.boulder.care/ | Boulder Care | | 2026-06-30 |
-| 5 | https://www.boulder.care/ | Boulder Care | | 2026-06-30 |
-| 6 | https://bridgeofhope-otc.com/ | Bridge of Hope | | 2026-06-30 |
-| 7 | https://www.bridgestochange.com/ | Bridges to Change | | 2026-06-30 |
+| 1 | https://www.bridgestochange.com/ | Bridges to Change | | 2026-06-30 |
 | 8 | https://calltosafety.org/ | Call to Safety | | 2026-06-30 |
 | 9 | https://www.capnw.org/ | Cascade AIDS Project | | 2026-06-30 |
 | 10 | https://cascadiahealth.org/ | Cascadia Health | | 2026-06-30 |

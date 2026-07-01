@@ -15,6 +15,8 @@ Master list of all URLs provided for scraping. Each URL was explored to discover
 | 5 | https://www.arrayanimalrescue.org/ | Array Animal Rescue | 2026-06-30 | 2 |
 | 6 | https://www.atlastreatmentcenter.com/ | Atlas Addiction Treatment Center of Oregon | 2026-06-30 | 7 |
 | 7 | https://www.b4hpdx.org/ | Bikes for Humanity PDX | 2026-07-01 | 2 |
+| 8 | https://www.boulder.care/ | Boulder Care | 2026-07-01 | 1 |
+| 9 | https://bridgeofhope-otc.com/ | Bridge of Hope | 2026-07-01 | 10 |
 
 ---
 
