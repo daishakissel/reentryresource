@@ -39,6 +39,7 @@ export default function AdminResourcesPage() {
   const [importing, setImporting] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
   const [importSuccess, setImportSuccess] = useState<string | null>(null);
+  const [importRowErrors, setImportRowErrors] = useState<string[]>([]);
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
     () => new Set(ALL_COLUMNS.filter((c) => c.defaultVisible).map((c) => c.key))
   );
@@ -143,6 +144,7 @@ export default function AdminResourcesPage() {
     setImporting(true);
     setImportError(null);
     setImportSuccess(null);
+    setImportRowErrors([]);
 
     const text = await file.text();
     const lines = text.split("\n");
@@ -217,7 +219,7 @@ export default function AdminResourcesPage() {
       if (data.skipped > 0) msg += ` Skipped ${data.skipped} (no title).`;
       if (data.errors?.length > 0) msg += ` ${data.errors.length} error(s).`;
       setImportSuccess(msg);
-      if (data.errors?.length > 0) console.log("Import errors:", data.errors);
+      if (data.errors?.length > 0) setImportRowErrors(data.errors);
     } else {
       setImportError(data.error || "Import failed");
     }
@@ -299,6 +301,14 @@ export default function AdminResourcesPage() {
 
       {importError && <p className="text-sm text-red-600 mb-4">{importError}</p>}
       {importSuccess && <p className="text-sm text-green-600 mb-4">{importSuccess}</p>}
+      {importRowErrors.length > 0 && (
+        <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <p className="text-sm font-medium text-red-700 dark:text-red-400 mb-1">Row errors:</p>
+          <ul className="text-sm text-red-600 dark:text-red-300 list-disc list-inside space-y-0.5">
+            {importRowErrors.map((e, i) => <li key={i}>{e}</li>)}
+          </ul>
+        </div>
+      )}
 
       <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
         {filteredResources.length} of {resources.length} resources
