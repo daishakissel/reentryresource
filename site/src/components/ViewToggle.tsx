@@ -120,19 +120,16 @@ export default function ViewToggle({ resources, hasMore, loadingMore, onLoadMore
         const fIds = resourceFormatMap[r.id] ?? [];
         return fIds.includes(format.id);
       });
-      if (matching.length > 0) {
-        formatTabs.push({ format, count: dbFormatCounts[format.id] ?? matching.length });
-        formatResourceMap[format.id] = matching;
-        matching.forEach((r) => assignedIds.add(r.id));
-      }
+      formatTabs.push({ format, count: dbFormatCounts[format.id] ?? matching.length });
+      formatResourceMap[format.id] = matching;
+      matching.forEach((r) => assignedIds.add(r.id));
     }
 
     // Unassigned resources go into Services
     const unassigned = modeFiltered.filter((r) => !assignedIds.has(r.id));
-    if (unassigned.length > 0 && servicesFormat) {
+    if (servicesFormat) {
       if (!formatResourceMap[servicesFormat.id]) {
         formatResourceMap[servicesFormat.id] = [];
-        formatTabs.unshift({ format: servicesFormat, count: 0 });
       }
       formatResourceMap[servicesFormat.id] = [...(formatResourceMap[servicesFormat.id] ?? []), ...unassigned];
       const tab = formatTabs.find((t) => t.format.id === servicesFormat.id);
