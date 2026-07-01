@@ -117,12 +117,6 @@ export default function ViewToggle({ resources, loading: resourcesLoading, hasMo
 
   return (
     <div>
-      {showMap && mappable.length > 0 && (
-        <div className="mb-6">
-          <ResourceMap resources={mappable} />
-        </div>
-      )}
-
       {!loaded ? (
         <p className="text-gray-500">Loading...</p>
       ) : (
@@ -142,6 +136,12 @@ export default function ViewToggle({ resources, loading: resourcesLoading, hasMo
                   {format.name} <span className="text-xs opacity-60">({count})</span>
                 </button>
               ))}
+            </div>
+          )}
+
+          {showMap && mappable.length > 0 && (
+            <div className="mb-6">
+              <ResourceMap resources={mappable} />
             </div>
           )}
 
