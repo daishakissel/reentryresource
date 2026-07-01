@@ -9,7 +9,7 @@ How to scrape a resource website and create a CSV file that can be imported into
 1. Visit the resource website
 2. Explore the site structure — identify separate programs/services
 3. Extract the information for each resource
-4. Fill it into the CSV template (one row per resource)
+4. Fill it into the CSV template (one row per resource; **one combined CSV per session** — see Step 8)
 5. Import the CSV through the admin panel (Resources → Import CSV)
 
 The import process automatically:
@@ -265,6 +265,8 @@ The result contains `coordinates: [longitude, latitude]` (note: longitude comes 
 ### Step 8: Compile the CSV
 
 Put one row per resource. Use semicolons (`;`) to separate multiple values in Modes, Formats, and Centerings.
+
+**One CSV per session (multi-scrape rule):** When asked to scrape more than one URL in a single session, combine the results of **all** scrapes into a **single CSV file** so the user only imports once. Do not create one file per organization. Name the combined file for the session (e.g. `imports/session-2026-07-01.csv`) and list one row per resource across all organizations. (When only a single URL is scraped, a single org-named CSV is fine.)
 
 **Column count reference — empty location/contact fields:** The columns in order are `centerings, street_address, city, state, zip, region, country, latitude, longitude, phone, email, website`. Count the commas needed to reach the first non-empty contact field:
 
