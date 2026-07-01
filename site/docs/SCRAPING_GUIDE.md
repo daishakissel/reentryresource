@@ -102,7 +102,7 @@ title,slug,organization_name,facility_name,description,engage,content,featured_i
 | source_url | The specific page URL for THIS resource (defaults to `website` if blank) | `https://caowash.org/early-childhood-care-education/head-start` |
 | scraped_url | The root/starting URL you were given to scrape (same for every resource from one scraping session) — also add this URL to `docs/SCRAPED_SOURCES.md` | `https://caowash.org` |
 
-**Note:** `scraped_at`, `last_verified_at`, `scrape_status`, and `content_hash` are auto-populated during import — do NOT include them in the CSV.
+**Note:** `scraped_at`, `last_verified_at`, `scrape_status` are auto-populated during import — do NOT include them in the CSV. `content_hash` is also auto-computed during import as an MD5 of the title, description, content, and engage fields combined — this is used later to detect if a resource has changed when re-scraped.
 
 ---
 

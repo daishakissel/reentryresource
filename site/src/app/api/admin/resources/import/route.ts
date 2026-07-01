@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { createHash } from "crypto";
+
+function md5(str: string): string {
+  return createHash("md5").update(str).digest("hex");
+}
 
 async function verifyAuth(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
@@ -59,6 +64,10 @@ export async function POST(req: NextRequest) {
     // Generate slug
     const slug = (row.slug || row.title).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
+    // Hash the scraped content so we can detect changes on re-scrape
+    const contentToHash = [row.title, row.description, row.content, row.engage].filter(Boolean).join("\n");
+    const content_hash = md5(contentToHash);
+
     // Insert resource
     const { data: resource, error } = await client
       .from("resources")
@@ -88,6 +97,7 @@ export async function POST(req: NextRequest) {
         scraped_at: row.scraped_at || new Date().toISOString(),
         last_verified_at: new Date().toISOString(),
         scrape_status: "active",
+        content_hash: content_hash,
         created_by: row.created_by || caller.email || "",
         created_at: row.created_at || new Date().toISOString(),
         updated_at: row.updated_at || new Date().toISOString(),
