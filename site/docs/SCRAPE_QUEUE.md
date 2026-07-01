@@ -11,16 +11,6 @@ Ordered crawl → walk → run: single-resource orgs first, then orgs with 2-3 k
 | # | URL | Organization (if known) | Notes | Added |
 |---|---|---|---|---|
 | 28b | https://www.familyshelter.org/ | My Father's House (Gresham) | Discovered while scraping Family Promise — NOT a Family Promise affiliate; independent Christ-centered family transitional housing in Gresham (food pantry, clothing, case management, children's center). 5003 W Powell Blvd, 503-492-3046 | 2026-07-01 |
-| 38 | https://www.pearmentor.org/ | P:ear | | 2026-06-30 |
-| 39 | https://poisedproperties.com/ | Poised Properties | | 2026-06-30 |
-| 40 | https://www.portlandalano.org/home | Alano Club | | 2026-06-30 |
-| 41 | https://quadinc.org/ | QUAD | | 2026-06-30 |
-| 42 | https://quest-center.org/ | Quest Center for Integrative Health | | 2026-06-30 |
-| 43 | https://rahabs-sisters.org/ | Rahab's Sisters | | 2026-06-30 |
-| 44 | https://www.raicesdebienestar.org/ | Raíces de Bienestar | | 2026-06-30 |
-| 45 | https://recoverynetworkoforegon.org/ | Recovery Network of Oregon | | 2026-06-30 |
-| 46 | https://www.recoveryworksnw.com/ | Recovery Works NW | | 2026-06-30 |
-| 47 | https://www.rosecitydetox.com/ | Rose City Detox | | 2026-06-30 |
 | 48 | https://serenitylane.org/ | Serenity Lane | | 2026-06-30 |
 | 49 | https://www.shelterbridge.org/ | Shelter Bridge | | 2026-06-30 |
 | 50 | https://www.soberhousingoregonllc.com/ | Sober Housing Oregon | | 2026-06-30 |
@@ -70,6 +60,7 @@ These came up in the wife's CSV but are not being added to the scrape queue as i
 |---|---|
 | https://www.211info.org/ | General referral/directory aggregator, not a single organization — useful as a taxonomy reference, not a scrape target |
 | https://www.findhelp.org/ | Same as above — directory aggregator, not a scrape target |
+| https://poisedproperties.com/ | Reviewed 2026-07-01 — for-profit property management company (Section 8/LIHTC landlord), not a direct-service org. Excluded. |
 | https://www.indeed.com/ | Generic job board, not a service organization — if wanted, add directly as a single "Job Search" resource (Employment & Career category) rather than scraping it as a site |
 
 ## How to use this file

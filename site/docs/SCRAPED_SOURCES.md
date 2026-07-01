@@ -48,6 +48,15 @@ Master list of all URLs provided for scraping. Each URL was explored to discover
 | 38 | https://www.paintedhorserecovery.org/ | Painted Horse Recovery | 2026-07-01 | 1 |
 | 39 | https://www.path-home.org/ | Path Home | 2026-07-01 | 2 |
 | 40 | https://pctdetox.com/ | Pacific Crest Trail Detox | 2026-07-01 | 2 |
+| 41 | https://www.pearmentor.org/ | P:ear | 2026-07-01 | 2 |
+| 42 | https://www.portlandalano.org/home | Alano Club of Portland | 2026-07-01 | 2 |
+| 43 | https://quadinc.org/ | QUAD | 2026-07-01 | 1 |
+| 44 | https://quest-center.org/ | Quest Center for Integrative Health | 2026-07-01 | 5 |
+| 45 | https://rahabs-sisters.org/ | Rahab's Sisters | 2026-07-01 | 1 |
+| 46 | https://www.raicesdebienestar.org/ | Raíces de Bienestar | 2026-07-01 | 1 |
+| 47 | https://recoverynetworkoforegon.org/ | Recovery Network of Oregon | 2026-07-01 | 1 |
+| 48 | https://www.recoveryworksnw.com/ | Recovery Works NW | 2026-07-01 | 3 |
+| 49 | https://www.rosecitydetox.com/ | Rose City Detox | 2026-07-01 | 1 |
 
 ---
 
