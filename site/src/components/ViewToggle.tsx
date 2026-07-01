@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import type { Resource } from "@/types/database";
 import ResourceGrid from "./ResourceGrid";
 import ResourceMap from "./ResourceMap";
@@ -18,6 +18,13 @@ interface ModeItem {
   name: string;
 }
 
+const JUNCTION_MAP: Record<string, { table: string; fk: string }> = {
+  categories: { table: "resources_categories", fk: "category_id" },
+  modes: { table: "resources_modes", fk: "mode_id" },
+  formats: { table: "resources_formats", fk: "format_id" },
+  centerings: { table: "resources_centerings", fk: "centering_id" },
+};
+
 interface ViewToggleProps {
   resources: Resource[];
   hasMore?: boolean;
@@ -26,22 +33,26 @@ interface ViewToggleProps {
   showMap?: boolean;
   showInPerson?: boolean;
   showOnline?: boolean;
+  filters?: Record<string, Set<string>>;
+  elementId?: string;
 }
 
-export default function ViewToggle({ resources, hasMore, loadingMore, onLoadMore, showMap = false, showInPerson = true, showOnline = true }: ViewToggleProps) {
+export default function ViewToggle({ resources, hasMore, loadingMore, onLoadMore, showMap = false, showInPerson = true, showOnline = true, filters, elementId }: ViewToggleProps) {
   const [formats, setFormats] = useState<FormatItem[]>([]);
-  const [resourceFormatMap, setResourceFormatMap] = useState<Record<string, string[]>>({});
   const [modes, setModes] = useState<ModeItem[]>([]);
   const [resourceModeMap, setResourceModeMap] = useState<Record<string, string[]>>({});
   const [resourceCategoryImages, setResourceCategoryImages] = useState<Record<string, { name: string; imageUrl: string }[]>>({});
   const [loaded, setLoaded] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [dbFormatCounts, setDbFormatCounts] = useState<Record<string, number>>({});
+  // Resources fetched per tab (null = not yet fetched)
+  const [tabResources, setTabResources] = useState<Record<string, Resource[] | null>>({});
+  const [tabLoading, setTabLoading] = useState(false);
+  const fetchingTabRef = useRef<string | null>(null);
 
   const fetchData = useCallback(async () => {
-    const [formatsRes, formatJunctionRes, modesRes, modeJunctionRes, catJunctionRes, categoriesRes] = await Promise.all([
+    const [formatsRes, modesRes, modeJunctionRes, catJunctionRes, categoriesRes] = await Promise.all([
       supabase.from("formats").select("id, name, sort_order").order("sort_order"),
-      supabase.from("resources_formats").select("resource_id, format_id"),
       supabase.from("modes").select("id, name"),
       supabase.from("resources_modes").select("resource_id, mode_id"),
       supabase.from("resources_categories").select("resource_id, category_id"),
@@ -66,13 +77,6 @@ export default function ViewToggle({ resources, hasMore, loadingMore, onLoadMore
     });
     setResourceCategoryImages(rcMap);
 
-    const fMap: Record<string, string[]> = {};
-    (formatJunctionRes.data ?? []).forEach((row: any) => {
-      if (!fMap[row.resource_id]) fMap[row.resource_id] = [];
-      fMap[row.resource_id].push(row.format_id);
-    });
-    setResourceFormatMap(fMap);
-
     const mMap: Record<string, string[]> = {};
     (modeJunctionRes.data ?? []).forEach((row: any) => {
       if (!mMap[row.resource_id]) mMap[row.resource_id] = [];
@@ -84,6 +88,65 @@ export default function ViewToggle({ resources, hasMore, loadingMore, onLoadMore
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
+  // Fetch all resources for the active tab from Supabase directly
+  const fetchTabResources = useCallback(async (formatId: string) => {
+    if (fetchingTabRef.current === formatId) return;
+    fetchingTabRef.current = formatId;
+    setTabLoading(true);
+
+    const today = new Date().toISOString().split("T")[0];
+
+    // Start with resource IDs for this format
+    const { data: formatLinks } = await supabase
+      .from("resources_formats")
+      .select("resource_id")
+      .eq("format_id", formatId);
+    let ids: Set<string> = new Set((formatLinks ?? []).map((l: any) => l.resource_id));
+
+    // Apply active filters (categories, centerings, etc.)
+    if (filters) {
+      for (const [filterKey, selectedIds] of Object.entries(filters)) {
+        if (!selectedIds || selectedIds.size === 0) continue;
+        const junction = JUNCTION_MAP[filterKey];
+        if (!junction) continue;
+        const { data: links } = await supabase
+          .from(junction.table)
+          .select("resource_id")
+          .in(junction.fk, Array.from(selectedIds));
+        const filtered = new Set((links ?? []).map((l: any) => l.resource_id));
+        ids = new Set([...ids].filter((id) => filtered.has(id)));
+      }
+    }
+
+    // Apply elementId scope
+    if (elementId) {
+      const { data: eleLinks } = await supabase
+        .from("resources_elements")
+        .select("resource_id")
+        .eq("element_id", elementId);
+      const eleIds = new Set((eleLinks ?? []).map((l: any) => l.resource_id));
+      ids = new Set([...ids].filter((id) => eleIds.has(id)));
+    }
+
+    if (ids.size === 0) {
+      setTabResources((prev) => ({ ...prev, [formatId]: [] }));
+      fetchingTabRef.current = null;
+      setTabLoading(false);
+      return;
+    }
+
+    const { data } = await supabase
+      .from("resources")
+      .select("*")
+      .in("id", Array.from(ids))
+      .or(`expiration_date.is.null,expiration_date.gte.${today}`)
+      .order("created_at", { ascending: false });
+
+    setTabResources((prev) => ({ ...prev, [formatId]: data ?? [] }));
+    fetchingTabRef.current = null;
+    setTabLoading(false);
+  }, [filters, elementId]);
+
   // Build mode name lookup
   const modeLookup = Object.fromEntries(modes.map((m) => [m.id, m.name]));
 
@@ -92,60 +155,43 @@ export default function ViewToggle({ resources, hasMore, loadingMore, onLoadMore
     return modeIds.map((id) => modeLookup[id]).filter(Boolean);
   }
 
-  // Filter resources by active mode toggles
-  const modeFiltered = loaded ? resources.filter((r) => {
+  function passesMode(r: Resource): boolean {
     const modeNames = getResourceModeNames(r.id);
     const isInPerson = modeNames.includes("In Person");
     const isOnline = modeNames.includes("Online");
     const hasNoMode = modeNames.length === 0 || (!isInPerson && !isOnline);
-
     if (showInPerson && showOnline) return true;
     if (!showInPerson && !showOnline) return false;
     if (showInPerson && !showOnline) return isInPerson || hasNoMode;
     if (!showInPerson && showOnline) return isOnline || hasNoMode;
     return true;
-  }) : resources;
-
-  // Group by format tabs
-  const formatTabs: { format: FormatItem; count: number }[] = [];
-  const formatResourceMap: Record<string, Resource[]> = {};
-  const assignedIds = new Set<string>();
-
-  if (loaded) {
-    // Find the Services format ID to use as default for unassigned
-    const servicesFormat = formats.find((f) => f.name === "Services");
-
-    for (const format of formats) {
-      const matching = modeFiltered.filter((r) => {
-        const fIds = resourceFormatMap[r.id] ?? [];
-        return fIds.includes(format.id);
-      });
-      formatTabs.push({ format, count: dbFormatCounts[format.id] ?? matching.length });
-      formatResourceMap[format.id] = matching;
-      matching.forEach((r) => assignedIds.add(r.id));
-    }
-
-    // Unassigned resources go into Services
-    const unassigned = modeFiltered.filter((r) => !assignedIds.has(r.id));
-    if (servicesFormat) {
-      if (!formatResourceMap[servicesFormat.id]) {
-        formatResourceMap[servicesFormat.id] = [];
-      }
-      formatResourceMap[servicesFormat.id] = [...(formatResourceMap[servicesFormat.id] ?? []), ...unassigned];
-      const tab = formatTabs.find((t) => t.format.id === servicesFormat.id);
-      if (tab) tab.count = dbFormatCounts[servicesFormat.id] ?? formatResourceMap[servicesFormat.id].length;
-    }
   }
 
-  // Set default active tab
+  // All format tabs (shown regardless of what's currently loaded)
+  const formatTabs: { format: FormatItem; count: number }[] = loaded
+    ? formats.map((format) => ({ format, count: dbFormatCounts[format.id] ?? 0 }))
+    : [];
+
+  // Set default active tab to first format on load
   useEffect(() => {
     if (loaded && activeTab === null && formatTabs.length > 0) {
       setActiveTab(formatTabs[0].format.id);
     }
   }, [loaded, formatTabs.length]);
 
-  const activeResources = activeTab ? (formatResourceMap[activeTab] ?? []) : modeFiltered;
-  const mappable = modeFiltered.filter((r) => r.latitude && r.longitude);
+  // Fetch resources for active tab when it changes
+  useEffect(() => {
+    if (!activeTab || !loaded) return;
+    if (tabResources[activeTab] !== undefined) return; // already fetched
+    fetchTabResources(activeTab);
+  }, [activeTab, loaded, tabResources, fetchTabResources]);
+
+  // Apply mode filter to active tab's resources
+  const rawActiveResources = activeTab ? (tabResources[activeTab] ?? null) : null;
+  const activeResources = rawActiveResources ? rawActiveResources.filter(passesMode) : null;
+
+  // Map uses the prop resources (already filtered+paginated, good enough for pins)
+  const mappable = resources.filter((r) => r.latitude && r.longitude);
 
   return (
     <div>
@@ -157,8 +203,6 @@ export default function ViewToggle({ resources, hasMore, loadingMore, onLoadMore
 
       {!loaded ? (
         <p className="text-gray-500">Loading...</p>
-      ) : modeFiltered.length === 0 ? (
-        <p className="text-gray-500 dark:text-gray-400">No resources found.</p>
       ) : (
         <div>
           {/* Format tabs */}
@@ -181,15 +225,21 @@ export default function ViewToggle({ resources, hasMore, loadingMore, onLoadMore
           )}
 
           {/* Resources for active tab */}
-          <ResourceGrid
-            resources={activeResources}
-            hasMore={hasMore}
-            loadingMore={loadingMore}
-            onLoadMore={onLoadMore}
-            resourceModeMap={resourceModeMap}
-            modeLookup={modeLookup}
-            resourceCategoryImages={resourceCategoryImages}
-          />
+          {tabLoading || activeResources === null ? (
+            <p className="text-gray-500">Loading...</p>
+          ) : activeResources.length === 0 ? (
+            <p className="text-gray-500 dark:text-gray-400">No resources found.</p>
+          ) : (
+            <ResourceGrid
+              resources={activeResources}
+              hasMore={false}
+              loadingMore={false}
+              onLoadMore={undefined}
+              resourceModeMap={resourceModeMap}
+              modeLookup={modeLookup}
+              resourceCategoryImages={resourceCategoryImages}
+            />
+          )}
         </div>
       )}
     </div>

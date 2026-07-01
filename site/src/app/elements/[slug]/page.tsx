@@ -102,6 +102,8 @@ export default function WhyPage({ params }: WhyPageProps) {
           showInPerson={showInPerson}
           showOnline={showOnline}
           onLoadMore={loadMore}
+          filters={selected}
+          elementId={elementId}
         />
       )}
     </div>

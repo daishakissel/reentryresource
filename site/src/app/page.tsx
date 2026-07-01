@@ -55,6 +55,7 @@ export default function HomePage() {
           showMap={showMap}
           showInPerson={showInPerson}
           showOnline={showOnline}
+          filters={selected}
         />
       )}
     </div>
