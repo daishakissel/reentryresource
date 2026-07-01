@@ -23,6 +23,7 @@ export default function WhyPage({ params }: WhyPageProps) {
   const [showMap, setShowMap] = useState(false);
   const [showInPerson, setShowInPerson] = useState(true);
   const [showOnline, setShowOnline] = useState(true);
+  const [activeFormatId, setActiveFormatId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const stored = loadFilters();
@@ -68,13 +69,13 @@ export default function WhyPage({ params }: WhyPageProps) {
   }, [resolveTopics]);
 
   const { resources, loading, loadingMore, hasMore, loadInitial, loadMore } =
-    useInfiniteResources({ topicIds, elementId, filters: selected });
+    useInfiniteResources({ topicIds, elementId, filters: selected, formatId: activeFormatId });
 
   useEffect(() => {
     if (loaded && !resolving && topicIds !== undefined) {
       loadInitial();
     }
-  }, [loaded, resolving, topicIds, loadInitial]);
+  }, [loaded, resolving, topicIds, loadInitial, activeFormatId]);
 
   if (!category || category.slug === "all") notFound();
 
@@ -102,8 +103,7 @@ export default function WhyPage({ params }: WhyPageProps) {
           showInPerson={showInPerson}
           showOnline={showOnline}
           onLoadMore={loadMore}
-          filters={selected}
-          elementId={elementId}
+          onFormatChange={setActiveFormatId}
         />
       )}
     </div>

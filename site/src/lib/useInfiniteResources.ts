@@ -15,9 +15,10 @@ interface UseInfiniteResourcesOptions {
   topicIds?: string[];
   elementId?: string;
   filters: Record<string, Set<string>>;
+  formatId?: string;
 }
 
-export function useInfiniteResources({ topicIds, elementId, filters }: UseInfiniteResourcesOptions) {
+export function useInfiniteResources({ topicIds, elementId, filters, formatId }: UseInfiniteResourcesOptions) {
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -73,6 +74,20 @@ export function useInfiniteResources({ topicIds, elementId, filters }: UseInfini
       }
     }
 
+    // If scoped to a format tab, intersect with resources in that format
+    if (reset && formatId) {
+      const { data: formatLinks } = await supabase
+        .from("resources_formats")
+        .select("resource_id")
+        .eq("format_id", formatId);
+      const formatResourceIds = new Set((formatLinks ?? []).map((l: any) => l.resource_id));
+      if (matchedIdsRef.current === null) {
+        matchedIdsRef.current = Array.from(formatResourceIds);
+      } else {
+        matchedIdsRef.current = matchedIdsRef.current.filter((id) => formatResourceIds.has(id));
+      }
+    }
+
     // If filters resulted in no matches
     if (matchedIdsRef.current !== null && matchedIdsRef.current.length === 0) {
       if (reset) setResources([]);
@@ -121,7 +136,7 @@ export function useInfiniteResources({ topicIds, elementId, filters }: UseInfini
     setHasMore(newResources.length === PAGE_SIZE);
     setLoading(false);
     setLoadingMore(false);
-  }, [filters, topicIds, elementId]);
+  }, [filters, topicIds, elementId, formatId]);
 
   const loadInitial = useCallback(() => {
     fetchPage(0, true);

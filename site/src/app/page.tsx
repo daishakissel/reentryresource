@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import ViewToggle, { MapToggleButton, ModeToggleButtons, ViewControlsInfo } from "@/components/ViewToggle";
 import ResourceFilter from "@/components/ResourceFilter";
 import { useInfiniteResources } from "@/lib/useInfiniteResources";
@@ -12,6 +12,7 @@ export default function HomePage() {
   const [showMap, setShowMap] = useState(false);
   const [showInPerson, setShowInPerson] = useState(true);
   const [showOnline, setShowOnline] = useState(true);
+  const [activeFormatId, setActiveFormatId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     setSelected(loadFilters());
@@ -25,11 +26,15 @@ export default function HomePage() {
   }
 
   const { resources, loading, loadingMore, hasMore, loadInitial, loadMore } =
-    useInfiniteResources({ filters: selected });
+    useInfiniteResources({ filters: selected, formatId: activeFormatId });
 
   useEffect(() => {
     if (loaded) loadInitial();
-  }, [loaded, loadInitial]);
+  }, [loaded, loadInitial, activeFormatId]);
+
+  const handleFormatChange = useCallback((formatId: string) => {
+    setActiveFormatId(formatId);
+  }, []);
 
   if (!loaded) return <p className="text-gray-500">Loading...</p>;
 
@@ -52,10 +57,10 @@ export default function HomePage() {
           hasMore={hasMore}
           loadingMore={loadingMore}
           onLoadMore={loadMore}
+          onFormatChange={handleFormatChange}
           showMap={showMap}
           showInPerson={showInPerson}
           showOnline={showOnline}
-          filters={selected}
         />
       )}
     </div>
