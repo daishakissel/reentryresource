@@ -47,13 +47,14 @@ export default function HomePage() {
         <MapToggleButton showMap={showMap} onToggle={() => setShowMap((v) => !v)} />
         <ModeToggleButtons showInPerson={showInPerson} showOnline={showOnline} onToggleInPerson={() => setShowInPerson((v) => !v)} onToggleOnline={() => setShowOnline((v) => !v)} />
       </div>
-      {loading ? (
+      {loading && resources.length === 0 ? (
         <p className="text-gray-500">Loading resources...</p>
-      ) : resources.length === 0 ? (
+      ) : !loading && resources.length === 0 && !activeFormatId ? (
         <p className="text-gray-500 dark:text-gray-400">No resources match your filters.</p>
       ) : (
         <ViewToggle
           resources={resources}
+          loading={loading}
           hasMore={hasMore}
           loadingMore={loadingMore}
           onLoadMore={loadMore}

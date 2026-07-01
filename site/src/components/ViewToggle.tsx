@@ -20,6 +20,7 @@ interface ModeItem {
 
 interface ViewToggleProps {
   resources: Resource[];
+  loading?: boolean;
   hasMore?: boolean;
   loadingMore?: boolean;
   onLoadMore?: () => void;
@@ -29,7 +30,7 @@ interface ViewToggleProps {
   showOnline?: boolean;
 }
 
-export default function ViewToggle({ resources, hasMore, loadingMore, onLoadMore, onFormatChange, showMap = false, showInPerson = true, showOnline = true }: ViewToggleProps) {
+export default function ViewToggle({ resources, loading: resourcesLoading, hasMore, loadingMore, onLoadMore, onFormatChange, showMap = false, showInPerson = true, showOnline = true }: ViewToggleProps) {
   const [formats, setFormats] = useState<FormatItem[]>([]);
   const [modes, setModes] = useState<ModeItem[]>([]);
   const [resourceModeMap, setResourceModeMap] = useState<Record<string, string[]>>({});
@@ -144,7 +145,9 @@ export default function ViewToggle({ resources, hasMore, loadingMore, onLoadMore
             </div>
           )}
 
-          {modeFiltered.length === 0 ? (
+          {resourcesLoading ? (
+            <p className="text-gray-500">Loading resources...</p>
+          ) : modeFiltered.length === 0 ? (
             <p className="text-gray-500 dark:text-gray-400">No resources found.</p>
           ) : (
             <ResourceGrid
