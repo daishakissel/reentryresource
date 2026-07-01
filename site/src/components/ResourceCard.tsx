@@ -105,10 +105,7 @@ export default function ResourceCard({ resource, modeLabels = [], categoryImages
       )}
 
       <Link href={href}>
-        <div
-          className="bg-white dark:bg-ocean-light rounded-lg border border-gray-200 dark:border-ocean-light overflow-hidden hover:shadow-md transition-shadow cursor-pointer flex flex-col"
-          style={{ minHeight: "440px" }}
-        >
+        <div className="bg-white dark:bg-ocean-light rounded-lg border border-gray-200 dark:border-ocean-light overflow-hidden hover:shadow-md transition-shadow cursor-pointer flex flex-col">
           {/* Top: Title + organization */}
           <div className="px-4 py-2 border-b border-gray-100 dark:border-ocean flex-shrink-0 h-[64px] flex flex-col justify-center">
             <h3 className="font-semibold text-gray-900 dark:text-white line-clamp-2 text-sm leading-tight">{resource.title}</h3>
@@ -169,27 +166,25 @@ export default function ResourceCard({ resource, modeLabels = [], categoryImages
             </button>
           </div>
 
-          {/* Description dropdown (flex-1 fills the baseline height; keeps Engage pinned to the bottom) */}
-          <div className="flex-1 min-h-0 border-t border-gray-100 dark:border-ocean">
-            {resource.description && (
-              <>
-                <button
-                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); setDescOpen((v) => !v); }}
-                  className="w-full flex items-center justify-between px-4 py-2 text-xs font-semibold text-gray-900 dark:text-white hover:text-brand-gold transition-colors"
-                >
-                  <span>Description</span>
-                  <svg className={`w-4 h-4 transition-transform ${descOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                {descOpen && (
-                  <div className="px-4 pb-3" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
-                    <p className="text-xs text-gray-600 dark:text-gray-300">{resource.description}</p>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
+          {/* Description dropdown (same row height as Engage) */}
+          {resource.description && (
+            <div className="border-t border-gray-100 dark:border-ocean flex-shrink-0">
+              <button
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); setDescOpen((v) => !v); }}
+                className="w-full flex items-center justify-between px-4 py-2 text-sm font-semibold text-gray-900 dark:text-white hover:text-brand-gold transition-colors"
+              >
+                <span>Description</span>
+                <svg className={`w-4 h-4 transition-transform ${descOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {descOpen && (
+                <div className="px-4 pb-3" onClick={(e) => { e.preventDefault(); e.stopPropagation(); }}>
+                  <p className="text-xs text-gray-600 dark:text-gray-300">{resource.description}</p>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Engage footer */}
           {resource.engage && (
