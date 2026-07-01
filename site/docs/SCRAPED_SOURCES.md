@@ -38,6 +38,16 @@ Master list of all URLs provided for scraping. Each URL was explored to discover
 | 28 | https://www.irontribenetwork.org/ | Iron Tribe Network | 2026-07-01 | 2 |
 | 29 | https://janusyouth.org/ | Janus Youth Programs | 2026-07-01 | 4 |
 | 30 | https://juntosnw.com/ | Juntos NW | 2026-07-01 | 1 |
+| 31 | https://justmeninrecovery.com/ | Just Men in Recovery | 2026-07-01 | 1 |
+| 32 | https://www.miraclesclub.org/ | Miracles Club | 2026-07-01 | 2 |
+| 33 | https://www.namimultnomah.org/ | NAMI Multnomah | 2026-07-01 | 2 |
+| 34 | https://newnarrativepdx.org/ | New Narrative | 2026-07-01 | 3 |
+| 35 | https://oregonlawhelp.org/ | Oregon Law Help | 2026-07-01 | 1 |
+| 36 | https://www.oregonrecoveryresidences.org/en/ | Oregon Recovery Residences | 2026-07-01 | 1 |
+| 37 | https://outsidein.org/ | Outside In | 2026-07-01 | 5 |
+| 38 | https://www.paintedhorserecovery.org/ | Painted Horse Recovery | 2026-07-01 | 1 |
+| 39 | https://www.path-home.org/ | Path Home | 2026-07-01 | 2 |
+| 40 | https://pctdetox.com/ | Pacific Crest Trail Detox | 2026-07-01 | 2 |
 
 ---
 

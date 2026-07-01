@@ -10,17 +10,7 @@ Ordered crawl → walk → run: single-resource orgs first, then orgs with 2-3 k
 
 | # | URL | Organization (if known) | Notes | Added |
 |---|---|---|---|---|
-| 28 | https://justmeninrecovery.com/ | Just Men in Recovery | | 2026-06-30 |
 | 28b | https://www.familyshelter.org/ | My Father's House (Gresham) | Discovered while scraping Family Promise — NOT a Family Promise affiliate; independent Christ-centered family transitional housing in Gresham (food pantry, clothing, case management, children's center). 5003 W Powell Blvd, 503-492-3046 | 2026-07-01 |
-| 29 | https://www.miraclesclub.org/ | Miracles Club | | 2026-06-30 |
-| 30 | https://www.namimultnomah.org/peer-delivered-services | National Alliance on Mental Illness (NAMI) Multnomah | | 2026-06-30 |
-| 31 | https://newnarrativepdx.org/ | New Narrative | | 2026-06-30 |
-| 32 | https://oregonlawhelp.org/ | Oregon Law Help | | 2026-06-30 |
-| 33 | https://www.oregonrecoveryresidences.org/en/ | Oregon Recovery Residences | | 2026-06-30 |
-| 34 | https://outsidein.org/ | Outside In | | 2026-06-30 |
-| 35 | https://www.paintedhorserecovery.org/ | Painted Horse Recovery | | 2026-06-30 |
-| 36 | https://www.path-home.org/ | Path Homes Family Village | | 2026-06-30 |
-| 37 | https://pctdetox.com/ | Pacific Crest Trail Detox | | 2026-06-30 |
 | 38 | https://www.pearmentor.org/ | P:ear | | 2026-06-30 |
 | 39 | https://poisedproperties.com/ | Poised Properties | | 2026-06-30 |
 | 40 | https://www.portlandalano.org/home | Alano Club | | 2026-06-30 |
