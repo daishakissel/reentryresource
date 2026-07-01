@@ -10,7 +10,7 @@ Ordered crawl → walk → run: single-resource orgs first, then orgs with 2-3 k
 
 | # | URL | Organization (if known) | Notes | Added |
 |---|---|---|---|---|
-| 1 | https://www.arrayanimalrescue.org/ | Array Animal Rescue | | 2026-06-30 |
+| 1 | https://www.atlastreatmentcenter.com/ | Atlas Addiction Treatment Center of Oregon | | 2026-06-30 |
 | 3 | https://www.atlastreatmentcenter.com/ | Atlas Addiction Treatment Center of Oregon | | 2026-06-30 |
 | 4 | https://www.b4hpdx.org/ | Bikes for Humanity PDX | | 2026-06-30 |
 | 5 | https://www.boulder.care/ | Boulder Care | | 2026-06-30 |

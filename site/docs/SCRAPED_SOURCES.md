@@ -12,6 +12,7 @@ Master list of all URLs provided for scraping. Each URL was explored to discover
 | 2 | https://4drecovery.org/ | 4D Recovery | 2026-06-30 | 4 |
 | 3 | https://www.accesswireless.com/ | Access Wireless | 2026-06-30 | 1 |
 | 4 | https://anotherchancerehab.com/ | Another Chance Drug & Alcohol Treatment Center | 2026-06-30 | 9 |
+| 5 | https://www.arrayanimalrescue.org/ | Array Animal Rescue | 2026-06-30 | 2 |
 
 ---
 
