@@ -316,6 +316,7 @@ If nothing stood out, say so briefly rather than forcing a suggestion. The goal 
 - Children Support
 - Clothing
 - Crisis Hotlines
+- Day Center
 - Dental
 - Detox
 - Education
@@ -388,6 +389,7 @@ The test is: **is there an actionable next step (apply, call, attend, sign up), 
 - Immigrants, Refugees, Asylum Seekers
 - Justice Impacted
 - LGBTQIA2S+
+- Living with HIV
 - Low Barrier
 - Men
 - People in Recovery

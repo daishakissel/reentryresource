@@ -12,7 +12,11 @@ reentryresource/
 │   ├── docs/       # Documentation (schema, guides, scraping queue, etc.)
 │   ├── data/       # Source CSV files
 │   └── public/     # Static assets
-├── app/            # Expo (React Native) mobile app — early stage scaffold
+├── app/            # Expo (React Native) mobile app — self-coaching app (in development)
+│   ├── app/        # expo-router screens (tabs, element, resources, feature)
+│   ├── features/   # self-contained feature modules (resources, tractions, diary, ...)
+│   ├── lib/        # db (SQLite), elements registry, supabase client
+│   └── docs/       # Mobile app documentation
 └── CLAUDE.md       # This file
 ```
 
@@ -134,17 +138,17 @@ The database was renamed from the original WHY/WHAT/WHERE/HOW/WHO naming:
 - **Categories** (was WHAT Topics) — 32 service types
 - **Modes** (was WHERE + WHEN merged) — 3 access methods (In Person, Online, By Appointment Only)
 - **Formats** (was HOW) — 4 delivery types
-- **Centerings** (was WHO) — 20 populations served
+- **Centerings** (was WHO) — 21 populations served
 
 #### Tables (Live DB — verified July 2026)
 
 | Table | Rows | Notes |
 |---|---|---|
 | `elements` | 6 | Health, Housing, Admin, Income, Daily Essentials, My Team |
-| `categories` | 32 | Service types — see full list in SCRAPING_GUIDE.md |
+| `categories` | 33 | Service types — see full list in SCRAPING_GUIDE.md |
 | `modes` | 3 | In Person, Online, By Appointment Only |
 | `formats` | 4 | Services; Classes, Workshops & Meetings; Guidebooks; Volunteering |
-| `centerings` | 20 | Populations served — see full list in SCRAPING_GUIDE.md |
+| `centerings` | 21 | Populations served — see full list in SCRAPING_GUIDE.md |
 | `resources` | 16 | Main content table (12 CAO + 4 4D Recovery) |
 | `categories_elements` | 33 | Junction: which categories map to which elements |
 | `resources_categories` | varies | Junction: which categories each resource belongs to |
@@ -201,17 +205,42 @@ node scripts/migrate-images.js             # migrate external images to Supabase
 
 ## app/ — Expo React Native App
 
-Very early stage — currently the default Expo template with Supabase client wired up. No screens built yet.
+A **self-coaching app for reentry**, structured around the same 6 Elements as the
+site. All personal data is stored **locally on the device** (SQLite) — no online
+account, for user safety. Resources are read-only from the shared Supabase DB.
 
-- **Framework:** Expo ~57.0.1 with React Native 0.86
-- **Supabase:** `@supabase/supabase-js ^2.109.0` + `@react-native-async-storage/async-storage`
-- **Auth storage:** AsyncStorage (for session persistence on mobile)
-- **Entry point:** `app/index.ts` → `app/App.tsx`
-- **Config:** `app/app.json`, `app/tsconfig.json`
-- **Credentials:** `app/.env.local` (separate from site)
-- **Docs:** `app/docs/` — to be created
+**Full architecture & data model live in `app/docs/` — read those first.**
 
-To start: `cd app && npm install && npm start`
+### Tech Stack
+- **Framework:** Expo SDK **54** (React Native 0.81, React 19). New Architecture on.
+- **Routing:** `expo-router` (file-based, entry `expo-router/entry`)
+- **Local DB:** `expo-sqlite` (`lib/db/`) with a `user_version` migration runner
+- **Secrets/keys:** `expo-secure-store` (for the future app password / DB encryption)
+- **Resources:** `@supabase/supabase-js` — read-only (`lib/supabase.ts`, anon key only)
+- **Credentials:** `app/.env.local` — `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`
+
+### Core Concepts
+- **Elements** (`lib/elements.ts`) — the 6 spokes; slugs match the site.
+- **Feature modules** (`features/`, registered in `features/registry.ts`) — each
+  "sub-app" (Resources, Weight, Sober, ...) declares which Elements it appears
+  under. Adding a feature = add a registry entry + a screen under `app/`.
+- **Tractions** (`features/tractions/`) — daily action steps tagged to an Element;
+  aggregated centrally. Home badges + the Tractions tab both read this store.
+
+### Navigation
+- Bottom tabs: **Home · Tractions · Diary · Profile** (`app/(tabs)/`)
+- `app/element/[slug].tsx` — an Element's data-driven module menu
+- `app/resources/[element].tsx` — Resources module (Supabase, filtered by element)
+- `app/feature/*` — individual feature screens
+
+### Gotchas (learned the hard way — see docs/DEV_GUIDE.md)
+- `babel-preset-expo` **must match the SDK** (54.x). A mismatched version causes
+  cryptic `Property 'DOMException'/'PerformanceEntry' does not exist` boot errors.
+- Expo Go on the test device must support the project's SDK (54).
+- `Alert.prompt` is **iOS-only** — replace with a custom modal before Android.
+- After config/babel changes: `npx expo start --clear` and fully relaunch Expo Go.
+
+To start: `cd app && npm install && npx expo start`
 
 ---
 
@@ -223,4 +252,7 @@ To start: `cd app && npm install && npm start`
 - Site files moved from root `src/` to `site/src/` — **uncommitted, not yet pushed or deployed**
 - After committing the reorganization: update Vercel Root Directory setting to `site`
 - Scraping is underway — see `site/docs/SCRAPE_QUEUE.md` and `site/docs/SCRAPED_SOURCES.md`
-- Expo mobile app (`app/`) is a blank scaffold — not yet developed
+- Expo mobile app (`app/`) — architecture skeleton built: SQLite data core,
+  Elements grid + module menus, Tractions, Diary, and read-only Resources from
+  Supabase. See `app/docs/`. Feature modules (weight, sober, metaphor, app
+  password/encryption, on-device SLM) still to come.

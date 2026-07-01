@@ -34,7 +34,7 @@ Every resource is defined by 6 angles:
 
 **Income (5):** Benefits, Education, Skill Building, Employment & Career, Financial
 
-**Daily Essentials (6):** Clothing, Food, Phone, Email, Toiletries, Transport
+**Daily Essentials (7):** Clothing, Food, Phone, Email, Toiletries, Transport, Day Center
 
 **My Team (3):** Crisis Hotlines, Peer Support, Case Management
 
@@ -83,17 +83,18 @@ Every resource is defined by 6 angles:
 7. Immigrants, Refugees, Asylum Seekers
 8. Justice Impacted
 9. LGBTQIA2S+
-10. Low Barrier
-11. Men
-12. People in Recovery
-13. People with Disabilities
-14. People with Pets/Animals
-15. Seniors
-16. Spanish Speakers
-17. Survivors of Human Trafficking
-18. Veterans
-19. Women
-20. Youth & Children
+10. Living with HIV
+11. Low Barrier
+12. Men
+13. People in Recovery
+14. People with Disabilities
+15. People with Pets/Animals
+16. Seniors
+17. Spanish Speakers
+18. Survivors of Human Trafficking
+19. Veterans
+20. Women
+21. Youth & Children
 
 ---
 

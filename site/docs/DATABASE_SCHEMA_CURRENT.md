@@ -1,6 +1,6 @@
 # Reentry Resource — Live Database Schema
 
-> Auto-generated on 2026-07-01 12:11:33 UTC
+> Auto-generated on 2026-07-01 13:12:15 UTC
 > Run `npm run export-db-schema` to regenerate
 
 ## Elements (6)
@@ -14,7 +14,7 @@
 | 5 | Daily Essentials | daily-essentials | I want this resource to access material necessities (food, clothing, transport, comms) |
 | 6 | My Team | my-team | I want this resource to build my support network (peer support, relationships, community) |
 
-## Categories (32)
+## Categories (33)
 
 | # | Name | Slug |
 |---|---|---|
@@ -50,8 +50,9 @@
 | 30 | Transport | transport |
 | 31 | Utilities | utilities |
 | 32 | Health Insurance | health-insurance |
+| 33 | Day Center | day-center |
 
-## Category → Element Mappings (33)
+## Category → Element Mappings (34)
 
 | Category | Element |
 |---|---|
@@ -72,6 +73,7 @@
 | Housing | Housing |
 | Transport | Daily Essentials |
 | Skill Building | Income |
+| Day Center | Daily Essentials |
 | Peer Support | My Team |
 | Recovery | Health |
 | Toiletries | Daily Essentials |
@@ -106,7 +108,7 @@
 | 3 | Guidebooks | Online information resources — how-to guides, videos, podcasts, blog posts, infographics, step-by-step instructions |
 | 4 | Volunteering | Opportunity to volunteer time or skills |
 
-## Centerings (20)
+## Centerings (21)
 
 | # | Name | Definition |
 |---|---|---|
@@ -119,25 +121,26 @@
 | 7 | Immigrants, Refugees, Asylum Seekers | Centers on immigrant and refugee populations |
 | 8 | Justice Impacted | Serves people with criminal justice system involvement |
 | 9 | LGBTQIA2S+ | Centers on LGBTQ+ communities |
-| 10 | Low Barrier | Minimal/no requirements (no sobriety requirement, no ID needed, etc.) |
-| 11 | Men | Specifically serves men |
-| 12 | People in Recovery | Centers on people in addiction recovery |
-| 13 | People with Disabilities | Accessible and serving people with disabilities |
-| 14 | People with Pets/Animals | Welcomes or accommodates pets/animals |
-| 15 | Seniors | Serves older adults (55+, 60+, etc.) |
-| 16 | Spanish Speakers | Offers services in Spanish or centers on the Spanish-speaking community |
-| 17 | Survivors of Human Trafficking | Centers on trafficking survivors |
-| 18 | Veterans | Serves military veterans |
-| 19 | Women | Specifically serves women |
-| 20 | Youth & Children | Serves young people and children |
+| 10 | Living with HIV | Centers on or is specifically for people living with HIV/AIDS |
+| 11 | Low Barrier | Minimal/no requirements (no sobriety requirement, no ID needed, etc.) |
+| 12 | Men | Specifically serves men |
+| 13 | People in Recovery | Centers on people in addiction recovery |
+| 14 | People with Disabilities | Accessible and serving people with disabilities |
+| 15 | People with Pets/Animals | Welcomes or accommodates pets/animals |
+| 16 | Seniors | Serves older adults (55+, 60+, etc.) |
+| 17 | Spanish Speakers | Offers services in Spanish or centers on the Spanish-speaking community |
+| 18 | Survivors of Human Trafficking | Centers on trafficking survivors |
+| 19 | Veterans | Serves military veterans |
+| 20 | Women | Specifically serves women |
+| 21 | Youth & Children | Serves young people and children |
 
 ## Table Row Counts
 
 | Table | Rows |
 |---|---|
-| resources | 37 |
+| resources | 66 |
 | elements | 6 |
-| categories | 32 |
+| categories | 33 |
 | modes | 3 |
 | resources_formats | ? |
 | resources_centerings | ? |
