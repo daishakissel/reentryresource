@@ -65,6 +65,26 @@ Master list of all URLs provided for scraping. Each URL was explored to discover
 | 55 | https://www.therecoverygym.org/ | The Recovery Gym | 2026-07-01 | 1 |
 | 56 | https://www.truecolorsrecovery.org/ | True Colors | 2026-07-01 | 1 |
 | 57 | https://www.williamtemple.org/ | William Temple House | 2026-07-01 | 4 |
+| 58 | https://worksourceoregon.org/ | WorkSource Oregon | 2026-07-01 | 1 |
+| 59 | https://paulsusi.wordpress.com/pdx-id-assistance/ | PDX ID Assistance | 2026-07-01 | 1 |
+| 60 | https://sites.google.com/view/fernsplaceinc/home | Fern's Place | 2026-07-01 | 1 |
+| 61 | https://choosework.ssa.gov/ | Ticket to Work Program | 2026-07-01 | 1 |
+| 62 | https://www.clackamas.us/communitydevelopment/cccha | Clackamas County Coordinated Housing Access | 2026-07-01 | 1 |
+| 63 | https://healthcenter.multco.us/ | Multnomah County Community Health Center | 2026-07-01 | 3 |
+| 64 | https://multco.us/services/behavioral-health-crisis-services | Multnomah County Behavioral Health Call Center | 2026-07-01 | 1 |
+| 65 | https://www.ohsu.edu/.../harm-reduction-bridges-care-hrbr | OHSU Harm Reduction & Bridges to Care | 2026-07-01 | 1 |
+| 66 | https://www.portland.gov/fire/community-health/chat | CHAT Team (Portland Fire) | 2026-07-01 | 1 |
+| 67 | https://www.smpdx.org/clothes.html | Bethlehem Children's Clothes Closet | 2026-07-01 | 1 |
+| 68 | https://www.familyshelter.org/ | My Father's House (Gresham) | 2026-07-01 | 1 |
+| 69 | https://ugmportland.org/help-for-women | Union Gospel Mission Portland (LifeChange for Women) | 2026-07-01 | 1 |
+| 70 | https://blanchethouse.org/ | Blanchet House | 2026-07-01 | 4 |
+| 71 | https://ourjustfuture.org/ | Our Just Future | 2026-07-01 | 3 |
+| 72 | https://portlandrescuemission.org/ | Portland Rescue Mission | 2026-07-01 | 3 |
+| 73 | https://centralcityconcern.org/ | Central City Concern | 2026-07-01 | 6 |
+| 74 | https://www.voaor.org/ | Volunteers of America Oregon | 2026-07-01 | 2 |
+| 75 | https://www.dogoodmultnomah.org/refer | Do Good Multnomah | 2026-07-01 | 2 |
+| 76 | https://www.oregon.gov/odhs/benefits/ | Oregon Dept. of Human Services (ODHS) | 2026-07-01 | 5 |
+| 77 | https://www.tprojects.org/shelters | Transition Projects (TPI) | 2026-07-01 | 3 |
 
 ---
 
